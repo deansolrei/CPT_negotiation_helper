@@ -1,0 +1,51 @@
+{
+    "payer": {
+        "name": "Florida Blue",
+        "type": "Commercial"
+    },
+    "provider_entity": {
+        "npi_number": "1003521006",
+        "entity_type": "NPI2",
+        "legal_name": "Solrei Behavioral Health, Inc.",
+        "tax_id": "921227672"
+    },
+    "contract": {
+        "payer_contract_id": "1FMCO",
+        "product_line": "Commercial PPO",
+        "line_of_business": "Florida Blue",
+        "effective_date": "2026-01-01",
+        "end_date": null
+    },
+    "fee_schedule_lines": [
+        {
+            "cpt_code": "99214",
+            "modifier": "95",
+            "place_of_service": "10",
+            "unit_type": "per_service",
+            "allowed_amount": 135.00,
+            "effective_date": "2026-01-01",
+            "end_date": null,
+            "notes": "Telehealth home"
+        },
+        {
+            "cpt_code": "90833",
+            "modifier": "95",
+            "place_of_service": "10",
+            "unit_type": "per_service",
+            "allowed_amount": 70.00,
+            "effective_date": "2026-01-01",
+            "end_date": null,
+            "notes": "Telehealth psychotherapy add-on"
+        },
+        {
+            "cpt_code": "90792",
+            "modifier": null,
+            "place_of_service": "10",
+            "unit_type": "per_service",
+            "allowed_amount": 210.00,
+            "effective_date": "2026-01-01",
+            "end_date": null,
+            "notes": "Psych intake with medical"
+        }
+    ]
+}

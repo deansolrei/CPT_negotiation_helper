@@ -1,0 +1,42 @@
+{
+    "payer_name": "Florida Blue",
+    "provider_entity": {
+        "legal_name": "Solrei Behavioral Health, Inc.",
+        "npi_number": "1003521006"
+    },
+    "product_line": "Commercial PPO",
+    "as_of_date": "2026-01-01",
+    "codes": [
+        {
+            "cpt_code": "99214",
+            "short_description": "Est patient E/M moderate complexity",
+            "payer_allowed": 135.00,
+            "medicare_allowed": 110.00,
+            "pct_of_medicare": 122.7,
+            "target_pct_of_medicare": 130.0,
+            "target_allowed": 143.00,
+            "annual_volume": 420,
+            "annual_revenue_current": 56700.00,
+            "annual_revenue_at_target": 60060.00,
+            "annual_revenue_gap": 3360.00
+        },
+        {
+            "cpt_code": "90833",
+            "short_description": "Add-on psychotherapy 30 minutes with E/M",
+            "payer_allowed": 70.00,
+            "medicare_allowed": 62.00,
+            "pct_of_medicare": 112.9,
+            "target_pct_of_medicare": 130.0,
+            "target_allowed": 80.60,
+            "annual_volume": 350,
+            "annual_revenue_current": 24500.00,
+            "annual_revenue_at_target": 28210.00,
+            "annual_revenue_gap": 3710.00
+        }
+    ],
+    "summary": {
+        "total_annual_revenue_current": 81200.00,
+        "total_annual_revenue_at_target": 88270.00,
+        "total_annual_revenue_gap": 7070.00
+    }
+}

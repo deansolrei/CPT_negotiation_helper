@@ -1,0 +1,22 @@
+{
+    "fee_schedule_lines": [
+        {
+            "cpt_code": "99214",
+            "modifier": "95",
+            "place_of_service": "10",
+            "unit_type": "per_service",
+            "allowed_amount": 135.00,
+            "effective_date": "2026-01-01",
+            "end_date": null
+        },
+        {
+            "cpt_code": "90833",
+            "modifier": "95",
+            "place_of_service": "10",
+            "unit_type": "per_service",
+            "allowed_amount": 70.00,
+            "effective_date": "2026-01-01",
+            "end_date": null
+        }
+    ]
+}
