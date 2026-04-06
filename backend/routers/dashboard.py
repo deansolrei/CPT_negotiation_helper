@@ -8,7 +8,10 @@ These are the heart of the tool — they answer:
   - What should we ask for in negotiations?
 """
 
+import csv
+import io
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from backend.database import get_db
 from backend.models import (
     DashboardRow,
@@ -184,3 +187,51 @@ def delete_target(target_id: int):
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Target {target_id} not found")
     return {"message": f"Target {target_id} deleted successfully"}
+
+
+# ── CSV Export ────────────────────────────────────────────────
+
+@router.get("/dashboard/export")
+def export_dashboard_csv(payer_id: int = None, underpaid_only: bool = False):
+    """
+    Export the full negotiation dashboard as a CSV file.
+    Optional filters: payer_id, underpaid_only.
+    """
+    filters = []
+    params  = []
+    if payer_id:
+        filters.append("payer_id = %s")
+        params.append(payer_id)
+    if underpaid_only:
+        filters.append("is_underpaid = TRUE")
+
+    where = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+    with get_db() as cur:
+        cur.execute(f"SELECT * FROM v_negotiation_dashboard {where}", params)
+        rows = cur.fetchall()
+
+    if not rows:
+        raise HTTPException(status_code=404, detail="No data found for export.")
+
+    output = io.StringIO()
+    columns = [
+        "payer_name", "provider_name", "npi_number", "entity_type",
+        "payer_contract_id", "product_line", "cpt_code", "short_description",
+        "category", "modifier", "payer_allowed", "medicare_allowed",
+        "pct_of_medicare", "target_pct_of_medicare", "target_allowed",
+        "rate_gap_per_unit", "is_underpaid", "annual_volume", "volume_year",
+        "annual_revenue_current", "annual_revenue_at_target", "annual_revenue_gap",
+    ]
+    writer = csv.DictWriter(output, fieldnames=columns, extrasaction="ignore")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow({k: row.get(k) for k in columns})
+
+    output.seek(0)
+    filename = f"negotiation_dashboard_export.csv"
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

@@ -15,7 +15,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
-from backend.routers import payers, contracts, fee_schedules, dashboard
+from backend.routers import payers, contracts, fee_schedules, dashboard, letters
 
 # Path to the dashboard HTML file (one level up from this file)
 DASHBOARD_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dashboard.html")
@@ -43,6 +43,7 @@ app.include_router(payers.router)
 app.include_router(contracts.router)
 app.include_router(fee_schedules.router)
 app.include_router(dashboard.router)
+app.include_router(letters.router)
 
 
 @app.get("/dashboard", tags=["Dashboard"], include_in_schema=False)
