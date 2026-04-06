@@ -4,7 +4,7 @@
 -- A NULL cpt_code means the target applies to all codes for that payer.
 -- Specificity wins: payer+code > payer-only > global default.
 
-CREATE TABLE negotiation_targets (
+CREATE TABLE IF NOT EXISTS negotiation_targets (
     target_id              SERIAL PRIMARY KEY,
     payer_id               INTEGER REFERENCES payers(payer_id),     -- NULL = global default
     cpt_code               VARCHAR(10) REFERENCES cpt_codes(cpt_code), -- NULL = all codes
@@ -18,8 +18,8 @@ CREATE TABLE negotiation_targets (
 );
 
 -- Index to speed up lookups when the dashboard resolves targets
-CREATE INDEX idx_negotiation_targets_payer ON negotiation_targets(payer_id);
-CREATE INDEX idx_negotiation_targets_code  ON negotiation_targets(cpt_code);
+CREATE INDEX IF NOT EXISTS idx_negotiation_targets_payer ON negotiation_targets(payer_id);
+CREATE INDEX IF NOT EXISTS idx_negotiation_targets_code  ON negotiation_targets(cpt_code);
 
 -- Helper function: resolve the most specific target for a given payer+code pair.
 -- Priority: (payer+code) > (payer only) > (global default)

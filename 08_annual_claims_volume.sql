@@ -5,7 +5,7 @@
 --   annual_revenue_at_target  = target_allowed  × annual_volume
 --   annual_revenue_gap        = at_target - current
 
-CREATE TABLE annual_claims_volume (
+CREATE TABLE IF NOT EXISTS annual_claims_volume (
     volume_id       SERIAL PRIMARY KEY,
     contract_id     INTEGER     NOT NULL REFERENCES contracts(contract_id),
     cpt_code        VARCHAR(10) NOT NULL REFERENCES cpt_codes(cpt_code),
@@ -19,6 +19,6 @@ CREATE TABLE annual_claims_volume (
     UNIQUE (contract_id, cpt_code, modifier, calendar_year)
 );
 
-CREATE INDEX idx_acv_contract  ON annual_claims_volume(contract_id);
-CREATE INDEX idx_acv_cpt       ON annual_claims_volume(cpt_code);
-CREATE INDEX idx_acv_year      ON annual_claims_volume(calendar_year);
+CREATE INDEX IF NOT EXISTS idx_acv_contract  ON annual_claims_volume(contract_id);
+CREATE INDEX IF NOT EXISTS idx_acv_cpt       ON annual_claims_volume(cpt_code);
+CREATE INDEX IF NOT EXISTS idx_acv_year      ON annual_claims_volume(calendar_year);

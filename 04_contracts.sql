@@ -1,4 +1,4 @@
-CREATE TABLE contracts (
+CREATE TABLE IF NOT EXISTS contracts (
     contract_id         SERIAL PRIMARY KEY,
     payer_id            INTEGER NOT NULL REFERENCES payers(payer_id),
     provider_entity_id  INTEGER NOT NULL REFERENCES provider_entities(provider_entity_id),

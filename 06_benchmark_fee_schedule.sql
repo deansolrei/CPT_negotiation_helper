@@ -1,4 +1,4 @@
-CREATE TABLE benchmark_fee_schedule (
+CREATE TABLE IF NOT EXISTS benchmark_fee_schedule (
     benchmark_id        SERIAL PRIMARY KEY,
     source_name         VARCHAR(100) NOT NULL,   -- 'Medicare 2026', 'FL Medicaid 2026'
     locality            VARCHAR(50),             -- e.g. 'FL', 'National'

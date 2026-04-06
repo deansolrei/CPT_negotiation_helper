@@ -1,4 +1,4 @@
-CREATE TABLE cpt_codes (
+CREATE TABLE IF NOT EXISTS cpt_codes (
     cpt_code              VARCHAR(10) PRIMARY KEY,   -- e.g. '99214'
     short_description     VARCHAR(255) NOT NULL,
     category              VARCHAR(50)  NOT NULL,

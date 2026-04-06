@@ -12,7 +12,8 @@ INSERT INTO payers (payer_name, payer_display_name, payer_type, payer_notes) VAL
     ('Aetna',         'Aetna',                      'Commercial', 'Group PID: TBD. Individual (Jodene Jensen) PID: 8646882'),
     ('Ambetter',      'Ambetter (Sunshine Health)', 'Exchange',   'ACA marketplace plan. Group ICM: 305011'),
     ('Cigna',         'Cigna',                      'Commercial', 'Individual (Jodene Jensen) PID: 62308'),
-    ('Optum / UHC',   'Optum / United Health Care', 'Commercial', 'Group PID: 008492809. Individual (Jodene Jensen) PID: 008492810');
+    ('Optum / UHC',   'Optum / United Health Care', 'Commercial', 'Group PID: 008492809. Individual (Jodene Jensen) PID: 008492810')
+ON CONFLICT DO NOTHING;
 
 
 -- ============================================================
@@ -23,7 +24,8 @@ INSERT INTO provider_entities (legal_name, npi_number, entity_type, tax_id, acti
     ('Jodene Jensen, PMHNP-BC',        '1093433955', 'NPI1', '921227672', TRUE,  'Psychiatric Mental Health Nurse Practitioner'),
     ('Katherine Robins, PMHNP-BC',     '1831127117', 'NPI1', '921227672', TRUE,  'Psychiatric Mental Health Nurse Practitioner'),
     ('Megan Ramirez, PMHNP-BC',        '1801895636', 'NPI1', '921227672', TRUE,  'Psychiatric Mental Health Nurse Practitioner'),
-    ('Lori Kistler, PMHNP-BC',         '1376234641', 'NPI1', '921227672', TRUE,  'Psychiatric Mental Health Nurse Practitioner');
+    ('Lori Kistler, PMHNP-BC',         '1376234641', 'NPI1', '921227672', TRUE,  'Psychiatric Mental Health Nurse Practitioner')
+ON CONFLICT DO NOTHING;
 
 
 -- ============================================================

@@ -1,4 +1,4 @@
-CREATE TABLE provider_entities (
+CREATE TABLE IF NOT EXISTS provider_entities (
     provider_entity_id SERIAL PRIMARY KEY,
     legal_name         VARCHAR(150) NOT NULL,      -- e.g. 'Solrei Behavioral Health, Inc.'
     npi_number         VARCHAR(10)  NOT NULL,

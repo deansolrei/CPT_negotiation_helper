@@ -1,4 +1,4 @@
-CREATE TABLE fee_schedule_lines (
+CREATE TABLE IF NOT EXISTS fee_schedule_lines (
     fee_schedule_line_id SERIAL PRIMARY KEY,
     contract_id          INTEGER NOT NULL REFERENCES contracts(contract_id),
     cpt_code             VARCHAR(10) NOT NULL REFERENCES cpt_codes(cpt_code),

@@ -176,6 +176,47 @@
     footer {
       text-align: center; padding: 24px; font-size: 0.75rem; color: #94a3b8;
     }
+
+    /* ── Channel Comparison ──────────────────────────────── */
+    .upload-zone {
+      border: 2px dashed #cbd5e1; border-radius: 10px;
+      padding: 20px 24px; text-align: center;
+      background: #f8fafc; margin-bottom: 16px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .upload-zone.drag-over { border-color: #2563a8; background: #eff6ff; }
+    .upload-zone p { color: #64748b; font-size: 0.82rem; margin-top: 6px; }
+    .upload-zone input[type="file"] { display: none; }
+
+    .channel-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+    }
+    .channel-direct       { background: #dbeafe; color: #1d4ed8; }
+    .channel-intermediary { background: #d1fae5; color: #065f46; }
+    .channel-tie          { background: #fef3c7; color: #92400e; }
+    .channel-na           { background: #f1f5f9; color: #94a3b8; }
+
+    .rate-best  { font-weight: 700; color: #059669; }
+    .rate-lower { color: #94a3b8; }
+
+    .tab-bar {
+      display: flex; gap: 4px; margin-bottom: 16px;
+    }
+    .tab-btn {
+      padding: 6px 16px; border-radius: 6px; font-size: 0.8rem;
+      font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0;
+      background: white; color: #64748b; transition: all 0.15s;
+    }
+    .tab-btn.active { background: #2563a8; color: white; border-color: #2563a8; }
+
+    .upload-status {
+      padding: 10px 16px; border-radius: 7px; font-size: 0.82rem;
+      margin-top: 10px; display: none;
+    }
+    .upload-status.success { background: #dcfce7; color: #166534; display: block; }
+    .upload-status.error   { background: #fee2e2; color: #dc2626; display: block; }
+    .upload-status.loading { background: #eff6ff; color: #2563a8; display: block; }
   </style>
 </head>
 <body>
@@ -283,6 +324,94 @@
       </tbody>
     </table>
   </div>
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- Billing Channel Comparison                            -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:12px;">
+    Billing Channel Comparison
+    <span>— Direct billing vs Headway · Alma · Grow Therapy</span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-sm" onclick="downloadChannelTemplate()"
+        style="background:#0891b2;" title="Download blank CSV template to fill in rates">
+        ⬇ Rate Template CSV
+      </button>
+      <button class="btn btn-sm" onclick="exportChannelCSV()"
+        style="background:#059669;" title="Export full comparison as CSV">
+        ⬇ Export Comparison
+      </button>
+    </div>
+  </div>
+
+  <!-- Upload panel -->
+  <div class="table-wrap" style="padding:20px;">
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+
+      <!-- Upload zone -->
+      <div style="flex:1;min-width:280px;">
+        <div style="font-weight:600;font-size:0.82rem;color:#475569;margin-bottom:8px;">
+          📤 Upload Intermediary Rates CSV
+        </div>
+        <div class="upload-zone" id="upload-zone"
+          ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event)" onclick="document.getElementById('rate-file-input').click()">
+          <div style="font-size:1.4rem;margin-bottom:4px;">📂</div>
+          <strong style="font-size:0.85rem;color:#1a2332;">Click or drag to upload rates CSV</strong>
+          <p>Fill in the Rate Template CSV with Headway, Alma, and Grow Therapy rates,<br>
+             then upload here. Safe to re-upload — existing rates will be updated.</p>
+          <input type="file" id="rate-file-input" accept=".csv" onchange="uploadRatesCSV(this.files[0])">
+        </div>
+        <div id="upload-status" class="upload-status"></div>
+      </div>
+
+      <!-- How it works -->
+      <div style="flex:1;min-width:240px;background:#f8fafc;border-radius:8px;padding:16px;font-size:0.8rem;color:#475569;line-height:1.6;">
+        <strong style="color:#1a2332;font-size:0.85rem;">How to update rates:</strong><br><br>
+        1. Click <strong>⬇ Rate Template CSV</strong> to download a pre-filled template<br>
+        2. Open in Excel or Numbers<br>
+        3. Fill in the <code>allowed_amount</code> column for each intermediary + CPT code<br>
+        4. Drag &amp; drop the saved file above (or click to browse)<br>
+        5. The comparison table updates automatically<br><br>
+        <strong>Columns:</strong> intermediary_name · payer_name (blank = all payers) ·
+        cpt_code · state · allowed_amount · effective_date · notes
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison table filters -->
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+    <div class="tab-bar" id="channel-payer-tabs">
+      <button class="tab-btn active" onclick="filterChannelTable(null, this)">All Payers</button>
+    </div>
+    <label style="font-size:0.8rem;font-weight:500;cursor:pointer;margin-left:auto;">
+      <input type="checkbox" id="channel-best-only" onchange="renderChannelTable()">
+      Show only where intermediary pays more
+    </label>
+  </div>
+
+  <!-- Comparison table -->
+  <div class="table-wrap">
+    <table id="channel-table">
+      <thead>
+        <tr>
+          <th>Payer</th>
+          <th>CPT</th>
+          <th>Description</th>
+          <th class="right">Medicare</th>
+          <th class="right">Direct</th>
+          <th class="right">Headway</th>
+          <th class="right">Alma</th>
+          <th class="right">Grow Therapy</th>
+          <th class="center">Best Channel</th>
+        </tr>
+      </thead>
+      <tbody id="channel-tbody">
+        <tr><td colspan="9" class="empty">
+          No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
 </main>
 
 <footer>Solrei CPT Negotiation Helper · Data source: Medicare 2026 FL, payer contracts · Target: 130% of Medicare</footer>
@@ -585,8 +714,164 @@ function exportCSV(payerId = null) {
   window.open(url, '_blank');
 }
 
+// ── Channel Comparison ────────────────────────────────────
+let channelData       = [];
+let channelPayerFilter = null;
+
+async function loadChannelComparison() {
+  try {
+    channelData = await fetchJSON('channel-comparison');
+    buildChannelPayerTabs();
+    renderChannelTable();
+  } catch(e) {
+    // Not an error if no data yet — just show empty state
+    if (!e.message.includes('404')) {
+      console.warn('Channel comparison:', e.message);
+    }
+  }
+}
+
+function buildChannelPayerTabs() {
+  const tabBar = document.getElementById('channel-payer-tabs');
+  const payers = [...new Map(channelData.map(r => [r.payer_id, r.payer_name])).entries()];
+  tabBar.innerHTML = `<button class="tab-btn ${channelPayerFilter === null ? 'active' : ''}"
+    onclick="filterChannelTable(null, this)">All Payers</button>` +
+    payers.map(([id, name]) =>
+      `<button class="tab-btn ${channelPayerFilter === id ? 'active' : ''}"
+        onclick="filterChannelTable(${id}, this)">${name.split(' ')[0]}</button>`
+    ).join('');
+}
+
+function filterChannelTable(payerId, btn) {
+  channelPayerFilter = payerId;
+  document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderChannelTable();
+}
+
+function renderChannelTable() {
+  const tbody    = document.getElementById('channel-tbody');
+  const bestOnly = document.getElementById('channel-best-only').checked;
+
+  let rows = channelData;
+  if (channelPayerFilter != null) rows = rows.filter(r => r.payer_id === channelPayerFilter);
+  if (bestOnly) rows = rows.filter(r => r.best_channel_type === 'Intermediary');
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">
+      ${channelData.length === 0
+        ? 'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.'
+        : 'No rows match the current filter.'}
+    </td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => {
+    const direct  = r.direct_rate;
+    const headway = r.headway_rate;
+    const alma    = r.alma_rate;
+    const grow    = r.grow_rate;
+
+    // Find best rate value for highlighting
+    const candidates = [direct, headway, alma, grow].filter(v => v != null);
+    const best = candidates.length ? Math.max(...candidates) : null;
+
+    function rateCell(val) {
+      if (val == null) return `<span style="color:#cbd5e1">—</span>`;
+      const cls = (best != null && val === best && candidates.filter(v => v === best).length === 1)
+        ? 'rate-best' : (val < best ? 'rate-lower' : '');
+      return `<span class="${cls}">${fmt$(val)}</span>`;
+    }
+
+    // Best channel badge
+    let channelBadge;
+    if (r.best_channel_type === 'Direct') {
+      channelBadge = `<span class="channel-badge channel-direct">Direct</span>`;
+    } else if (r.best_channel_type === 'Intermediary') {
+      // Find which intermediary
+      const best3 = [['Headway', headway], ['Alma', alma], ['Grow', grow]];
+      const winner = best3.filter(([,v]) => v === best).map(([n]) => n).join(' / ');
+      channelBadge = `<span class="channel-badge channel-intermediary">▲ ${winner || 'Intermediary'}</span>`;
+    } else {
+      channelBadge = `<span class="channel-badge channel-na">No data</span>`;
+    }
+
+    return `
+      <tr>
+        <td style="font-size:0.8rem;">${r.payer_name || '—'}</td>
+        <td><strong>${r.cpt_code}</strong></td>
+        <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.78rem;color:#475569">${r.short_description || ''}</td>
+        <td class="right" style="color:#64748b;font-size:0.8rem">${fmt$(r.medicare_allowed)}</td>
+        <td class="right">${rateCell(direct)}</td>
+        <td class="right">${rateCell(headway)}</td>
+        <td class="right">${rateCell(alma)}</td>
+        <td class="right">${rateCell(grow)}</td>
+        <td class="center">${channelBadge}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ── Template download ─────────────────────────────────────
+function downloadChannelTemplate() {
+  window.open('/api/intermediaries/template', '_blank');
+}
+
+function exportChannelCSV() {
+  const url = channelPayerFilter
+    ? `/api/channel-comparison/export?payer_id=${channelPayerFilter}`
+    : '/api/channel-comparison/export';
+  window.open(url, '_blank');
+}
+
+// ── CSV upload ────────────────────────────────────────────
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  document.getElementById('upload-zone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) uploadRatesCSV(file);
+}
+
+async function uploadRatesCSV(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('upload-status');
+  statusEl.className = 'upload-status loading';
+  statusEl.textContent = `⏳ Uploading ${file.name}…`;
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const r = await fetch('/api/intermediaries/import', { method: 'POST', body: formData });
+    const result = await r.json();
+
+    if (!r.ok) throw new Error(result.detail || 'Upload failed');
+
+    statusEl.className = 'upload-status success';
+    statusEl.innerHTML = `✓ ${result.message}` +
+      (result.errors.length ? `<br><small style="color:#b45309">Warnings: ${result.errors.join('; ')}</small>` : '');
+
+    // Refresh the channel comparison table
+    await loadChannelComparison();
+
+    // Reset file input
+    document.getElementById('rate-file-input').value = '';
+  } catch(e) {
+    statusEl.className = 'upload-status error';
+    statusEl.textContent = `✗ Upload failed: ${e.message}`;
+  }
+}
+
 // ── Boot ──────────────────────────────────────────────────
 loadAll();
+loadChannelComparison();
 </script>
 </body>
 </html>
