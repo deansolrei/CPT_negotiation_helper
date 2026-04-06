@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solrei CPT Negotiation Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f0f4f8;
+      color: #1a2332;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a3a5c 0%, #2563a8 100%);
+      color: white;
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
+    header p  { font-size: 0.8rem; opacity: 0.75; margin-top: 3px; }
+    #status-badge {
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-weight: 600;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    #status-badge.ok     { background: #16a34a22; border-color: #16a34a; color: #4ade80; }
+    #status-badge.error  { background: #dc262622; border-color: #dc2626; color: #f87171; }
+
+    /* ── Main layout ─────────────────────────────────────── */
+    main { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+
+    /* ── Summary cards ───────────────────────────────────── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      border-left: 4px solid #2563a8;
+    }
+    .card.gap  { border-left-color: #dc2626; }
+    .card.ok   { border-left-color: #16a34a; }
+    .card label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #64748b; font-weight: 600; }
+    .card .value { font-size: 1.7rem; font-weight: 700; margin-top: 4px; color: #1a2332; }
+    .card.gap .value { color: #dc2626; }
+    .card.ok  .value { color: #16a34a; }
+
+    /* ── Section titles ──────────────────────────────────── */
+    .section-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a2332;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #64748b;
+    }
+
+    /* ── Tables ──────────────────────────────────────────── */
+    .table-wrap {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    thead tr { background: #f8fafc; }
+    thead th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      border-bottom: 2px solid #e2e8f0;
+      white-space: nowrap;
+    }
+    thead th.right { text-align: right; }
+    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 11px 14px; }
+    tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
+    tbody td.center { text-align: center; }
+
+    /* ── Payer summary row ────────────────────────────────── */
+    .payer-row { cursor: pointer; }
+    .payer-row:hover { background: #eff6ff !important; }
+    .payer-name { font-weight: 600; color: #2563a8; }
+    .payer-name:hover { text-decoration: underline; }
+    .expand-icon { color: #94a3b8; font-size: 0.8rem; transition: transform 0.2s; }
+    .expanded .expand-icon { transform: rotate(90deg); }
+
+    /* ── Badges ──────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+    .badge-red    { background: #fee2e2; color: #dc2626; }
+    .badge-green  { background: #dcfce7; color: #16a34a; }
+    .badge-yellow { background: #fef9c3; color: #b45309; }
+    .badge-gray   { background: #f1f5f9; color: #64748b; }
+    .badge-blue   { background: #dbeafe; color: #2563a8; }
+
+    /* ── Drilldown panel ─────────────────────────────────── */
+    .drilldown-row td { padding: 0 !important; background: #f8fafc !important; }
+    .drilldown-inner  { padding: 0 16px 16px; }
+    .drilldown-title  {
+      font-size: 0.8rem; font-weight: 700; color: #475569;
+      padding: 12px 0 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .drilldown-row table thead tr { background: #f1f5f9; }
+
+    /* ── Pct bar ─────────────────────────────────────────── */
+    .pct-bar-wrap { display: flex; align-items: center; gap: 8px; }
+    .pct-bar-bg {
+      flex: 1; height: 6px; background: #e2e8f0;
+      border-radius: 3px; overflow: hidden; min-width: 60px;
+    }
+    .pct-bar-fill { height: 100%; border-radius: 3px; }
+
+    /* ── Loading / empty states ──────────────────────────── */
+    .loading {
+      text-align: center; padding: 48px; color: #94a3b8; font-size: 0.9rem;
+    }
+    .empty {
+      text-align: center; padding: 32px; color: #94a3b8; font-size: 0.85rem;
+    }
+    .error-msg {
+      background: #fee2e2; color: #dc2626; border-radius: 8px;
+      padding: 16px 20px; margin-bottom: 20px; font-size: 0.85rem;
+    }
+
+    /* ── Refresh button ──────────────────────────────────── */
+    .btn {
+      background: #2563a8; color: white; border: none;
+      border-radius: 7px; padding: 8px 18px; font-size: 0.82rem;
+      font-weight: 600; cursor: pointer; transition: background 0.15s;
+    }
+    .btn:hover { background: #1d4ed8; }
+    .btn-sm { padding: 5px 12px; font-size: 0.75rem; border-radius: 5px; }
+
+    /* ── Target line annotation ──────────────────────────── */
+    .target-note {
+      font-size: 0.72rem; color: #64748b; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .target-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    footer {
+      text-align: center; padding: 24px; font-size: 0.75rem; color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏥 Solrei CPT Negotiation Dashboard</h1>
+    <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <button class="btn btn-sm" onclick="loadAll()">↻ Refresh</button>
+    <div id="status-badge">Connecting…</div>
+  </div>
+</header>
+
+<main>
+  <div id="error-container"></div>
+
+  <!-- Summary cards -->
+  <div class="cards" id="cards">
+    <div class="card"><label>Payers Loaded</label><div class="value" id="c-payers">—</div></div>
+    <div class="card"><label>CPT Codes Tracked</label><div class="value" id="c-codes">—</div></div>
+    <div class="card gap"><label>Underpaid Codes</label><div class="value" id="c-underpaid">—</div></div>
+    <div class="card gap"><label>Est. Annual Revenue Gap</label><div class="value" id="c-gap">—</div></div>
+    <div class="card"><label>Est. Revenue at Target</label><div class="value" id="c-target">—</div></div>
+    <div class="card"><label>Target vs. Medicare</label><div class="value" id="c-pct">130%</div></div>
+  </div>
+
+  <!-- Payer Summary Table -->
+  <div class="section-title">
+    Payer Summary
+    <span>— click any row to see underpaid codes for that payer</span>
+  </div>
+  <div class="table-wrap">
+    <table id="payer-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Payer</th>
+          <th class="right">Codes w/ Rates</th>
+          <th class="right">Codes Underpaid</th>
+          <th class="right">Avg % of Medicare</th>
+          <th class="right">Current Revenue</th>
+          <th class="right">Revenue at Target</th>
+          <th class="right">Revenue Gap</th>
+        </tr>
+      </thead>
+      <tbody id="payer-tbody">
+        <tr><td colspan="8" class="loading">Loading payer data…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Full Dashboard Table -->
+  <div class="section-title">
+    All Codes — All Payers
+    <span>— showing underpaid codes only</span>
+    <label style="margin-left:auto;font-size:0.8rem;font-weight:500;cursor:pointer;">
+      <input type="checkbox" id="show-all" onchange="renderFullTable()"> Show all codes
+    </label>
+  </div>
+  <div class="table-wrap">
+    <table id="full-table">
+      <thead>
+        <tr>
+          <th>Payer</th>
+          <th>Provider</th>
+          <th>Code</th>
+          <th>Description</th>
+          <th class="right">Payer Rate</th>
+          <th class="right">Medicare</th>
+          <th class="right">% of Med</th>
+          <th class="right">Target</th>
+          <th class="right">Gap/Unit</th>
+          <th class="right">Volume</th>
+          <th class="right">Annual Gap $</th>
+          <th class="center">Status</th>
+        </tr>
+      </thead>
+      <tbody id="full-tbody">
+        <tr><td colspan="12" class="loading">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer>Solrei CPT Negotiation Helper · Data source: Medicare 2026 FL, payer contracts · Target: 130% of Medicare</footer>
+
+<script>
+const API = 'http://localhost:8000/api';
+let summaryData = [];
+let dashboardData = [];
+
+// ── Utilities ─────────────────────────────────────────────
+const fmt$ = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtK = v => v == null ? '—' : '$' + (Number(v)/1000).toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1}) + 'K';
+const fmtPct = v => v == null ? '—' : Number(v).toFixed(1) + '%';
+const fmtN = v => v == null ? '—' : Number(v).toLocaleString('en-US');
+
+function pctColor(pct, target) {
+  if (pct == null) return '#94a3b8';
+  const ratio = pct / (target || 130);
+  if (ratio >= 1)    return '#16a34a';
+  if (ratio >= 0.90) return '#b45309';
+  return '#dc2626';
+}
+
+function pctBadge(pct, target) {
+  if (pct == null) return `<span class="badge badge-gray">—</span>`;
+  const ratio = pct / (target || 130);
+  const cls = ratio >= 1 ? 'badge-green' : ratio >= 0.90 ? 'badge-yellow' : 'badge-red';
+  return `<span class="badge ${cls}">${fmtPct(pct)}</span>`;
+}
+
+function statusBadge(isUnderpaid, pct, target) {
+  if (isUnderpaid === true)  return `<span class="badge badge-red">↓ Underpaid</span>`;
+  if (isUnderpaid === false) return `<span class="badge badge-green">✓ On Target</span>`;
+  return `<span class="badge badge-gray">No Data</span>`;
+}
+
+async function fetchJSON(path) {
+  const r = await fetch(`${API}/${path}`);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+// ── Load everything ───────────────────────────────────────
+async function loadAll() {
+  setStatus('loading');
+  document.getElementById('error-container').innerHTML = '';
+  try {
+    const [health, summary, dashboard] = await Promise.all([
+      fetchJSON('health'),   // wait — actually health is at /health not /api/health
+      fetchJSON('dashboard/summary'),
+      fetchJSON('dashboard'),
+    ]);
+    summaryData   = summary;
+    dashboardData = dashboard;
+    renderCards();
+    renderPayerTable();
+    renderFullTable();
+    setStatus('ok');
+  } catch(e) {
+    setStatus('error');
+    document.getElementById('error-container').innerHTML =
+      `<div class="error-msg">⚠️ Could not connect to API. Make sure uvicorn is running: <code>uvicorn backend.main:app --reload</code><br><small>${e.message}</small></div>`;
+  }
+}
+
+// Also load health separately (it's at /health not /api/health)
+async function checkHealth() {
+  try {
+    const r = await fetch('http://localhost:8000/health');
+    const h = await r.json();
+    if (h.status === 'ok') setStatus('ok');
+  } catch(e) { /* handled by loadAll */ }
+}
+
+function setStatus(state) {
+  const el = document.getElementById('status-badge');
+  el.className = 'status-badge';
+  if (state === 'ok')      { el.textContent = '● Live'; el.className = 'ok'; }
+  else if (state === 'error') { el.textContent = '● Offline'; el.className = 'error'; }
+  else                     { el.textContent = '○ Loading…'; el.className = ''; }
+  el.id = 'status-badge';
+}
+
+// ── Summary cards ─────────────────────────────────────────
+function renderCards() {
+  const totalGap     = summaryData.reduce((s,r) => s + (r.total_revenue_gap    || 0), 0);
+  const totalTarget  = summaryData.reduce((s,r) => s + (r.total_revenue_at_target || 0), 0);
+  const totalUnderpaid = summaryData.reduce((s,r) => s + (r.codes_underpaid    || 0), 0);
+  const totalCodes     = new Set(dashboardData.map(r => r.cpt_code)).size;
+
+  document.getElementById('c-payers').textContent    = summaryData.length;
+  document.getElementById('c-codes').textContent     = totalCodes;
+  document.getElementById('c-underpaid').textContent = totalUnderpaid;
+  document.getElementById('c-gap').textContent       = fmtK(totalGap);
+  document.getElementById('c-target').textContent    = fmtK(totalTarget);
+}
+
+// ── Payer summary table ───────────────────────────────────
+function renderPayerTable() {
+  const tbody = document.getElementById('payer-tbody');
+  if (!summaryData.length) {
+    tbody.innerHTML = `<tr><td colspan="8" class="empty">No payer data loaded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = summaryData.map(row => {
+    const gap = row.total_revenue_gap;
+    const gapFmt = gap ? `<strong style="color:#dc2626">${fmtK(gap)}</strong>` : '—';
+    return `
+      <tr class="payer-row" onclick="toggleDrilldown(${row.payer_id}, this)" data-payer="${row.payer_id}">
+        <td><span class="expand-icon">▶</span></td>
+        <td><span class="payer-name">${row.payer_name}</span></td>
+        <td class="right">${row.codes_with_rates ?? '—'}</td>
+        <td class="right">
+          ${row.codes_underpaid > 0
+            ? `<span class="badge badge-red">${row.codes_underpaid}</span>`
+            : `<span class="badge badge-green">0</span>`}
+        </td>
+        <td class="right">
+          <div class="pct-bar-wrap">
+            <div class="pct-bar-bg">
+              <div class="pct-bar-fill" style="width:${Math.min(100, (row.avg_pct_of_medicare||0)/1.6)}%;background:${pctColor(row.avg_pct_of_medicare, 130)}"></div>
+            </div>
+            ${pctBadge(row.avg_pct_of_medicare, 130)}
+          </div>
+        </td>
+        <td class="right">${fmtK(row.total_revenue_current)}</td>
+        <td class="right">${fmtK(row.total_revenue_at_target)}</td>
+        <td class="right">${gapFmt}</td>
+      </tr>
+      <tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;">
+        <td colspan="8">
+          <div class="drilldown-inner" id="drilldown-inner-${row.payer_id}">
+            <div class="loading">Loading…</div>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ── Payer drilldown ───────────────────────────────────────
+const openDrilldowns = new Set();
+
+async function toggleDrilldown(payerId, rowEl) {
+  const drillRow   = document.getElementById(`drilldown-${payerId}`);
+  const innerDiv   = document.getElementById(`drilldown-inner-${payerId}`);
+  const isOpen     = openDrilldowns.has(payerId);
+
+  // Toggle icon
+  rowEl.classList.toggle('expanded', !isOpen);
+
+  if (isOpen) {
+    drillRow.style.display = 'none';
+    openDrilldowns.delete(payerId);
+    return;
+  }
+
+  drillRow.style.display = 'table-row';
+  openDrilldowns.add(payerId);
+  innerDiv.innerHTML = '<div class="loading">Loading underpaid codes…</div>';
+
+  try {
+    const data = await fetchJSON(`dashboard/underpaid/${payerId}`);
+    const codes = data.underpaid_codes || [];
+
+    if (!codes.length) {
+      innerDiv.innerHTML = `<div class="empty">✓ No underpaid codes found for ${data.payer_name}.</div>`;
+      return;
+    }
+
+    innerDiv.innerHTML = `
+      <div class="drilldown-title">
+        ${data.payer_name} — ${codes.length} Underpaid Code${codes.length !== 1 ? 's' : ''}
+        ${data.total_underpaid_codes > 0 ? `<span class="badge badge-red" style="margin-left:8px">${data.total_underpaid_codes} below 130% target</span>` : ''}
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th><th>Description</th>
+            <th class="right">Payer Rate</th>
+            <th class="right">Medicare</th>
+            <th class="right">% of Med</th>
+            <th class="right">Target (130%)</th>
+            <th class="right">Gap/Unit</th>
+            <th class="right">Volume</th>
+            <th class="right">Annual Gap $</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${codes.map(c => `
+            <tr>
+              <td><strong>${c.cpt_code}</strong></td>
+              <td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.short_description}</td>
+              <td class="right">${fmt$(c.payer_allowed)}</td>
+              <td class="right">${fmt$(c.medicare_allowed)}</td>
+              <td class="right">${pctBadge(c.pct_of_medicare, 130)}</td>
+              <td class="right">${fmt$(c.target_allowed)}</td>
+              <td class="right" style="color:#dc2626;font-weight:600">${fmt$(c.rate_gap_per_unit)}</td>
+              <td class="right">${c.annual_volume != null ? fmtN(c.annual_volume) : '<span style="color:#94a3b8">—</span>'}</td>
+              <td class="right" style="font-weight:700;color:#dc2626">${c.annual_revenue_gap != null ? fmtK(c.annual_revenue_gap) : '<span style="color:#94a3b8">—</span>'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) {
+    innerDiv.innerHTML = `<div class="error-msg">Error loading data: ${e.message}</div>`;
+  }
+}
+
+// ── Full dashboard table ──────────────────────────────────
+function renderFullTable() {
+  const showAll = document.getElementById('show-all').checked;
+  const tbody   = document.getElementById('full-tbody');
+  let rows = dashboardData;
+
+  if (!showAll) rows = rows.filter(r => r.is_underpaid === true);
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="12" class="empty">${showAll ? 'No data loaded.' : 'No underpaid codes. Check "Show all codes" to see full list.'}</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.payer_name}</td>
+      <td style="font-size:0.78rem;color:#64748b">${r.npi_number === '1003521006' ? 'Group' : r.provider_name.split(',')[0]}</td>
+      <td><strong>${r.cpt_code}</strong></td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.8rem">${r.short_description}</td>
+      <td class="right">${fmt$(r.payer_allowed)}</td>
+      <td class="right">${fmt$(r.medicare_allowed)}</td>
+      <td class="right">${pctBadge(r.pct_of_medicare, r.target_pct_of_medicare)}</td>
+      <td class="right" style="color:#475569;font-size:0.8rem">${fmt$(r.target_allowed)}</td>
+      <td class="right" style="color:${r.rate_gap_per_unit > 0 ? '#dc2626' : '#16a34a'};font-weight:600">${fmt$(r.rate_gap_per_unit)}</td>
+      <td class="right">${r.annual_volume != null ? fmtN(r.annual_volume) : '<span style="color:#94a3b8">—</span>'}</td>
+      <td class="right" style="font-weight:700;color:${r.annual_revenue_gap > 0 ? '#dc2626' : '#16a34a'}">${r.annual_revenue_gap != null ? fmtK(r.annual_revenue_gap) : '—'}</td>
+      <td class="center">${statusBadge(r.is_underpaid)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Boot ──────────────────────────────────────────────────
+loadAll();
+</script>
+</body>
+</html>
