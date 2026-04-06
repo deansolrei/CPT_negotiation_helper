@@ -351,13 +351,27 @@
         <div style="font-weight:600;font-size:0.82rem;color:#475569;margin-bottom:8px;">
           📤 Upload Intermediary Rates CSV
         </div>
+
+        <!-- Intermediary selector for wide-format uploads -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+          <label style="font-size:0.78rem;color:#475569;white-space:nowrap;">Platform:</label>
+          <select id="upload-intermediary" style="flex:1;padding:5px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;">
+            <option value="Headway">Headway</option>
+            <option value="Alma">Alma</option>
+            <option value="Grow Therapy">Grow Therapy</option>
+          </select>
+          <label style="font-size:0.75rem;color:#64748b;white-space:nowrap;" title="Use 'Auto-detect' for our standard template format">
+            <input type="checkbox" id="upload-auto-detect" checked> Auto-detect format
+          </label>
+        </div>
+
         <div class="upload-zone" id="upload-zone"
           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
           ondrop="handleDrop(event)" onclick="document.getElementById('rate-file-input').click()">
           <div style="font-size:1.4rem;margin-bottom:4px;">📂</div>
           <strong style="font-size:0.85rem;color:#1a2332;">Click or drag to upload rates CSV</strong>
-          <p>Fill in the Rate Template CSV with Headway, Alma, and Grow Therapy rates,<br>
-             then upload here. Safe to re-upload — existing rates will be updated.</p>
+          <p>Upload the native Headway/Alma/Grow rate sheet (payers as columns),<br>
+             or use our Rate Template for a custom format. Safe to re-upload.</p>
           <input type="file" id="rate-file-input" accept=".csv" onchange="uploadRatesCSV(this.files[0])">
         </div>
         <div id="upload-status" class="upload-status"></div>
@@ -733,17 +747,18 @@ async function loadChannelComparison() {
 
 function buildChannelPayerTabs() {
   const tabBar = document.getElementById('channel-payer-tabs');
-  const payers = [...new Map(channelData.map(r => [r.payer_id, r.payer_name])).entries()];
+  // Use payer_name as key (works for both direct and intermediary-only payers)
+  const payers = [...new Set(channelData.map(r => r.payer_name))].filter(Boolean).sort();
   tabBar.innerHTML = `<button class="tab-btn ${channelPayerFilter === null ? 'active' : ''}"
     onclick="filterChannelTable(null, this)">All Payers</button>` +
-    payers.map(([id, name]) =>
-      `<button class="tab-btn ${channelPayerFilter === id ? 'active' : ''}"
-        onclick="filterChannelTable(${id}, this)">${name.split(' ')[0]}</button>`
+    payers.map(name =>
+      `<button class="tab-btn ${channelPayerFilter === name ? 'active' : ''}"
+        onclick="filterChannelTable('${name.replace(/'/g,"\\'")}', this)">${name.split(' ')[0]}</button>`
     ).join('');
 }
 
-function filterChannelTable(payerId, btn) {
-  channelPayerFilter = payerId;
+function filterChannelTable(payerName, btn) {
+  channelPayerFilter = payerName;
   document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderChannelTable();
@@ -754,7 +769,7 @@ function renderChannelTable() {
   const bestOnly = document.getElementById('channel-best-only').checked;
 
   let rows = channelData;
-  if (channelPayerFilter != null) rows = rows.filter(r => r.payer_id === channelPayerFilter);
+  if (channelPayerFilter != null) rows = rows.filter(r => r.payer_name === channelPayerFilter);
   if (bestOnly) rows = rows.filter(r => r.best_channel_type === 'Intermediary');
 
   if (!rows.length) {
@@ -841,15 +856,18 @@ function handleDrop(e) {
 
 async function uploadRatesCSV(file) {
   if (!file) return;
-  const statusEl = document.getElementById('upload-status');
+  const statusEl   = document.getElementById('upload-status');
   statusEl.className = 'upload-status loading';
   statusEl.textContent = `⏳ Uploading ${file.name}…`;
+
+  const intermediary = document.getElementById('upload-intermediary').value;
+  const url = `/api/intermediaries/import?intermediary_name=${encodeURIComponent(intermediary)}`;
 
   const formData = new FormData();
   formData.append('file', file);
 
   try {
-    const r = await fetch('/api/intermediaries/import', { method: 'POST', body: formData });
+    const r = await fetch(url, { method: 'POST', body: formData });
     const result = await r.json();
 
     if (!r.ok) throw new Error(result.detail || 'Upload failed');

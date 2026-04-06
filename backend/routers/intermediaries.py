@@ -129,14 +129,140 @@ def download_template():
     )
 
 
-# ── CSV import ────────────────────────────────────────────────
+# ── CSV import (auto-detect format) ──────────────────────────
+
+def _detect_wide_format(header: list[str]) -> bool:
+    """Return True if the CSV is in wide/pivoted format (payers as columns)."""
+    # Wide format: first col is CPT Code or similar, has 3+ columns, no 'intermediary_name' col
+    if len(header) < 3:
+        return False
+    has_intermediary_col = any("intermediary" in h.lower() for h in header)
+    looks_like_cpt_col   = "cpt" in header[0].lower() or "code" in header[0].lower()
+    return looks_like_cpt_col and not has_intermediary_col
+
+
+def _import_wide_format(
+    reader, header: list[str], intermediary_map: dict, payer_name_map: dict,
+    valid_cpts: set, cur
+) -> tuple[int, int, list[str]]:
+    """
+    Parse a wide-format CSV (payers as columns) like the Headway rate sheet.
+
+    Header: CPT Code | Description | Payer1 | Payer2 | ...
+    Rows:   code     | description | rate   | rate   | ...
+
+    The intermediary must be identified by the caller (passed via `intermediary_name` param).
+    In this mode we use the first intermediary as default, or the one specified in the request.
+    """
+    payer_names = [h.strip() for h in header[2:]]
+    imported = 0
+    skipped  = 0
+    errors   = []
+
+    for i, row in enumerate(reader, start=2):
+        if not row or not row[0].strip():
+            skipped += 1
+            continue
+
+        # Skip comment / instruction rows
+        if row[0].strip().startswith("#"):
+            skipped += 1
+            continue
+
+        cpt_code = row[0].strip()
+
+        # Auto-insert unknown CPT codes from the wide sheet
+        if cpt_code not in valid_cpts:
+            desc = row[1].strip() if len(row) > 1 else cpt_code
+            try:
+                category = "Telehealth E/M" if cpt_code.startswith("980") else "E/M"
+                cur.execute(
+                    """
+                    INSERT INTO cpt_codes (cpt_code, short_description, full_description, category)
+                    VALUES (%s, %s, %s, %s)
+                    ON CONFLICT (cpt_code) DO NOTHING
+                    """,
+                    (cpt_code, desc[:100], desc, category),
+                )
+                valid_cpts.add(cpt_code)
+            except Exception as e:
+                errors.append(f"Row {i}: could not add CPT {cpt_code} — {e}")
+                skipped += 1
+                continue
+
+        for col_idx, payer_name in enumerate(payer_names, start=2):
+            raw = row[col_idx].strip() if col_idx < len(row) else ""
+            if not raw:
+                continue
+            amount_str = raw.replace("$", "").replace(",", "").strip()
+            if not amount_str:
+                continue
+            try:
+                amount = float(amount_str)
+            except ValueError:
+                continue
+            if amount <= 0:
+                continue
+
+            # Determine intermediary_id — use the intermediary_name from payer_name_map
+            # In wide format, there's no intermediary column; use context from caller
+            intermediary_id = list(intermediary_map.values())[0] if intermediary_map else None
+            if not intermediary_id:
+                errors.append(f"Row {i}: no intermediary found — skipped")
+                skipped += 1
+                break
+
+            # Ensure payer is in intermediary_payer_map
+            try:
+                cur.execute(
+                    """
+                    INSERT INTO intermediary_payer_map (intermediary_payer_name)
+                    VALUES (%s) ON CONFLICT DO NOTHING
+                    """,
+                    (payer_name,),
+                )
+            except Exception:
+                pass
+
+            try:
+                cur.execute(
+                    """
+                    INSERT INTO intermediary_rates
+                        (intermediary_id, payer_name, cpt_code, state,
+                         allowed_amount, effective_date, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, NULL, NOW())
+                    ON CONFLICT ON CONSTRAINT intermediary_rates_unique
+                    DO UPDATE SET
+                        allowed_amount = EXCLUDED.allowed_amount,
+                        updated_at     = NOW()
+                    """,
+                    (intermediary_id, payer_name, cpt_code, "FL", amount),
+                )
+                imported += 1
+            except Exception as e:
+                errors.append(f"Row {i} / {payer_name}: DB error — {str(e)}")
+                skipped += 1
+
+    return imported, skipped, errors
+
 
 @router.post("/intermediaries/import")
-async def import_rates(file: UploadFile = File(...)):
+async def import_rates(file: UploadFile = File(...), intermediary_name: str = None):
     """
-    Upload a filled CSV file to import or update intermediary rates.
+    Upload a CSV to import or update intermediary rates.
 
-    Expected columns (in any order):
+    Accepts TWO formats automatically:
+
+    1. LONG format (our standard template):
+       Columns: intermediary_name, payer_name, cpt_code, state, allowed_amount, effective_date, notes
+
+    2. WIDE format (Headway / Alma / Grow native export — payers as columns):
+       Row 1 (optional): Title row, skipped
+       Row 2: CPT Code | Description | Payer1 | Payer2 | ...
+       Row 3+: code | description | $rate | $rate | ...
+       Pass ?intermediary_name=Headway in the URL when uploading a wide-format file.
+
+    Expected columns (long format only):
       intermediary_name, payer_name, cpt_code, state, allowed_amount,
       effective_date, notes
 
@@ -152,111 +278,202 @@ async def import_rates(file: UploadFile = File(...)):
     except UnicodeDecodeError:
         text = content.decode("latin-1")
 
-    reader = csv.DictReader(io.StringIO(text))
+    # Read all rows to detect format
+    raw_rows = list(csv.reader(io.StringIO(text)))
+
+    # Find the actual header row (skip any "Florida Rates" or similar title rows)
+    header_idx = 0
+    for idx, row in enumerate(raw_rows):
+        if row and ("cpt" in row[0].lower() or "code" in row[0].lower()
+                    or "intermediary" in (row[0] if row else "").lower()):
+            header_idx = idx
+            break
+
+    header    = [h.strip() for h in raw_rows[header_idx]]
+    data_rows = raw_rows[header_idx + 1:]
+    is_wide   = _detect_wide_format(header)
 
     imported = 0
     skipped  = 0
     errors   = []
 
     with get_db() as cur:
-        # Build lookup caches
         cur.execute("SELECT name, intermediary_id FROM intermediaries")
         intermediary_map = {r["name"].strip().lower(): r["intermediary_id"]
                             for r in cur.fetchall()}
 
-        cur.execute("SELECT payer_name, payer_id FROM payers")
-        payer_map = {r["payer_name"].strip().lower(): r["payer_id"]
-                     for r in cur.fetchall()}
-
         cur.execute("SELECT cpt_code FROM cpt_codes")
         valid_cpts = {r["cpt_code"] for r in cur.fetchall()}
 
-        for i, row in enumerate(reader, start=2):  # row 2 = first data row
-            # Skip comment rows
-            first_val = (list(row.values())[0] or "").strip()
-            if first_val.startswith("#"):
-                skipped += 1
-                continue
+        if is_wide:
+            # ── Wide format (Headway/Alma/Grow native sheet) ──────────
+            # Intermediary must be specified via ?intermediary_name= param
+            if not intermediary_name:
+                # Try to guess from filename or default to first active intermediary
+                intermediary_name = list(intermediary_map.keys())[0] if intermediary_map else None
 
-            # Resolve intermediary
-            iname = (row.get("intermediary_name") or "").strip()
-            if not iname:
-                skipped += 1
-                continue
-            intermediary_id = intermediary_map.get(iname.lower())
-            if not intermediary_id:
-                errors.append(f"Row {i}: unknown intermediary '{iname}' — skipped")
-                skipped += 1
-                continue
+            if not intermediary_name or intermediary_name.lower() not in intermediary_map:
+                return {
+                    "status":   "error",
+                    "imported": 0,
+                    "skipped":  0,
+                    "errors":   [f"Wide-format CSV detected. Please specify ?intermediary_name=Headway (or Alma, Grow Therapy) in the upload URL."],
+                    "message":  "Intermediary name required for wide-format upload.",
+                }
 
-            # Resolve payer (optional)
-            pname = (row.get("payer_name") or "").strip()
-            payer_id = None
-            if pname:
-                payer_id = payer_map.get(pname.lower())
-                if not payer_id:
-                    errors.append(f"Row {i}: unknown payer '{pname}' — skipped")
+            intermediary_id = intermediary_map[intermediary_name.lower()]
+            payer_names     = [h.strip() for h in header[2:]]
+
+            for i, row in enumerate(data_rows, start=header_idx + 2):
+                if not row or not row[0].strip() or row[0].strip().startswith("#"):
                     skipped += 1
                     continue
 
-            # CPT code
-            cpt_code = (row.get("cpt_code") or "").strip()
-            if not cpt_code or cpt_code not in valid_cpts:
-                if cpt_code:
-                    errors.append(f"Row {i}: unknown CPT code '{cpt_code}' — skipped")
-                skipped += 1
-                continue
+                cpt_code = row[0].strip()
+                desc     = row[1].strip() if len(row) > 1 else cpt_code
 
-            # Allowed amount
-            amount_raw = (row.get("allowed_amount") or "").strip().replace("$", "").replace(",", "")
-            if not amount_raw:
-                skipped += 1
-                continue
-            try:
-                allowed_amount = float(amount_raw)
-            except ValueError:
-                errors.append(f"Row {i}: invalid allowed_amount '{amount_raw}' — skipped")
-                skipped += 1
-                continue
+                # Auto-add new CPT codes (e.g. 98000–98007 telehealth codes)
+                if cpt_code not in valid_cpts:
+                    try:
+                        category = "Telehealth E/M" if cpt_code.startswith("980") else "E/M"
+                        cur.execute(
+                            """
+                            INSERT INTO cpt_codes (cpt_code, short_description, full_description, category)
+                            VALUES (%s, %s, %s, %s) ON CONFLICT (cpt_code) DO NOTHING
+                            """,
+                            (cpt_code, desc[:100], desc, category),
+                        )
+                        valid_cpts.add(cpt_code)
+                    except Exception as e:
+                        errors.append(f"Row {i}: could not add CPT {cpt_code} — {e}")
+                        skipped += 1
+                        continue
 
-            # State
-            state = (row.get("state") or "FL").strip() or "FL"
+                for col_idx, payer_name in enumerate(payer_names, start=2):
+                    raw = row[col_idx].strip() if col_idx < len(row) else ""
+                    if not raw:
+                        continue
+                    amount_str = raw.replace("$", "").replace(",", "").strip()
+                    if not amount_str:
+                        continue
+                    try:
+                        amount = float(amount_str)
+                    except ValueError:
+                        continue
+                    if amount <= 0:
+                        continue
 
-            # Effective date
-            eff_raw = (row.get("effective_date") or "").strip()
-            effective_date = eff_raw if eff_raw else None
+                    # Ensure payer is registered in the mapping table
+                    cur.execute(
+                        "INSERT INTO intermediary_payer_map (intermediary_payer_name) VALUES (%s) ON CONFLICT DO NOTHING",
+                        (payer_name,),
+                    )
 
-            # Notes
-            notes = (row.get("notes") or "").strip() or None
+                    try:
+                        cur.execute(
+                            """
+                            INSERT INTO intermediary_rates
+                                (intermediary_id, payer_name, cpt_code, state,
+                                 allowed_amount, effective_date, updated_at)
+                            VALUES (%s, %s, %s, %s, %s, NULL, NOW())
+                            ON CONFLICT ON CONSTRAINT intermediary_rates_unique
+                            DO UPDATE SET
+                                allowed_amount = EXCLUDED.allowed_amount,
+                                updated_at     = NOW()
+                            """,
+                            (intermediary_id, payer_name, cpt_code, "FL", amount),
+                        )
+                        imported += 1
+                    except Exception as e:
+                        errors.append(f"Row {i} / {payer_name}: {str(e)}")
+                        skipped += 1
 
-            # Upsert
-            try:
-                cur.execute(
-                    """
-                    INSERT INTO intermediary_rates
-                        (intermediary_id, payer_id, cpt_code, state,
-                         allowed_amount, effective_date, notes, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
-                    ON CONFLICT (intermediary_id, payer_id, cpt_code, state, effective_date)
-                    DO UPDATE SET
-                        allowed_amount = EXCLUDED.allowed_amount,
-                        notes          = EXCLUDED.notes,
-                        updated_at     = NOW()
-                    """,
-                    (intermediary_id, payer_id, cpt_code, state,
-                     allowed_amount, effective_date, notes),
-                )
-                imported += 1
-            except Exception as e:
-                errors.append(f"Row {i}: DB error — {str(e)}")
-                skipped += 1
+        else:
+            # ── Long format (our standard template) ──────────────────
+            dict_reader = csv.DictReader(io.StringIO(text))
 
+            for i, row in enumerate(dict_reader, start=2):
+                first_val = (list(row.values())[0] or "").strip()
+                if first_val.startswith("#"):
+                    skipped += 1
+                    continue
+
+                iname = (row.get("intermediary_name") or "").strip()
+                if not iname:
+                    skipped += 1
+                    continue
+                intermediary_id = intermediary_map.get(iname.lower())
+                if not intermediary_id:
+                    errors.append(f"Row {i}: unknown intermediary '{iname}' — skipped")
+                    skipped += 1
+                    continue
+
+                pname    = (row.get("payer_name") or "").strip() or None
+                cpt_code = (row.get("cpt_code") or "").strip()
+
+                if not cpt_code:
+                    skipped += 1
+                    continue
+
+                # Auto-add unknown CPT codes
+                if cpt_code not in valid_cpts:
+                    category = "Telehealth E/M" if cpt_code.startswith("980") else "E/M"
+                    cur.execute(
+                        "INSERT INTO cpt_codes (cpt_code, short_description, category) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING",
+                        (cpt_code, cpt_code, category),
+                    )
+                    valid_cpts.add(cpt_code)
+
+                amount_raw = (row.get("allowed_amount") or "").strip().replace("$", "").replace(",", "")
+                if not amount_raw:
+                    skipped += 1
+                    continue
+                try:
+                    allowed_amount = float(amount_raw)
+                except ValueError:
+                    errors.append(f"Row {i}: invalid amount '{amount_raw}' — skipped")
+                    skipped += 1
+                    continue
+
+                state          = (row.get("state") or "FL").strip() or "FL"
+                eff_raw        = (row.get("effective_date") or "").strip()
+                effective_date = eff_raw if eff_raw else None
+                notes          = (row.get("notes") or "").strip() or None
+
+                if pname:
+                    cur.execute(
+                        "INSERT INTO intermediary_payer_map (intermediary_payer_name) VALUES (%s) ON CONFLICT DO NOTHING",
+                        (pname,),
+                    )
+
+                try:
+                    cur.execute(
+                        """
+                        INSERT INTO intermediary_rates
+                            (intermediary_id, payer_name, cpt_code, state,
+                             allowed_amount, effective_date, notes, updated_at)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+                        ON CONFLICT ON CONSTRAINT intermediary_rates_unique
+                        DO UPDATE SET
+                            allowed_amount = EXCLUDED.allowed_amount,
+                            notes          = EXCLUDED.notes,
+                            updated_at     = NOW()
+                        """,
+                        (intermediary_id, pname, cpt_code, state,
+                         allowed_amount, effective_date, notes),
+                    )
+                    imported += 1
+                except Exception as e:
+                    errors.append(f"Row {i}: DB error — {str(e)}")
+                    skipped += 1
+
+    fmt = "wide (payer-as-columns)" if is_wide else "long (row-per-rate)"
     return {
         "status":   "ok",
         "imported": imported,
         "skipped":  skipped,
-        "errors":   errors[:20],  # cap at 20 errors shown
-        "message":  f"Successfully imported {imported} rate(s). {skipped} row(s) skipped.",
+        "errors":   errors[:20],
+        "message":  f"Imported {imported} rate(s) from {fmt} CSV. {skipped} row(s) skipped.",
     }
 
 
@@ -264,18 +481,19 @@ async def import_rates(file: UploadFile = File(...)):
 
 @router.get("/channel-comparison")
 def get_channel_comparison(
-    payer_id:  int = None,
-    cpt_code:  str = None,
-    best_only: bool = False,
+    payer_id:   int = None,
+    payer_name: str = None,
+    cpt_code:   str = None,
+    best_only:  bool = False,
 ):
     """
     Return side-by-side comparison of direct billing vs each intermediary.
 
     Optional filters:
-      - payer_id: filter to a specific payer
-      - cpt_code: filter to a specific CPT code
-      - best_only: if true, only return rows where best_channel_type = 'Intermediary'
-                   (i.e. an intermediary pays more than direct)
+      - payer_id:   filter to a specific payer (direct-contract payers only)
+      - payer_name: filter by payer name text (works for all payers incl. intermediary-only)
+      - cpt_code:   filter to a specific CPT code
+      - best_only:  only return rows where an intermediary pays more than direct
     """
     filters = []
     params  = []
@@ -283,6 +501,9 @@ def get_channel_comparison(
     if payer_id:
         filters.append("payer_id = %s")
         params.append(payer_id)
+    if payer_name:
+        filters.append("payer_name = %s")
+        params.append(payer_name)
     if cpt_code:
         filters.append("cpt_code = %s")
         params.append(cpt_code)
