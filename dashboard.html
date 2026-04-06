@@ -265,7 +265,7 @@
 <footer>Solrei CPT Negotiation Helper · Data source: Medicare 2026 FL, payer contracts · Target: 130% of Medicare</footer>
 
 <script>
-const API = 'http://localhost:8000/api';
+const API = '/api';
 let summaryData = [];
 let dashboardData = [];
 
@@ -307,8 +307,7 @@ async function loadAll() {
   setStatus('loading');
   document.getElementById('error-container').innerHTML = '';
   try {
-    const [health, summary, dashboard] = await Promise.all([
-      fetchJSON('health'),   // wait — actually health is at /health not /api/health
+    const [summary, dashboard] = await Promise.all([
       fetchJSON('dashboard/summary'),
       fetchJSON('dashboard'),
     ]);
@@ -328,7 +327,7 @@ async function loadAll() {
 // Also load health separately (it's at /health not /api/health)
 async function checkHealth() {
   try {
-    const r = await fetch('http://localhost:8000/health');
+    const r = await fetch('/health');
     const h = await r.json();
     if (h.status === 'ok') setStatus('ok');
   } catch(e) { /* handled by loadAll */ }
