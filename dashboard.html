@@ -16,16 +16,18 @@
 
     /* ── Header ─────────────────────────────────────────── */
     header {
-      background: linear-gradient(135deg, #1a3a5c 0%, #2563a8 100%);
+      background: #92ae9d;
       color: white;
-      padding: 20px 32px;
+      padding: 16px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    header h1 { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px; }
-    header p  { font-size: 0.8rem; opacity: 0.75; margin-top: 3px; }
+    header .logo-wrap { display:flex; align-items:center; gap:14px; }
+    header .logo-wrap img { height:52px; width:auto; object-fit:contain; }
+    header h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.2px; color:white; opacity:0.92; }
+    header p  { font-size: 0.78rem; opacity: 0.72; margin-top: 2px; }
     #status-badge {
       font-size: 0.75rem;
       padding: 5px 12px;
@@ -87,6 +89,9 @@
     }
     table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     thead tr { background: #f8fafc; }
+    /* Subtle column separators */
+    th:not(:last-child), td:not(:last-child) { border-right: 1px solid rgba(0,0,0,0.06); }
+    thead th:not(:last-child) { border-right-color: rgba(0,0,0,0.10); }
     thead th {
       padding: 11px 14px;
       text-align: left;
@@ -192,9 +197,11 @@
       display: inline-block; padding: 3px 10px; border-radius: 12px;
       font-size: 0.7rem; font-weight: 700; white-space: nowrap;
     }
-    .channel-direct       { background: #dbeafe; color: #1d4ed8; }
-    .channel-intermediary { background: #d1fae5; color: #065f46; }
-    .channel-tie          { background: #fef3c7; color: #92400e; }
+    .channel-direct       { background: #497aa9; color: #fff; }
+    .channel-headway      { background: #4fa86b; color: #fff; }
+    .channel-alma         { background: #264b3a; color: #fff; }
+    .channel-grow         { background: #beb1fa; color: #1a2332; }
+    .channel-tie          { background: #686f76; color: #fff; }
     .channel-na           { background: #f1f5f9; color: #94a3b8; }
 
     .rate-best  { font-weight: 700; color: #059669; }
@@ -222,9 +229,16 @@
 <body>
 
 <header>
-  <div>
-    <h1>🏥 Solrei CPT Negotiation Dashboard</h1>
-    <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+  <div class="logo-wrap">
+    <img src="/assets/solrei_logo.gif" alt="Solrei Behavioral Health" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+    <div id="logo-fallback" style="display:none;">
+      <h1>Solrei CPT Negotiation Dashboard</h1>
+      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+    </div>
+    <div>
+      <h1>CPT Negotiation Dashboard</h1>
+      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+    </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <button class="btn btn-sm" onclick="loadAll()">↻ Refresh</button>
@@ -435,6 +449,33 @@
 const API = '/api';
 let summaryData = [];
 let dashboardData = [];
+
+// ── Payer color palette ───────────────────────────────────────
+// accent = muted brand color (used for left border accent & active tab)
+// rowA / rowB = very light alternating row tints
+const PAYER_PALETTE = {
+  'aetna':           { accent:'#8b6aa8', rowA:'#f7f1fc', rowB:'#ede3f5' },
+  'ambetter':        { accent:'#c4699a', rowA:'#fef0f7', rowB:'#fde8d5' },
+  'bcbs':            { accent:'#7a95a8', rowA:'#edf3f7', rowB:'#dde8f0' },
+  'carelon':         { accent:'#7264c4', rowA:'#f0eefb', rowB:'#e3dffa' },
+  'cigna':           { accent:'#6dba65', rowA:'#eef8ec', rowB:'#dff0de' },
+  'florida blue':    { accent:'#5a9dcc', rowA:'#e9f3fb', rowB:'#d5e9f7' },
+  'florida':         { accent:'#5a9dcc', rowA:'#e9f3fb', rowB:'#d5e9f7' },
+  'uhc':             { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
+  'oscar':           { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
+  'optum':           { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
+  'wellmark':        { accent:'#4a7fa8', rowA:'#e6eef5', rowB:'#d5e2ee' },
+};
+const DEFAULT_PALETTE = { accent:'#8a9bb0', rowA:'#f4f6f8', rowB:'#eaecef' };
+
+function getPayerPalette(payerName) {
+  if (!payerName) return DEFAULT_PALETTE;
+  const lower = payerName.toLowerCase();
+  for (const [key, pal] of Object.entries(PAYER_PALETTE)) {
+    if (lower.includes(key)) return pal;
+  }
+  return DEFAULT_PALETTE;
+}
 
 // ── Display filters ───────────────────────────────────────────
 const JODENE_NPI   = '1093433955';
@@ -700,8 +741,13 @@ function renderFullTable() {
     return;
   }
 
-  tbody.innerHTML = rows.map(r => `
-    <tr>
+  let _ftPayer = null, _ftIdx = 0;
+  tbody.innerHTML = rows.map(r => {
+    const pal = getPayerPalette(r.payer_name);
+    if (r.payer_name !== _ftPayer) { _ftPayer = r.payer_name; _ftIdx = 0; }
+    const bg = _ftIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
+    return `
+    <tr style="background:${bg};border-left:3px solid ${pal.accent};">
       <td>${r.payer_name}</td>
       <td><strong>${r.cpt_code}</strong></td>
       <td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.8rem">${r.short_description}</td>
@@ -714,7 +760,7 @@ function renderFullTable() {
       <td class="right" style="font-weight:700;color:${r.annual_revenue_gap > 0 ? '#dc2626' : '#16a34a'}">${r.annual_revenue_gap != null ? fmtK(r.annual_revenue_gap) : '—'}</td>
       <td class="center">${statusBadge(r.is_underpaid)}</td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 
 // ── Negotiation Letter ────────────────────────────────────
@@ -818,20 +864,40 @@ async function loadChannelComparison() {
 
 function buildChannelPayerTabs() {
   const tabBar = document.getElementById('channel-payer-tabs');
-  // Use payer_name as key (works for both direct and intermediary-only payers)
   const payers = [...new Set(channelData.map(r => r.payer_name))].filter(Boolean).sort();
-  tabBar.innerHTML = `<button class="tab-btn ${channelPayerFilter === null ? 'active' : ''}"
-    onclick="filterChannelTable(null, this)">All Payers</button>` +
-    payers.map(name =>
-      `<button class="tab-btn ${channelPayerFilter === name ? 'active' : ''}"
-        onclick="filterChannelTable('${name.replace(/'/g,"\\'")}', this)">${name}</button>`
-    ).join('');
+  const allActive = channelPayerFilter === null;
+  tabBar.innerHTML =
+    `<button class="tab-btn ${allActive ? 'active' : ''}"
+      onclick="filterChannelTable(null, this)">All Payers</button>` +
+    payers.map(name => {
+      const pal     = getPayerPalette(name);
+      const isActive = channelPayerFilter === name;
+      const inlineStyle = isActive
+        ? `background:${pal.accent};color:white;border-color:${pal.accent};`
+        : '';
+      return `<button class="tab-btn ${isActive ? 'active' : ''}"
+        style="${inlineStyle}"
+        data-accent="${pal.accent}"
+        onclick="filterChannelTable('${name.replace(/'/g,"\\'")}', this)">${name}</button>`;
+    }).join('');
 }
 
 function filterChannelTable(payerName, btn) {
   channelPayerFilter = payerName;
-  document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  // Reset all tabs to default style
+  document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background  = '';
+    b.style.color       = '';
+    b.style.borderColor = '';
+  });
+  // Activate clicked tab
   btn.classList.add('active');
+  if (payerName && btn.dataset.accent) {
+    btn.style.background  = btn.dataset.accent;
+    btn.style.color       = 'white';
+    btn.style.borderColor = btn.dataset.accent;
+  }
   renderChannelTable();
 }
 
@@ -852,7 +918,12 @@ function renderChannelTable() {
     return;
   }
 
+  let _ctPayer = null, _ctIdx = 0;
   tbody.innerHTML = rows.map(r => {
+    const pal = getPayerPalette(r.payer_name);
+    if (r.payer_name !== _ctPayer) { _ctPayer = r.payer_name; _ctIdx = 0; }
+    const bg = _ctIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
+
     const direct  = r.direct_rate;
     const headway = r.headway_rate;
     const alma    = r.alma_rate;
@@ -869,21 +940,27 @@ function renderChannelTable() {
       return `<span class="${cls}">${fmt$(val)}</span>`;
     }
 
-    // Best channel badge
+    // Best channel badge — use named classes per channel
     let channelBadge;
     if (r.best_channel_type === 'Direct') {
       channelBadge = `<span class="channel-badge channel-direct">Direct</span>`;
     } else if (r.best_channel_type === 'Intermediary') {
-      // Find which intermediary
       const best3 = [['Headway', headway], ['Alma', alma], ['Grow', grow]];
-      const winner = best3.filter(([,v]) => v === best).map(([n]) => n).join(' / ');
-      channelBadge = `<span class="channel-badge channel-intermediary">▲ ${winner || 'Intermediary'}</span>`;
+      const winners = best3.filter(([,v]) => v === best).map(([n]) => n);
+      if (winners.length === 1) {
+        const cls = 'channel-' + winners[0].toLowerCase();
+        channelBadge = `<span class="channel-badge ${cls}">▲ ${winners[0]}</span>`;
+      } else if (winners.length > 1) {
+        channelBadge = `<span class="channel-badge channel-tie">▲ ${winners.join(' / ')}</span>`;
+      } else {
+        channelBadge = `<span class="channel-badge channel-tie">▲ Intermediary</span>`;
+      }
     } else {
       channelBadge = `<span class="channel-badge channel-na">No data</span>`;
     }
 
     return `
-      <tr>
+      <tr style="background:${bg};border-left:3px solid ${pal.accent};">
         <td style="font-size:0.8rem;">${r.payer_name || '—'}</td>
         <td><strong>${r.cpt_code}</strong></td>
         <td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:0.78rem;color:#475569">${r.short_description || ''}</td>

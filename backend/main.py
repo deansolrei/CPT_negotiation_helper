@@ -14,12 +14,14 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend.routers import payers, contracts, fee_schedules, dashboard, letters, intermediaries
 
-# Path to the dashboard HTML file (one level up from this file)
-DASHBOARD_PATH = os.path.join(os.path.dirname(
-    os.path.dirname(__file__)), "dashboard.html")
+# Paths relative to this file
+_APP_ROOT      = os.path.dirname(os.path.dirname(__file__))
+DASHBOARD_PATH = os.path.join(_APP_ROOT, "dashboard.html")
+ASSETS_PATH    = os.path.join(_APP_ROOT, "assets")
 
 app = FastAPI(
     title="Solrei CPT Negotiation Helper",
@@ -46,6 +48,11 @@ app.include_router(fee_schedules.router)
 app.include_router(dashboard.router)
 app.include_router(letters.router)
 app.include_router(intermediaries.router)
+
+
+# Serve static assets (logo, etc.) — mount AFTER routers so /api routes take priority
+os.makedirs(ASSETS_PATH, exist_ok=True)
+app.mount("/assets", StaticFiles(directory=ASSETS_PATH), name="assets")
 
 
 @app.get("/dashboard", tags=["Dashboard"], include_in_schema=False)

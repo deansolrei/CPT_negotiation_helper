@@ -9,6 +9,7 @@ Usage:
     python3 backend/load_intermediaries.py
 """
 
+from backend.database import get_db
 import sys
 import os
 
@@ -16,7 +17,6 @@ import os
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
-from backend.database import get_db
 
 PLATFORMS = [
     {
@@ -55,7 +55,7 @@ PLATFORMS = [
 
 def seed_intermediaries():
     inserted = 0
-    skipped  = 0
+    skipped = 0
 
     with get_db() as cur:
         for p in PLATFORMS:

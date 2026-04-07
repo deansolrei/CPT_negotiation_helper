@@ -29,7 +29,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 
-BASE_URL   = "http://localhost:8000/api"
+BASE_URL = "http://localhost:8000/api"
 IMPORT_URL = f"{BASE_URL}/import-fee-schedule"
 
 # ── Payer rate factors (% of Medicare) ────────────────────────
@@ -89,7 +89,8 @@ def main():
 
     # ── Fetch Medicare benchmarks ──────────────────────────────────
     print("Fetching Medicare 2026 benchmark rates...")
-    benchmarks = api_get("benchmark?source_name=Medicare 2026&locality=FL&year=2026")
+    benchmarks = api_get(
+        "benchmark?source_name=Medicare 2026&locality=FL&year=2026")
     if not benchmarks:
         print("ERROR: No Medicare 2026 benchmarks found. Run load_medicare_2026.py first.")
         return
@@ -107,10 +108,11 @@ def main():
 
     for payer_name, config in PAYER_FACTORS.items():
         factor = config["factor"]
-        label  = config["notes_label"]
+        label = config["notes_label"]
 
         # Find all contracts for this payer
-        payer_contracts = [c for c in contracts if c["payer_name"] == payer_name]
+        payer_contracts = [
+            c for c in contracts if c["payer_name"] == payer_name]
         if not payer_contracts:
             print(f"  SKIP: No contracts found for {payer_name}")
             continue
@@ -142,28 +144,34 @@ def main():
                       f"{result['lines_upserted']} lines")
                 grand_total += result["lines_upserted"]
             except urllib.error.HTTPError as e:
-                print(f"    ✗ [{contract['contract_id']}] Error: {e.read().decode()}")
+                print(
+                    f"    ✗ [{contract['contract_id']}] Error: {e.read().decode()}")
 
     print(f"{'─' * 65}")
     print()
-    print(f"✓ Import complete: {grand_total} total lines imported across all payers.")
+    print(
+        f"✓ Import complete: {grand_total} total lines imported across all payers.")
     print()
     print("Payer rate summary vs your 130% Medicare target:")
     print(f"  {'Payer':<20} {'Factor':>8}  {'99214 Rate':>12}  {'vs Target':>12}")
     print(f"  {'-'*20} {'-'*8}  {'-'*12}  {'-'*12}")
 
-    m99214 = next((float(b["allowed_amount"]) for b in benchmarks if b["cpt_code"] == "99214"), None)
+    m99214 = next((float(b["allowed_amount"])
+                  for b in benchmarks if b["cpt_code"] == "99214"), None)
     if m99214:
         target = round(m99214 * 1.30, 2)
-        print(f"  {'[Target 130%]':<20} {'130%':>8}  ${target:>11.2f}  {'baseline':>12}")
+        print(
+            f"  {'[Target 130%]':<20} {'130%':>8}  ${target:>11.2f}  {'baseline':>12}")
         for payer_name, config in PAYER_FACTORS.items():
             rate = round(m99214 * config["factor"], 2)
-            gap  = round(target - rate, 2)
-            print(f"  {payer_name:<20} {config['factor']*100:.0f}%{'':<5}  ${rate:>11.2f}  -${gap:>10.2f}")
+            gap = round(target - rate, 2)
+            print(
+                f"  {payer_name:<20} {config['factor']*100:.0f}%{'':<5}  ${rate:>11.2f}  -${gap:>10.2f}")
         # Florida Blue reference
         fl_rate = round(m99214 * 0.80, 2)
-        fl_gap  = round(target - fl_rate, 2)
-        print(f"  {'Florida Blue':<20} {'80%':>8}  ${fl_rate:>11.2f}  -${fl_gap:>10.2f}")
+        fl_gap = round(target - fl_rate, 2)
+        print(
+            f"  {'Florida Blue':<20} {'80%':>8}  ${fl_rate:>11.2f}  -${fl_gap:>10.2f}")
 
     print()
     print("Next step: python3 backend/load_claims_volume.py")

@@ -85,36 +85,21 @@ ON CONFLICT (intermediary_payer_name) DO UPDATE SET
 --    Note: Medicare does NOT reimburse these separately (status "I").
 --    Commercial payers and intermediaries (Headway etc.) do use them.
 -- ──────────────────────────────────────────────────────────────────
-INSERT INTO cpt_codes (cpt_code, short_description, full_description, category, typical_time_minutes)
+-- is_time_based, is_addon, primary_code_required, telehealth_eligible
+INSERT INTO cpt_codes (cpt_code, short_description, category, typical_time_minutes,
+                       is_time_based, is_addon, primary_code_required, telehealth_eligible)
 VALUES
-    ('98000', 'Telehealth E/M new pt, straightforward, 15 min',
-     'Synchronous audio-video visit, new patient, straightforward MDM, 15 min',
-     'Telehealth E/M', 15),
-    ('98001', 'Telehealth E/M new pt, low MDM, 30 min',
-     'Synchronous audio-video visit, new patient, low medical decision making, 30 min',
-     'Telehealth E/M', 30),
-    ('98002', 'Telehealth E/M new pt, moderate MDM, 45 min',
-     'Synchronous audio-video visit, new patient, moderate medical decision making, 45 min',
-     'Telehealth E/M', 45),
-    ('98003', 'Telehealth E/M new pt, high MDM, 60 min',
-     'Synchronous audio-video visit, new patient, high medical decision making, 60 min',
-     'Telehealth E/M', 60),
-    ('98004', 'Telehealth E/M est pt, straightforward, 10 min',
-     'Synchronous audio-video visit, established patient, straightforward MDM, 10 min',
-     'Telehealth E/M', 10),
-    ('98005', 'Telehealth E/M est pt, low MDM, 20 min',
-     'Synchronous audio-video visit, established patient, low medical decision making, 20 min',
-     'Telehealth E/M', 20),
-    ('98006', 'Telehealth E/M est pt, moderate MDM, 30 min',
-     'Synchronous audio-video visit, established patient, moderate medical decision making, 30 min',
-     'Telehealth E/M', 30),
-    ('98007', 'Telehealth E/M est pt, high MDM, 40 min',
-     'Synchronous audio-video visit, established patient, high medical decision making, 40 min',
-     'Telehealth E/M', 40)
+    ('98000', 'Telehealth E/M new pt, straightforward, 15 min', 'Telehealth E/M', 15, TRUE, FALSE, FALSE, TRUE),
+    ('98001', 'Telehealth E/M new pt, low MDM, 30 min',         'Telehealth E/M', 30, TRUE, FALSE, FALSE, TRUE),
+    ('98002', 'Telehealth E/M new pt, moderate MDM, 45 min',    'Telehealth E/M', 45, TRUE, FALSE, FALSE, TRUE),
+    ('98003', 'Telehealth E/M new pt, high MDM, 60 min',        'Telehealth E/M', 60, TRUE, FALSE, FALSE, TRUE),
+    ('98004', 'Telehealth E/M est pt, straightforward, 10 min', 'Telehealth E/M', 10, TRUE, FALSE, FALSE, TRUE),
+    ('98005', 'Telehealth E/M est pt, low MDM, 20 min',         'Telehealth E/M', 20, TRUE, FALSE, FALSE, TRUE),
+    ('98006', 'Telehealth E/M est pt, moderate MDM, 30 min',    'Telehealth E/M', 30, TRUE, FALSE, FALSE, TRUE),
+    ('98007', 'Telehealth E/M est pt, high MDM, 40 min',        'Telehealth E/M', 40, TRUE, FALSE, FALSE, TRUE)
 ON CONFLICT (cpt_code) DO UPDATE SET
-    short_description = EXCLUDED.short_description,
-    full_description  = EXCLUDED.full_description,
-    category          = EXCLUDED.category,
+    short_description    = EXCLUDED.short_description,
+    category             = EXCLUDED.category,
     typical_time_minutes = EXCLUDED.typical_time_minutes;
 
 
@@ -123,7 +108,8 @@ ON CONFLICT (cpt_code) DO UPDATE SET
 --    Now works across ALL payers — direct-contract and intermediary-only.
 --    Joins direct rates via the payer name mapping table.
 -- ──────────────────────────────────────────────────────────────────
-CREATE OR REPLACE VIEW v_channel_comparison AS
+DROP VIEW IF EXISTS v_channel_comparison;
+CREATE VIEW v_channel_comparison AS
 WITH
 
 -- Direct rates from Solrei's own fee schedule (NPI2 / group entity)
@@ -135,7 +121,7 @@ direct_rates AS (
     FROM fee_schedule_lines fsl
     JOIN contracts         c   ON fsl.contract_id = c.contract_id
     JOIN payers            p   ON c.payer_id      = p.payer_id
-    JOIN provider_entities pe  ON c.entity_id     = pe.entity_id
+    JOIN provider_entities pe  ON c.provider_entity_id = pe.provider_entity_id
     WHERE pe.entity_type = 'NPI2'
     GROUP BY p.payer_name, fsl.cpt_code
 ),
@@ -144,7 +130,7 @@ direct_rates AS (
 medicare AS (
     SELECT cpt_code, allowed_amount AS medicare_allowed
     FROM   benchmark_fee_schedule
-    WHERE  benchmark_name = 'Medicare 2026'
+    WHERE  source_name = 'Medicare 2026'
 ),
 
 -- All unique (payer_name, cpt_code) combinations present in any intermediary's rates

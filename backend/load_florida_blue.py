@@ -25,7 +25,7 @@ import urllib.request
 import urllib.error
 import urllib.parse
 
-BASE_URL   = "http://localhost:8000/api"
+BASE_URL = "http://localhost:8000/api"
 IMPORT_URL = f"{BASE_URL}/import-fee-schedule"
 
 # ── Florida Blue NP rate policy ────────────────────────────────
@@ -49,11 +49,13 @@ MAT_RATES = [
      "notes": "MAT established patient 60-74 min. Table 1 fixed rate."},
 ]
 
+
 def api_get(path):
     url = f"{BASE_URL}/{urllib.parse.quote(path, safe='=&?/')}"
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req) as r:
         return json.loads(r.read().decode())
+
 
 def api_post(url, payload):
     data = json.dumps(payload).encode("utf-8")
@@ -65,6 +67,7 @@ def api_post(url, payload):
     with urllib.request.urlopen(req) as r:
         return json.loads(r.read().decode())
 
+
 def main():
     print("=" * 60)
     print("Florida Blue Fee Schedule Import")
@@ -75,7 +78,8 @@ def main():
     # ── Step 1: Find Florida Blue contracts ───────────────────────
     print("Step 1: Finding Florida Blue contracts...")
     contracts = api_get("contracts?active_only=true")
-    fl_blue_contracts = [c for c in contracts if "Florida Blue" in c["payer_name"]]
+    fl_blue_contracts = [
+        c for c in contracts if "Florida Blue" in c["payer_name"]]
 
     if not fl_blue_contracts:
         print("ERROR: No Florida Blue contracts found. Run 09_seed_data.sql first.")
@@ -88,7 +92,8 @@ def main():
 
     # ── Step 2: Get Medicare 2026 benchmark rates ──────────────────
     print("Step 2: Fetching Medicare 2026 benchmark rates...")
-    benchmarks = api_get("benchmark?source_name=Medicare 2026&locality=FL&year=2026")
+    benchmarks = api_get(
+        "benchmark?source_name=Medicare 2026&locality=FL&year=2026")
 
     if not benchmarks:
         print("ERROR: No Medicare 2026 benchmark rates found.")
@@ -105,7 +110,7 @@ def main():
         standard_lines.append({
             "cpt_code":       b["cpt_code"],
             "modifier":       "95",   # telehealth synchronous
-            "place_of_service": "10", # telehealth in patient home
+            "place_of_service": "10",  # telehealth in patient home
             "unit_type":      "per_service",
             "allowed_amount": rate,
             "effective_date": "2026-01-01",
@@ -131,8 +136,10 @@ def main():
         })
 
     all_lines = standard_lines + mat_lines
-    print(f"Step 3: Built {len(standard_lines)} standard NP lines (80% of Medicare)")
-    print(f"        + {len(mat_lines)} Table 1 MAT lines (HF modifier, fixed rates)")
+    print(
+        f"Step 3: Built {len(standard_lines)} standard NP lines (80% of Medicare)")
+    print(
+        f"        + {len(mat_lines)} Table 1 MAT lines (HF modifier, fixed rates)")
     print(f"        = {len(all_lines)} total lines per contract")
     print()
 
@@ -150,7 +157,8 @@ def main():
                   f"{contract['provider_name']}: {result['lines_upserted']} lines imported")
             total_imported += result["lines_upserted"]
         except urllib.error.HTTPError as e:
-            print(f"  ✗ Contract [{contract['contract_id']}] error: {e.read().decode()}")
+            print(
+                f"  ✗ Contract [{contract['contract_id']}] error: {e.read().decode()}")
 
     print()
     print("=" * 60)
@@ -160,19 +168,22 @@ def main():
 
     # ── Step 6: Show a preview of the rate gaps ───────────────────
     print("Rate gap preview (your highest-volume codes):")
-    print(f"  {'Code':<8} {'Medicare':>10} {'FL Blue':>10} {'% of Med':>10} {'Gap/Unit':>10}")
+    print(
+        f"  {'Code':<8} {'Medicare':>10} {'FL Blue':>10} {'% of Med':>10} {'Gap/Unit':>10}")
     print(f"  {'-'*8} {'-'*10} {'-'*10} {'-'*10} {'-'*10}")
 
-    highlight_codes = ["99214", "99213", "99215", "90833", "90837", "90792", "90791"]
+    highlight_codes = ["99214", "99213", "99215",
+                       "90833", "90837", "90792", "90791"]
     bench_map = {b["cpt_code"]: float(b["allowed_amount"]) for b in benchmarks}
 
     for code in highlight_codes:
         if code in bench_map:
             medicare = bench_map[code]
-            fl_blue  = round(medicare * FL_BLUE_NP_FACTOR, 2)
-            pct      = round((fl_blue / medicare) * 100, 1)
-            gap      = round(medicare * 1.30 - fl_blue, 2)   # gap to 130% target
-            print(f"  {code:<8} ${medicare:>9.2f} ${fl_blue:>9.2f} {pct:>9.1f}% ${gap:>9.2f}")
+            fl_blue = round(medicare * FL_BLUE_NP_FACTOR, 2)
+            pct = round((fl_blue / medicare) * 100, 1)
+            gap = round(medicare * 1.30 - fl_blue, 2)   # gap to 130% target
+            print(
+                f"  {code:<8} ${medicare:>9.2f} ${fl_blue:>9.2f} {pct:>9.1f}% ${gap:>9.2f}")
 
     print()
     print("These are gaps to your 130% target. Every row above is a negotiation opportunity.")
@@ -181,6 +192,7 @@ def main():
     print("  1. View full dashboard: http://localhost:8000/api/dashboard?payer_id=1")
     print("  2. View underpaid codes: http://localhost:8000/api/dashboard/underpaid/1")
     print("  3. View payer summary:   http://localhost:8000/api/dashboard/summary")
+
 
 if __name__ == "__main__":
     main()

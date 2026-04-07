@@ -129,8 +129,9 @@ def main():
     print(f"Found {len(contracts)} active contracts.")
 
     # ── Fetch benchmark rates to calculate revenue estimates ───────
-    benchmarks = api_get("benchmark?source_name=Medicare 2026&locality=FL&year=2026")
-    bench_map  = {b["cpt_code"]: float(b["allowed_amount"]) for b in benchmarks}
+    benchmarks = api_get(
+        "benchmark?source_name=Medicare 2026&locality=FL&year=2026")
+    bench_map = {b["cpt_code"]: float(b["allowed_amount"]) for b in benchmarks}
 
     # ── Distribute total volume proportionally across contracts ────
     # Simple approach: split estimated total volume by number of contracts
@@ -145,7 +146,7 @@ def main():
     # For payers with both group and individual contracts,
     # allocate 70% to group, 30% to individual
     total_imported = 0
-    skipped        = 0
+    skipped = 0
 
     print()
     print("Loading volume per contract:")
@@ -199,19 +200,20 @@ def main():
     print(f"  {'-'*8} {'-'*8} {'-'*10} {'-'*13} {'-'*13} {'-'*12}")
 
     highlight = ["99214", "99213", "99215", "90833", "90792", "90837", "90791"]
-    total_rev     = 0
-    total_target  = 0
+    total_rev = 0
+    total_target = 0
     for code in highlight:
         vol = VOLUME_BY_CODE.get(code, 0)
         med = bench_map.get(code)
         if not med or not vol:
             continue
-        rev    = round(med * 0.85 * vol, 0)   # rough blended 85% of Medicare
-        tgt    = round(med * 1.30 * vol, 0)   # at 130% target
-        gap    = tgt - rev
-        total_rev    += rev
+        rev = round(med * 0.85 * vol, 0)   # rough blended 85% of Medicare
+        tgt = round(med * 1.30 * vol, 0)   # at 130% target
+        gap = tgt - rev
+        total_rev += rev
         total_target += tgt
-        print(f"  {code:<8} {vol:>8,} ${med:>9.2f} ${rev:>12,.0f} ${tgt:>12,.0f} ${gap:>11,.0f}")
+        print(
+            f"  {code:<8} {vol:>8,} ${med:>9.2f} ${rev:>12,.0f} ${tgt:>12,.0f} ${gap:>11,.0f}")
 
     print(f"  {'─'*8} {'─'*8} {'─'*10} {'─'*13} {'─'*13} {'─'*12}")
     print(f"  {'TOTAL':<8} {'':>8} {'':>10} ${total_rev:>12,.0f} ${total_target:>12,.0f} ${total_target-total_rev:>11,.0f}")

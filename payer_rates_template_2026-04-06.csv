@@ -1,0 +1,100 @@
+payer_name,cpt_code,allowed_amount,modifier,place_of_service,effective_date,notes
+# INSTRUCTIONS:,,,,,,
+# payer_name,"Required. One of: Aetna, Ambetter, Cigna, Florida Blue, Optum / UHC, Wellmark Iowa",,,,,
+# cpt_code,Required. CPT code,,,,,
+# allowed_amount,Required. Contracted rate in $ (e.g. 145.00),,,,,
+# modifier,Optional. e.g. 95 or HF — leave blank if none,,,,,
+# place_of_service,"Optional. 10=telehealth, 11=office",,,,,
+# effective_date,Optional. YYYY-MM-DD,,,,,
+# notes,Optional free text,,,,,
+,,,,,,
+Aetna,99214,,,10,4/6/26,Est patient E/M moderate complexity
+Aetna,99215,,,10,4/6/26,Est patient E/M high complexity
+Aetna,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Aetna,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Aetna,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Aetna,99204,,,10,4/6/26,New patient E/M mod-high complexity
+Aetna,99205,,,10,4/6/26,New patient E/M high complexity
+Aetna,90785,,,10,4/6/26,Interactive Complexity
+Aetna,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Aetna,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Aetna,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Aetna,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+Ambetter,99214,94.82,,10,4/6/26,Est patient E/M moderate complexity
+Ambetter,99215,133.2,,10,4/6/26,Est patient E/M high complexity
+Ambetter,90833,55.55,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Ambetter,90836,70.66,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Ambetter,90838,94.15,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Ambetter,99204,124.45,,10,4/6/26,New patient E/M mod-high complexity
+Ambetter,99205,164.78,,10,4/6/26,New patient E/M high complexity
+Ambetter,90785,,,10,4/6/26,Interactive Complexity
+Ambetter,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Ambetter,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Ambetter,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Ambetter,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+Cigna,99214,,,10,4/6/26,Est patient E/M moderate complexity
+Cigna,99215,,,10,4/6/26,Est patient E/M high complexity
+Cigna,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Cigna,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Cigna,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Cigna,99204,,,10,4/6/26,New patient E/M mod-high complexity
+Cigna,99205,,,10,4/6/26,New patient E/M high complexity
+Cigna,90785,,,10,4/6/26,Interactive Complexity
+Cigna,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Cigna,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Cigna,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Cigna,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+Florida Blue,99214,108.02,,10,4/6/26,Est patient E/M moderate complexity
+Florida Blue,99215,153.5,,10,4/6/26,Est patient E/M high complexity
+Florida Blue,90833,65.36,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Florida Blue,90836,82.66,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Florida Blue,90838,109.59,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Florida Blue,99204,142.41,,10,4/6/26,New patient E/M mod-high complexity
+Florida Blue,99205,190.49,,10,4/6/26,New patient E/M high complexity
+Florida Blue,90785,11.62,,10,4/6/26,Interactive Complexity
+Florida Blue,98002,142.41,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Florida Blue,98003,190.49,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Florida Blue,98006,108.02,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Florida Blue,98007,153.5,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+Optum / UHC,99214,,,10,4/6/26,Est patient E/M moderate complexity
+Optum / UHC,99215,,,10,4/6/26,Est patient E/M high complexity
+Optum / UHC,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Optum / UHC,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Optum / UHC,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Optum / UHC,99204,,,10,4/6/26,New patient E/M mod-high complexity
+Optum / UHC,99205,,,10,4/6/26,New patient E/M high complexity
+Optum / UHC,90785,,,10,4/6/26,Interactive Complexity
+Optum / UHC,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Optum / UHC,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Optum / UHC,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Optum / UHC,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+Wellmark Iowa,99214,,,10,4/6/26,Est patient E/M moderate complexity
+Wellmark Iowa,99215,,,10,4/6/26,Est patient E/M high complexity
+Wellmark Iowa,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Wellmark Iowa,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Wellmark Iowa,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Wellmark Iowa,99204,,,10,4/6/26,New patient E/M mod-high complexity
+Wellmark Iowa,99205,,,10,4/6/26,New patient E/M high complexity
+Wellmark Iowa,90785,,,10,4/6/26,Interactive Complexity
+Wellmark Iowa,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+Wellmark Iowa,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+Wellmark Iowa,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+Wellmark Iowa,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
+,,,,,,
+BCBS - Massachusetts,99214,,,10,4/6/26,Est patient E/M moderate complexity
+BCBS - Massachusetts,99215,,,10,4/6/26,Est patient E/M high complexity
+BCBS - Massachusetts,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+BCBS - Massachusetts,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+BCBS - Massachusetts,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+BCBS - Massachusetts,99204,,,10,4/6/26,New patient E/M mod-high complexity
+BCBS - Massachusetts,99205,,,10,4/6/26,New patient E/M high complexity
+BCBS - Massachusetts,90785,,,10,4/6/26,Interactive Complexity
+BCBS - Massachusetts,98002,,,10,4/6/26,"Telehealth E/M new pt, moderate MDM, 45 min"
+BCBS - Massachusetts,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
+BCBS - Massachusetts,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
+BCBS - Massachusetts,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"

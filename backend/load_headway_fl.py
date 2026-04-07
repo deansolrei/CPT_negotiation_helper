@@ -16,6 +16,7 @@ Or pass a custom CSV path:
     python3 backend/load_headway_fl.py /path/to/headway_rates.csv
 """
 
+from backend.database import get_db
 import csv
 import os
 import sys
@@ -23,7 +24,6 @@ import sys
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
-from backend.database import get_db
 
 # Default path — the file the user already uploaded
 DEFAULT_CSV = os.path.join(
@@ -31,9 +31,9 @@ DEFAULT_CSV = os.path.join(
     "HEADWAY SOLREI FLORIDA RATES - Sheet1.csv",
 )
 
-STATE       = "FL"
-PLATFORM    = "Headway"
-EFF_DATE    = "2026-01-01"  # Update this when Headway sends new rate sheets
+STATE = "FL"
+PLATFORM = "Headway"
+EFF_DATE = "2026-01-01"  # Update this when Headway sends new rate sheets
 
 
 def clean_amount(raw: str) -> float | None:
@@ -75,7 +75,7 @@ def load_headway_csv(csv_path: str) -> None:
 
     with open(csv_path, newline="", encoding="utf-8-sig") as f:
         reader = csv.reader(f)
-        rows   = list(reader)
+        rows = list(reader)
 
     # Find the header row (contains "CPT Code")
     header_idx = None
@@ -88,8 +88,8 @@ def load_headway_csv(csv_path: str) -> None:
         print("✗  Could not find header row with 'CPT Code'. Check the file format.")
         sys.exit(1)
 
-    header    = rows[header_idx]
-    data_rows = rows[header_idx + 1 :]
+    header = rows[header_idx]
+    data_rows = rows[header_idx + 1:]
 
     # Columns: 0=CPT Code, 1=Description, 2+=payer names
     payer_names = [h.strip() for h in header[2:]]
@@ -103,7 +103,7 @@ def load_headway_csv(csv_path: str) -> None:
         if not row or not row[0].strip():
             continue
         cpt_code = row[0].strip()
-        desc     = row[1].strip() if len(row) > 1 else ""
+        desc = row[1].strip() if len(row) > 1 else ""
 
         code_descriptions[cpt_code] = desc
 
@@ -113,7 +113,8 @@ def load_headway_csv(csv_path: str) -> None:
             if amt is not None and amt > 0:
                 rate_data.append((cpt_code, payer_name.strip(), amt))
 
-    print(f"Found {len(code_descriptions)} CPT codes, {len(rate_data)} rate entries")
+    print(
+        f"Found {len(code_descriptions)} CPT codes, {len(rate_data)} rate entries")
 
     with get_db() as cur:
         # 1. Ensure all CPT codes exist
@@ -121,7 +122,8 @@ def load_headway_csv(csv_path: str) -> None:
         ensure_cpt_codes(cur, code_descriptions)
 
         # 2. Get Headway's intermediary_id
-        cur.execute("SELECT intermediary_id FROM intermediaries WHERE name = %s", (PLATFORM,))
+        cur.execute(
+            "SELECT intermediary_id FROM intermediaries WHERE name = %s", (PLATFORM,))
         row = cur.fetchone()
         if not row:
             print(f"✗  '{PLATFORM}' not found in intermediaries table.")
@@ -162,7 +164,8 @@ def load_headway_csv(csv_path: str) -> None:
             imported += 1
 
     print(f"\n✓  Done — {imported} Headway Florida rate(s) imported.")
-    print(f"   Payers: {len(payer_names)}  ·  CPT codes: {len(code_descriptions)}")
+    print(
+        f"   Payers: {len(payer_names)}  ·  CPT codes: {len(code_descriptions)}")
     print("\nRestart uvicorn (or it will auto-reload), then refresh the dashboard.")
     print("The Billing Channel Comparison section will now show all Headway rates.")
 
