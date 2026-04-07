@@ -18,7 +18,8 @@ from fastapi.responses import FileResponse
 from backend.routers import payers, contracts, fee_schedules, dashboard, letters, intermediaries
 
 # Path to the dashboard HTML file (one level up from this file)
-DASHBOARD_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "dashboard.html")
+DASHBOARD_PATH = os.path.join(os.path.dirname(
+    os.path.dirname(__file__)), "dashboard.html")
 
 app = FastAPI(
     title="Solrei CPT Negotiation Helper",

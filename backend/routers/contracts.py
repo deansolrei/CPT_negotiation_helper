@@ -5,8 +5,8 @@ Endpoints for contracts between payers and provider entities.
 """
 
 from fastapi import APIRouter, HTTPException
-from backend.database import get_db
-from backend.models import Contract
+from ..database import get_db
+from ..models import Contract
 
 router = APIRouter(prefix="/api", tags=["Contracts"])
 
@@ -69,5 +69,6 @@ def get_contract(contract_id: int):
         )
         row = cur.fetchone()
     if not row:
-        raise HTTPException(status_code=404, detail=f"Contract {contract_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Contract {contract_id} not found")
     return row

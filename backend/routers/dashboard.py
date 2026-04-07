@@ -13,7 +13,7 @@ import io
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from backend.database import get_db
-from backend.models import (
+from ..models import (
     DashboardRow,
     DashboardSummaryRow,
     NegotiationTargetIn,
@@ -85,14 +85,16 @@ def get_underpaid_codes(payer_id: int):
     """
     with get_db() as cur:
         # Verify payer exists
-        cur.execute("SELECT payer_name FROM payers WHERE payer_id = %s", (payer_id,))
+        cur.execute(
+            "SELECT payer_name FROM payers WHERE payer_id = %s", (payer_id,))
         payer = cur.fetchone()
         if not payer:
-            raise HTTPException(status_code=404, detail=f"Payer {payer_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Payer {payer_id} not found")
 
         cur.execute(
             """
-            SELECT
+            SELECT DISTINCT ON (cpt_code)
                 cpt_code,
                 short_description,
                 category,
@@ -109,7 +111,12 @@ def get_underpaid_codes(payer_id: int):
             FROM v_negotiation_dashboard
             WHERE payer_id = %s
               AND is_underpaid = TRUE
-            ORDER BY annual_revenue_gap DESC NULLS LAST, rate_gap_per_unit DESC
+              AND cpt_code IN (
+                  '99214','99215','90833','90836','90838',
+                  '99204','99205','90785',
+                  '98002','98003','98006','98007'
+              )
+            ORDER BY cpt_code, annual_revenue_gap DESC NULLS LAST
             """,
             (payer_id,),
         )
@@ -170,7 +177,8 @@ def upsert_target(payload: NegotiationTargetIn):
                 updated_at             = NOW()
             RETURNING *
             """,
-            (payload.payer_id, payload.cpt_code, payload.target_pct_of_medicare, payload.notes),
+            (payload.payer_id, payload.cpt_code,
+             payload.target_pct_of_medicare, payload.notes),
         )
         return cur.fetchone()
 
@@ -185,7 +193,8 @@ def delete_target(target_id: int):
         )
         deleted = cur.fetchone()
     if not deleted:
-        raise HTTPException(status_code=404, detail=f"Target {target_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Target {target_id} not found")
     return {"message": f"Target {target_id} deleted successfully"}
 
 
@@ -198,7 +207,7 @@ def export_dashboard_csv(payer_id: int = None, underpaid_only: bool = False):
     Optional filters: payer_id, underpaid_only.
     """
     filters = []
-    params  = []
+    params = []
     if payer_id:
         filters.append("payer_id = %s")
         params.append(payer_id)
@@ -212,7 +221,8 @@ def export_dashboard_csv(payer_id: int = None, underpaid_only: bool = False):
         rows = cur.fetchall()
 
     if not rows:
-        raise HTTPException(status_code=404, detail="No data found for export.")
+        raise HTTPException(
+            status_code=404, detail="No data found for export.")
 
     output = io.StringIO()
     columns = [

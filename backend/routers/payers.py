@@ -7,7 +7,7 @@ These are mostly read-only reference data.
 
 from fastapi import APIRouter, HTTPException
 from backend.database import get_db
-from backend.models import Payer, ProviderEntity, CptCode
+from ..models import Payer, ProviderEntity, CptCode
 
 router = APIRouter(prefix="/api", tags=["Reference Data"])
 
@@ -29,7 +29,8 @@ def get_payer(payer_id: int):
         cur.execute("SELECT * FROM payers WHERE payer_id = %s", (payer_id,))
         row = cur.fetchone()
     if not row:
-        raise HTTPException(status_code=404, detail=f"Payer {payer_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Payer {payer_id} not found")
     return row
 
 
@@ -55,7 +56,8 @@ def get_provider(provider_entity_id: int):
         )
         row = cur.fetchone()
     if not row:
-        raise HTTPException(status_code=404, detail=f"Provider {provider_entity_id} not found")
+        raise HTTPException(
+            status_code=404, detail=f"Provider {provider_entity_id} not found")
     return row
 
 
@@ -95,5 +97,6 @@ def get_cpt_code(cpt_code: str):
         cur.execute("SELECT * FROM cpt_codes WHERE cpt_code = %s", (cpt_code,))
         row = cur.fetchone()
     if not row:
-        raise HTTPException(status_code=404, detail=f"CPT code {cpt_code} not found")
+        raise HTTPException(
+            status_code=404, detail=f"CPT code {cpt_code} not found")
     return row

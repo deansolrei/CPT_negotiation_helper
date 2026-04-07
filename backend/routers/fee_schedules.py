@@ -6,7 +6,7 @@ Endpoints for importing and viewing fee schedule lines and benchmark rates.
 
 from fastapi import APIRouter, HTTPException
 from backend.database import get_db
-from backend.models import (
+from ..models import (
     FeeScheduleImportRequest,
     FeeScheduleImportResponse,
     BenchmarkImportRequest,
@@ -39,9 +39,11 @@ def import_fee_schedule(payload: FeeScheduleImportRequest):
     """
     # Verify the contract exists
     with get_db() as cur:
-        cur.execute("SELECT contract_id FROM contracts WHERE contract_id = %s", (payload.contract_id,))
+        cur.execute(
+            "SELECT contract_id FROM contracts WHERE contract_id = %s", (payload.contract_id,))
         if not cur.fetchone():
-            raise HTTPException(status_code=404, detail=f"Contract {payload.contract_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Contract {payload.contract_id} not found")
 
     upserted = 0
     with get_db() as cur:
@@ -191,9 +193,11 @@ def upsert_claims_volume(payload: ClaimsVolumeIn):
     }
     """
     with get_db() as cur:
-        cur.execute("SELECT contract_id FROM contracts WHERE contract_id = %s", (payload.contract_id,))
+        cur.execute(
+            "SELECT contract_id FROM contracts WHERE contract_id = %s", (payload.contract_id,))
         if not cur.fetchone():
-            raise HTTPException(status_code=404, detail=f"Contract {payload.contract_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Contract {payload.contract_id} not found")
 
         cur.execute(
             """

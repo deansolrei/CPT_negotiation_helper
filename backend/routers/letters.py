@@ -16,35 +16,39 @@ from backend.database import get_db
 
 router = APIRouter(prefix="/api", tags=["Negotiation Letters"])
 
-CLINIC_NAME    = "Solrei Behavioral Health, Inc."
+CLINIC_NAME = "Solrei Behavioral Health, Inc."
 CLINIC_ADDRESS = "9100 Conroy Windermere Rd, Windermere, FL 34786"
-CLINIC_NPI2    = "1003521006"
-CLINIC_EIN     = "92-1227672"
+CLINIC_NPI2 = "1003521006"
+CLINIC_EIN = "92-1227672"
 CLINIC_CONTACT = "Dean Pedersen"
-CLINIC_EMAIL   = "dean@solreibehavioralhealth.com"
+CLINIC_EMAIL = "dean@solreibehavioralhealth.com"
 
 
 def build_letter(payer: dict, codes: list, contract: dict) -> str:
-    today       = date.today().strftime("%B %d, %Y")
-    payer_name  = payer["payer_name"]
-    total_gap   = sum(float(c["annual_revenue_gap"] or 0) for c in codes)
-    top_codes   = sorted(codes, key=lambda c: float(c["annual_revenue_gap"] or 0), reverse=True)[:10]
+    today = date.today().strftime("%B %d, %Y")
+    payer_name = payer["payer_name"]
+    total_gap = sum(float(c["annual_revenue_gap"] or 0) for c in codes)
+    top_codes = sorted(codes, key=lambda c: float(
+        c["annual_revenue_gap"] or 0), reverse=True)[:10]
 
     # Build the code-by-code table
     table_lines = []
-    table_lines.append(f"  {'CPT':<8} {'Description':<38} {'Current':>10} {'Target':>10} {'Gap/Unit':>10} {'Est. Annual Gap':>16}")
-    table_lines.append(f"  {'─'*8} {'─'*38} {'─'*10} {'─'*10} {'─'*10} {'─'*16}")
+    table_lines.append(
+        f"  {'CPT':<8} {'Description':<38} {'Current':>10} {'Target':>10} {'Gap/Unit':>10} {'Est. Annual Gap':>16}")
+    table_lines.append(
+        f"  {'─'*8} {'─'*38} {'─'*10} {'─'*10} {'─'*10} {'─'*16}")
     for c in top_codes:
-        desc  = (c["short_description"] or "")[:37]
-        cur   = f"${float(c['payer_allowed'] or 0):>8.2f}"
-        tgt   = f"${float(c['target_allowed'] or 0):>8.2f}"
+        desc = (c["short_description"] or "")[:37]
+        cur = f"${float(c['payer_allowed'] or 0):>8.2f}"
+        tgt = f"${float(c['target_allowed'] or 0):>8.2f}"
         gap_u = f"${float(c['rate_gap_per_unit'] or 0):>8.2f}"
         gap_a = f"${float(c['annual_revenue_gap'] or 0):>13,.0f}" if c["annual_revenue_gap"] else "        (vol. TBD)"
-        table_lines.append(f"  {c['cpt_code']:<8} {desc:<38} {cur:>10} {tgt:>10} {gap_u:>10} {gap_a:>16}")
+        table_lines.append(
+            f"  {c['cpt_code']:<8} {desc:<38} {cur:>10} {tgt:>10} {gap_u:>10} {gap_a:>16}")
 
     table = "\n".join(table_lines)
     total_gap_fmt = f"${total_gap:,.0f}" if total_gap else "(pending volume data)"
-    pid   = contract.get("payer_contract_id") or "on file"
+    pid = contract.get("payer_contract_id") or "on file"
 
     letter = f"""
 {today}
@@ -163,7 +167,8 @@ def preview_letter(payer_id: int):
         cur.execute("SELECT * FROM payers WHERE payer_id = %s", (payer_id,))
         payer = cur.fetchone()
         if not payer:
-            raise HTTPException(status_code=404, detail=f"Payer {payer_id} not found")
+            raise HTTPException(
+                status_code=404, detail=f"Payer {payer_id} not found")
 
         # Get underpaid codes from dashboard view
         cur.execute(
@@ -197,10 +202,11 @@ def preview_letter(payer_id: int):
         raise HTTPException(
             status_code=404,
             detail=f"No underpaid codes found for payer {payer_id}. "
-                   "Import a fee schedule first.",
+            "Import a fee schedule first.",
         )
 
-    letter_text = build_letter(dict(payer), [dict(c) for c in codes], dict(contract))
+    letter_text = build_letter(
+        dict(payer), [dict(c) for c in codes], dict(contract))
 
     return {
         "payer_id":          payer_id,
@@ -216,7 +222,7 @@ def download_letter(payer_id: int):
     """
     Download the negotiation letter as a plain text file.
     """
-    result   = preview_letter(payer_id)
+    result = preview_letter(payer_id)
     filename = f"Negotiation_Letter_{result['payer_name'].replace(' ', '_')}_{date.today()}.txt"
     return PlainTextResponse(
         content=result["letter"],
