@@ -775,6 +775,53 @@
     let summaryData = [];
     let dashboardData = [];
 
+    // ── Canonical payer list — defines display names AND enforced sort order ──
+    const CANONICAL_PAYERS = [
+      'Aetna',
+      'Ambetter',
+      'BCBS - Massachusetts',
+      'Carelon',
+      'Cigna',
+      'Florida Blue',
+      'Optum/UHC/Oscar',
+      'Quest Health',
+      'Wellmark Iowa',
+    ];
+
+    // Map any raw DB / intermediary name → canonical display name.
+    // Ordered longest-first so "florida blue" is tested before "florida".
+    const _ALIAS_KEYS = [
+      ['florida blue',  'Florida Blue'],
+      ['aetna',         'Aetna'],
+      ['ambetter',      'Ambetter'],
+      ['bcbs',          'BCBS - Massachusetts'],
+      ['blue cross',    'BCBS - Massachusetts'],
+      ['massachusetts', 'BCBS - Massachusetts'],
+      ['carelon',       'Carelon'],
+      ['beacon',        'Carelon'],
+      ['cigna',         'Cigna'],
+      ['optum',         'Optum/UHC/Oscar'],
+      ['uhc',           'Optum/UHC/Oscar'],
+      ['oscar',         'Optum/UHC/Oscar'],
+      ['united',        'Optum/UHC/Oscar'],
+      ['quest',         'Quest Health'],
+      ['wellmark',      'Wellmark Iowa'],
+    ];
+
+    function canonicalizePayer(name) {
+      if (!name) return name;
+      const lower = (name || '').toLowerCase().trim();
+      for (const [key, canonical] of _ALIAS_KEYS) {
+        if (lower.includes(key)) return canonical;
+      }
+      return name.trim();
+    }
+
+    function payerSortIdx(name) {
+      const idx = CANONICAL_PAYERS.indexOf(name);
+      return idx === -1 ? 999 : idx;
+    }
+
     // ── Payer color palette ───────────────────────────────────────
     // accent = muted brand color (used for left border accent & active tab)
     // rowA / rowB = very light alternating row tints
@@ -789,6 +836,7 @@
       'oscar': { accent: '#5A99AF', rowA: '#9FC4D1', rowB: '#E7EFEB' },
       'optum': { accent: '#FFFFFF', rowA: '#FFFFFF', rowB: '#E7EFEB' },
       'wellmark': { accent: '#0F4AC9', rowA: '#9FC4D1', rowB: '#E7EFEB' },
+      'quest':    { accent: '#e8a832', rowA: '#fdf6e3', rowB: '#faecc5' },
     };
     const DEFAULT_PALETTE = { accent: '#498397', rowA: '#9FC4D1', rowB: '#E7EFEB' };
 
@@ -899,51 +947,68 @@
     // ── Payer summary table ───────────────────────────────────
     function renderPayerTable() {
       const tbody = document.getElementById('payer-tbody');
-      if (!summaryData.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="empty">No payer data loaded yet.</td></tr>`;
-        return;
-      }
 
-      tbody.innerHTML = summaryData.map(row => {
+      // Normalize DB payer names → canonical; merge duplicates by summing revenue
+      const payerMap = new Map(); // canonical → row
+      summaryData.forEach(row => {
+        const canonical = canonicalizePayer(row.payer_name);
+        if (!payerMap.has(canonical)) {
+          payerMap.set(canonical, { ...row, payer_name: canonical });
+        }
+        // If the same canonical already exists (e.g. Optum + UHC), keep existing
+        // (they'd ideally be merged in DB, but as a safeguard just keep first)
+      });
+
+      // Emit one row per canonical payer in defined order; placeholder if no data
+      tbody.innerHTML = CANONICAL_PAYERS.map(canonical => {
+        const row = payerMap.get(canonical);
+        if (!row) {
+          return `
+            <tr class="payer-row" style="opacity:0.4;pointer-events:none;">
+              <td><span class="expand-icon" style="color:#cbd5e1">▶</span></td>
+              <td><span class="payer-name" style="color:#94a3b8">${canonical}</span></td>
+              <td class="right" colspan="6" style="color:#cbd5e1;font-size:0.78rem;font-style:italic;">No contract data loaded</td>
+              <td class="center"></td>
+            </tr>`;
+        }
         const gap = row.total_revenue_gap;
         const gapFmt = gap ? `<strong style="color:#dc2626">${fmtK(gap)}</strong>` : '—';
         return `
-      <tr class="payer-row" onclick="toggleDrilldown(${row.payer_id}, this)" data-payer="${row.payer_id}">
-        <td><span class="expand-icon">▶</span></td>
-        <td><span class="payer-name">${row.payer_name}</span></td>
-        <td class="right">${row.codes_with_rates ?? '—'}</td>
-        <td class="right">
-          ${row.codes_underpaid > 0
-            ? `<span class="badge badge-red">${row.codes_underpaid}</span>`
-            : `<span class="badge badge-green">0</span>`}
-        </td>
-        <td class="right">
-          <div class="pct-bar-wrap">
-            <div class="pct-bar-bg">
-              <div class="pct-bar-fill" style="width:${Math.min(100, (row.avg_pct_of_medicare || 0) / 1.6)}%;background:${pctColor(row.avg_pct_of_medicare, 130)}"></div>
-            </div>
-            ${pctBadge(row.avg_pct_of_medicare, 130)}
-          </div>
-        </td>
-        <td class="right">${fmtK(row.total_revenue_current)}</td>
-        <td class="right">${fmtK(row.total_revenue_at_target)}</td>
-        <td class="right">${gapFmt}</td>
-        <td class="center" onclick="event.stopPropagation()">
-          <button class="btn btn-sm" onclick="openLetterModal(${row.payer_id}, '${row.payer_name}')"
-            title="Generate negotiation letter for ${row.payer_name}"
-            style="background:#7c3aed;">✉ Letter</button>
-          <button class="btn btn-sm" onclick="exportCSV(${row.payer_id})"
-            title="Export CSV for ${row.payer_name}" style="margin-top:4px;background:#0891b2;">⬇ CSV</button>
-        </td>
-      </tr>
-      <tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;">
-        <td colspan="8">
-          <div class="drilldown-inner" id="drilldown-inner-${row.payer_id}">
-            <div class="loading">Loading…</div>
-          </div>
-        </td>
-      </tr>
-    `;
+          <tr class="payer-row" onclick="toggleDrilldown(${row.payer_id}, this)" data-payer="${row.payer_id}">
+            <td><span class="expand-icon">▶</span></td>
+            <td><span class="payer-name">${canonical}</span></td>
+            <td class="right">${row.codes_with_rates ?? '—'}</td>
+            <td class="right">
+              ${row.codes_underpaid > 0
+                ? `<span class="badge badge-red">${row.codes_underpaid}</span>`
+                : `<span class="badge badge-green">0</span>`}
+            </td>
+            <td class="right">
+              <div class="pct-bar-wrap">
+                <div class="pct-bar-bg">
+                  <div class="pct-bar-fill" style="width:${Math.min(100, (row.avg_pct_of_medicare || 0) / 1.6)}%;background:${pctColor(row.avg_pct_of_medicare, 130)}"></div>
+                </div>
+                ${pctBadge(row.avg_pct_of_medicare, 130)}
+              </div>
+            </td>
+            <td class="right">${fmtK(row.total_revenue_current)}</td>
+            <td class="right">${fmtK(row.total_revenue_at_target)}</td>
+            <td class="right">${gapFmt}</td>
+            <td class="center" onclick="event.stopPropagation()">
+              <button class="btn btn-sm" onclick="openLetterModal(${row.payer_id}, '${canonical}')"
+                title="Generate negotiation letter for ${canonical}"
+                style="background:#7c3aed;">✉ Letter</button>
+              <button class="btn btn-sm" onclick="exportCSV(${row.payer_id})"
+                title="Export CSV for ${canonical}" style="margin-top:4px;background:#0891b2;">⬇ CSV</button>
+            </td>
+          </tr>
+          <tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;">
+            <td colspan="8">
+              <div class="drilldown-inner" id="drilldown-inner-${row.payer_id}">
+                <div class="loading">Loading…</div>
+              </div>
+            </td>
+          </tr>`;
       }).join('');
     }
 
@@ -1030,18 +1095,17 @@
       const showAll = document.getElementById('show-all').checked;
       const tbody = document.getElementById('full-tbody');
 
-      // One row per (payer, CPT): prefer Jodene Jensen NPI1 rate where available,
-      // fall back to any other entity so future payers show up automatically.
+      // One row per (canonical payer, CPT): prefer Jodene Jensen NPI1 rate.
       const seen = new Map();
       dashboardData.filter(r => DISPLAY_CPTS.includes(r.cpt_code)).forEach(r => {
-        const key = `${r.payer_name}|${r.cpt_code}`;
+        const canonical = canonicalizePayer(r.payer_name);
+        const key = `${canonical}|${r.cpt_code}`;
         if (!seen.has(key)) {
-          seen.set(key, r);
+          seen.set(key, { ...r, payer_name: canonical });
         } else {
           const ex = seen.get(key);
-          // Promote to Jodene Jensen's rate if we find it
           if (r.npi_number === JODENE_NPI && ex.npi_number !== JODENE_NPI) {
-            seen.set(key, r);
+            seen.set(key, { ...r, payer_name: canonical });
           }
         }
       });
@@ -1049,10 +1113,10 @@
 
       if (!showAll) rows = rows.filter(r => r.is_underpaid === true);
 
-      // Sort: payer A→Z, then CPT in DISPLAY_CPTS order
+      // Sort: canonical payer order, then CPT in DISPLAY_CPTS order
       rows.sort((a, b) => {
-        const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
-        if (pc !== 0) return pc;
+        const pa = payerSortIdx(a.payer_name), pb = payerSortIdx(b.payer_name);
+        if (pa !== pb) return pa - pb;
         return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
       });
 
@@ -1154,24 +1218,24 @@
         // Keep the row with the highest rate values.
         const seen = new Map();
         raw.forEach(row => {
-          if (!DISPLAY_CPTS.includes(row.cpt_code)) return;  // skip non-display codes
-          const normPayer = (row.payer_name || '').trim();
-          const key = `${normPayer.toLowerCase()}|${row.cpt_code}`;
+          if (!DISPLAY_CPTS.includes(row.cpt_code)) return;
+          const canonical = canonicalizePayer((row.payer_name || '').trim());
+          const key = `${canonical.toLowerCase()}|${row.cpt_code}`;
           if (!seen.has(key)) {
-            seen.set(key, Object.assign({}, row, { payer_name: normPayer }));
+            seen.set(key, Object.assign({}, row, { payer_name: canonical }));
           } else {
             const ex = seen.get(key);
             if ((row.headway_rate || 0) > (ex.headway_rate || 0)) ex.headway_rate = row.headway_rate;
-            if ((row.alma_rate || 0) > (ex.alma_rate || 0)) ex.alma_rate = row.alma_rate;
-            if ((row.grow_rate || 0) > (ex.grow_rate || 0)) ex.grow_rate = row.grow_rate;
-            if ((row.direct_rate || 0) > (ex.direct_rate || 0)) ex.direct_rate = row.direct_rate;
+            if ((row.alma_rate    || 0) > (ex.alma_rate    || 0)) ex.alma_rate    = row.alma_rate;
+            if ((row.grow_rate    || 0) > (ex.grow_rate    || 0)) ex.grow_rate    = row.grow_rate;
+            if ((row.direct_rate  || 0) > (ex.direct_rate  || 0)) ex.direct_rate  = row.direct_rate;
           }
         });
 
-        // Sort: payer name A→Z, then CPT in DISPLAY_CPTS order
+        // Sort: canonical payer order, then CPT in DISPLAY_CPTS order
         channelData = [...seen.values()].sort((a, b) => {
-          const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
-          if (pc !== 0) return pc;
+          const pa = payerSortIdx(a.payer_name), pb = payerSortIdx(b.payer_name);
+          if (pa !== pb) return pa - pb;
           return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
         });
 
@@ -1187,21 +1251,21 @@
 
     function buildChannelPayerTabs() {
       const tabBar = document.getElementById('channel-payer-tabs');
-      const payers = [...new Set(channelData.map(r => r.payer_name))].filter(Boolean).sort();
       const allActive = channelPayerFilter === null;
+      // Always show ALL canonical payers in defined order, even if no data yet
       tabBar.innerHTML =
         `<button class="tab-btn ${allActive ? 'active' : ''}"
-      onclick="filterChannelTable(null, this)">All Payers</button>` +
-        payers.map(name => {
-          const pal = getPayerPalette(name);
-          const isActive = channelPayerFilter === name;
+          onclick="filterChannelTable(null, this)">All Payers</button>` +
+        CANONICAL_PAYERS.map(canonical => {
+          const pal = getPayerPalette(canonical);
+          const isActive = channelPayerFilter === canonical;
           const inlineStyle = isActive
             ? `background:${pal.accent};color:white;border-color:${pal.accent};`
             : '';
           return `<button class="tab-btn ${isActive ? 'active' : ''}"
-        style="${inlineStyle}"
-        data-accent="${pal.accent}"
-        onclick="filterChannelTable('${name.replace(/'/g, "\\'")}', this)">${name}</button>`;
+            style="${inlineStyle}"
+            data-accent="${pal.accent}"
+            onclick="filterChannelTable('${canonical.replace(/'/g, "\\'")}', this)">${canonical}</button>`;
         }).join('');
     }
 
