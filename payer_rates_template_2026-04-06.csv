@@ -8,11 +8,11 @@ payer_name,cpt_code,allowed_amount,modifier,place_of_service,effective_date,note
 # effective_date,Optional. YYYY-MM-DD,,,,,
 # notes,Optional free text,,,,,
 ,,,,,,
-Aetna,99214,,,10,4/6/26,Est patient E/M moderate complexity
-Aetna,99215,,,10,4/6/26,Est patient E/M high complexity
-Aetna,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
-Aetna,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
-Aetna,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Aetna,99214,94.76,,10,4/6/26,Est patient E/M moderate complexity
+Aetna,99215,128.13,,10,4/6/26,Est patient E/M high complexity
+Aetna,90833,60.78,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Aetna,90836,76.51,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Aetna,90838,101.21,,10,4/6/26,Add-on psychotherapy 60 min with E/M
 Aetna,99204,,,10,4/6/26,New patient E/M mod-high complexity
 Aetna,99205,,,10,4/6/26,New patient E/M high complexity
 Aetna,90785,,,10,4/6/26,Interactive Complexity
@@ -34,11 +34,11 @@ Ambetter,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
 Ambetter,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
 Ambetter,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
 ,,,,,,
-Cigna,99214,,,10,4/6/26,Est patient E/M moderate complexity
-Cigna,99215,,,10,4/6/26,Est patient E/M high complexity
-Cigna,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
-Cigna,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
-Cigna,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Cigna,99214,80.56,,10,4/6/26,Est patient E/M moderate complexity
+Cigna,99215,117.66,,10,4/6/26,Est patient E/M high complexity
+Cigna,90833,38,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Cigna,90836,62,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Cigna,90838,101,,10,4/6/26,Add-on psychotherapy 60 min with E/M
 Cigna,99204,,,10,4/6/26,New patient E/M mod-high complexity
 Cigna,99205,,,10,4/6/26,New patient E/M high complexity
 Cigna,90785,,,10,4/6/26,Interactive Complexity
@@ -60,11 +60,11 @@ Florida Blue,98003,190.49,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
 Florida Blue,98006,108.02,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
 Florida Blue,98007,153.5,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
 ,,,,,,
-Optum / UHC,99214,,,10,4/6/26,Est patient E/M moderate complexity
-Optum / UHC,99215,,,10,4/6/26,Est patient E/M high complexity
-Optum / UHC,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
-Optum / UHC,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
-Optum / UHC,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
+Optum / UHC,99214,109.17,,10,4/6/26,Est patient E/M moderate complexity
+Optum / UHC,99215,152.95,,10,4/6/26,Est patient E/M high complexity
+Optum / UHC,90833,64.63,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Optum / UHC,90836,74.89,,10,4/6/26,Add-on psychotherapy 45 min with E/M
+Optum / UHC,90838,99.08,,10,4/6/26,Add-on psychotherapy 60 min with E/M
 Optum / UHC,99204,,,10,4/6/26,New patient E/M mod-high complexity
 Optum / UHC,99205,,,10,4/6/26,New patient E/M high complexity
 Optum / UHC,90785,,,10,4/6/26,Interactive Complexity
@@ -73,9 +73,9 @@ Optum / UHC,98003,,,10,4/6/26,"Telehealth E/M new pt, high MDM, 60 min"
 Optum / UHC,98006,,,10,4/6/26,"Telehealth E/M est pt, moderate MDM, 30 min"
 Optum / UHC,98007,,,10,4/6/26,"Telehealth E/M est pt, high MDM, 40 min"
 ,,,,,,
-Wellmark Iowa,99214,,,10,4/6/26,Est patient E/M moderate complexity
+Wellmark Iowa,99214,155.8,,10,4/6/26,Est patient E/M moderate complexity
 Wellmark Iowa,99215,,,10,4/6/26,Est patient E/M high complexity
-Wellmark Iowa,90833,,,10,4/6/26,Add-on psychotherapy 30 min with E/M
+Wellmark Iowa,90833,77.2,,10,4/6/26,Add-on psychotherapy 30 min with E/M
 Wellmark Iowa,90836,,,10,4/6/26,Add-on psychotherapy 45 min with E/M
 Wellmark Iowa,90838,,,10,4/6/26,Add-on psychotherapy 60 min with E/M
 Wellmark Iowa,99204,,,10,4/6/26,New patient E/M mod-high complexity

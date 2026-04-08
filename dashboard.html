@@ -1,46 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Solrei CPT Negotiation Dashboard</title>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #f0f4f8;
-      color: #1a2332;
+      background: #F8FBF9;
+      color: #2E3A32;
       min-height: 100vh;
     }
 
     /* ── Header ─────────────────────────────────────────── */
     header {
-      background: #92ae9d;
+      background: #C3D5CB;
       color: white;
       padding: 16px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     }
-    header .logo-wrap { display:flex; align-items:center; gap:14px; }
-    header .logo-wrap img { height:52px; width:auto; object-fit:contain; }
-    header h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: -0.2px; color:white; opacity:0.92; }
-    header p  { font-size: 0.78rem; opacity: 0.72; margin-top: 2px; }
+
+    header .logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    header .logo-wrap img {
+      height: 52px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    header h1 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      color: white;
+      opacity: 0.92;
+    }
+
+    header p {
+      font-size: 0.78rem;
+      opacity: 0.72;
+      margin-top: 2px;
+    }
+
     #status-badge {
       font-size: 0.75rem;
       padding: 5px 12px;
       border-radius: 20px;
       font-weight: 600;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
-    #status-badge.ok     { background: #16a34a22; border-color: #16a34a; color: #4ade80; }
-    #status-badge.error  { background: #dc262622; border-color: #dc2626; color: #f87171; }
+
+    #status-badge.ok {
+      background: #7fcc9b;
+      border-color: #1b532f;
+      color: #277644;
+    }
+
+    #status-badge.error {
+      background: #dc262622;
+      border-color: #7a0e0e;
+      color: #c83c3c;
+    }
 
     /* ── Main layout ─────────────────────────────────────── */
-    main { max-width: 1400px; margin: 0 auto; padding: 28px 24px; }
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
 
     /* ── Summary cards ───────────────────────────────────── */
     .cards {
@@ -49,19 +93,45 @@
       gap: 16px;
       margin-bottom: 28px;
     }
+
     .card {
-      background: white;
+      background: rgb(224, 220, 220);
       border-radius: 10px;
       padding: 18px 20px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-      border-left: 4px solid #2563a8;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+      border-left: 4px solid #319bc2;
     }
-    .card.gap  { border-left-color: #dc2626; }
-    .card.ok   { border-left-color: #16a34a; }
-    .card label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.6px; color: #64748b; font-weight: 600; }
-    .card .value { font-size: 1.7rem; font-weight: 700; margin-top: 4px; color: #1a2332; }
-    .card.gap .value { color: #dc2626; }
-    .card.ok  .value { color: #16a34a; }
+
+    .card.gap {
+      border-left-color: #ce1717;
+    }
+
+    .card.ok {
+      border-left-color: #277644;
+    }
+
+    .card label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .card .value {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #1a2332;
+    }
+
+    .card.gap .value {
+      color: #ce1717;
+    }
+
+    .card.ok .value {
+      color: #277644;
+    }
 
     /* ── Section titles ──────────────────────────────────── */
     .section-title {
@@ -73,6 +143,7 @@
       align-items: center;
       gap: 8px;
     }
+
     .section-title span {
       font-size: 0.75rem;
       font-weight: 500;
@@ -83,15 +154,31 @@
     .table-wrap {
       background: white;
       border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
       overflow: hidden;
       margin-bottom: 28px;
     }
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    thead tr { background: #f8fafc; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead tr {
+      background: #f8fafc;
+    }
+
     /* Subtle column separators */
-    th:not(:last-child), td:not(:last-child) { border-right: 1px solid rgba(0,0,0,0.06); }
-    thead th:not(:last-child) { border-right-color: rgba(0,0,0,0.10); }
+    th:not(:last-child),
+    td:not(:last-child) {
+      border-right: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    thead th:not(:last-child) {
+      border-right-color: rgba(0, 0, 0, 0.10);
+    }
+
     thead th {
       padding: 11px 14px;
       text-align: left;
@@ -103,21 +190,64 @@
       border-bottom: 2px solid #e2e8f0;
       white-space: nowrap;
     }
-    thead th.right { text-align: right; }
-    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.1s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #f8fafc; }
-    tbody td { padding: 11px 14px; }
-    tbody td.right { text-align: right; font-variant-numeric: tabular-nums; }
-    tbody td.center { text-align: center; }
+
+    thead th.right {
+      text-align: right;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.1s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    tbody td {
+      padding: 11px 14px;
+    }
+
+    tbody td.right {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody td.center {
+      text-align: center;
+    }
 
     /* ── Payer summary row ────────────────────────────────── */
-    .payer-row { cursor: pointer; }
-    .payer-row:hover { background: #eff6ff !important; }
-    .payer-name { font-weight: 600; color: #2563a8; }
-    .payer-name:hover { text-decoration: underline; }
-    .expand-icon { color: #94a3b8; font-size: 0.8rem; transition: transform 0.2s; }
-    .expanded .expand-icon { transform: rotate(90deg); }
+    .payer-row {
+      cursor: pointer;
+    }
+
+    .payer-row:hover {
+      background: #eff6ff !important;
+    }
+
+    .payer-name {
+      font-weight: 600;
+      color: #319bc2;
+    }
+
+    .payer-name:hover {
+      text-decoration: underline;
+    }
+
+    .expand-icon {
+      color: #94a3b8;
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+    }
+
+    .expanded .expand-icon {
+      transform: rotate(90deg);
+    }
 
     /* ── Badges ──────────────────────────────────────────── */
     .badge {
@@ -127,463 +257,657 @@
       font-size: 0.72rem;
       font-weight: 600;
     }
-    .badge-red    { background: #fee2e2; color: #dc2626; }
-    .badge-green  { background: #dcfce7; color: #16a34a; }
-    .badge-yellow { background: #fef9c3; color: #b45309; }
-    .badge-gray   { background: #f1f5f9; color: #64748b; }
-    .badge-blue   { background: #dbeafe; color: #2563a8; }
+
+    .badge-red {
+      background: #bbbbbb;
+      color: #ce1717;
+    }
+
+    .badge-green {
+      background: #dcfce7;
+      color: #277644;
+    }
+
+    .badge-yellow {
+      background: #fff59e;
+      color: #4bb24a;
+    }
+
+    .badge-gray {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .badge-blue {
+      background: #dbeafe;
+      color: #2563a8;
+    }
 
     /* ── Drilldown panel ─────────────────────────────────── */
-    .drilldown-row td { padding: 0 !important; background: #f8fafc !important; }
-    .drilldown-inner  { padding: 0 16px 16px; }
-    .drilldown-title  {
-      font-size: 0.8rem; font-weight: 700; color: #475569;
-      padding: 12px 0 8px; text-transform: uppercase; letter-spacing: 0.5px;
+    .drilldown-row td {
+      padding: 0 !important;
+      background: #f8fafc !important;
     }
-    .drilldown-row table thead tr { background: #f1f5f9; }
+
+    .drilldown-inner {
+      padding: 0 16px 16px;
+    }
+
+    .drilldown-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #475569;
+      padding: 12px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .drilldown-row table thead tr {
+      background: #f1f5f9;
+    }
 
     /* ── Pct bar ─────────────────────────────────────────── */
-    .pct-bar-wrap { display: flex; align-items: center; gap: 8px; }
-    .pct-bar-bg {
-      flex: 1; height: 6px; background: #e2e8f0;
-      border-radius: 3px; overflow: hidden; min-width: 60px;
+    .pct-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .pct-bar-fill { height: 100%; border-radius: 3px; }
+
+    .pct-bar-bg {
+      flex: 1;
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+
+    .pct-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+    }
 
     /* ── Loading / empty states ──────────────────────────── */
     .loading {
-      text-align: center; padding: 48px; color: #94a3b8; font-size: 0.9rem;
+      text-align: center;
+      padding: 48px;
+      color: #94a3b8;
+      font-size: 0.9rem;
     }
+
     .empty {
-      text-align: center; padding: 32px; color: #94a3b8; font-size: 0.85rem;
+      text-align: center;
+      padding: 32px;
+      color: #94a3b8;
+      font-size: 0.85rem;
     }
+
     .error-msg {
-      background: #fee2e2; color: #dc2626; border-radius: 8px;
-      padding: 16px 20px; margin-bottom: 20px; font-size: 0.85rem;
+      background: #fee2e2;
+      color: #951717;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
     }
 
     /* ── Refresh button ──────────────────────────────────── */
     .btn {
-      background: #2563a8; color: white; border: none;
-      border-radius: 7px; padding: 8px 18px; font-size: 0.82rem;
-      font-weight: 600; cursor: pointer; transition: background 0.15s;
+      background: #319bc2;
+      color: white;
+      border: none;
+      border-radius: 7px;
+      padding: 8px 18px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
     }
-    .btn:hover { background: #1d4ed8; }
-    .btn-sm { padding: 5px 12px; font-size: 0.75rem; border-radius: 5px; }
+
+    .btn:hover {
+      background: #319bc2;
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      border-radius: 5px;
+    }
 
     /* ── Target line annotation ──────────────────────────── */
     .target-note {
-      font-size: 0.72rem; color: #64748b; margin-bottom: 6px;
-      display: flex; align-items: center; gap: 8px;
+      font-size: 0.72rem;
+      color: #64748b;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .target-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+    .target-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
 
     footer {
-      text-align: center; padding: 24px; font-size: 0.75rem; color: #94a3b8;
+      text-align: center;
+      padding: 24px;
+      font-size: 0.75rem;
+      color: #94a3b8;
     }
 
     /* ── Channel Comparison ──────────────────────────────── */
     .upload-zone {
-      border: 2px dashed #cbd5e1; border-radius: 10px;
-      padding: 20px 24px; text-align: center;
-      background: #f8fafc; margin-bottom: 16px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 20px 24px;
+      text-align: center;
+      background: #f8fafc;
+      margin-bottom: 16px;
       transition: border-color 0.2s, background 0.2s;
     }
-    .upload-zone.drag-over { border-color: #2563a8; background: #eff6ff; }
-    .upload-zone p { color: #64748b; font-size: 0.82rem; margin-top: 6px; }
-    .upload-zone input[type="file"] { display: none; }
+
+    .upload-zone.drag-over {
+      border-color: #319bc2;
+      background: #eff6ff;
+    }
+
+    .upload-zone p {
+      color: #64748b;
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    .upload-zone input[type="file"] {
+      display: none;
+    }
 
     .channel-badge {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
-      font-size: 0.7rem; font-weight: 700; white-space: nowrap;
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
-    .channel-direct       { background: #497aa9; color: #fff; }
-    .channel-headway      { background: #4fa86b; color: #fff; }
-    .channel-alma         { background: #264b3a; color: #fff; }
-    .channel-grow         { background: #beb1fa; color: #1a2332; }
-    .channel-tie          { background: #686f76; color: #fff; }
-    .channel-na           { background: #f1f5f9; color: #94a3b8; }
 
-    .rate-best  { font-weight: 700; color: #059669; }
-    .rate-lower { color: #94a3b8; }
+    .channel-direct {
+      background: #497aa9;
+      color: #fff;
+    }
+
+    .channel-headway {
+      background: #4fa86b;
+      color: #fff;
+    }
+
+    .channel-alma {
+      background: #264b3a;
+      color: #fff;
+    }
+
+    .channel-grow {
+      background: #beb1fa;
+      color: #1a2332;
+    }
+
+    .channel-tie {
+      background: #686f76;
+      color: #fff;
+    }
+
+    .channel-na {
+      background: #f1f5f9;
+      color: #94a3b8;
+    }
+
+    .rate-best {
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .rate-lower {
+      color: #94a3b8;
+    }
 
     .tab-bar {
-      display: flex; gap: 4px; margin-bottom: 16px;
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
     }
+
     .tab-btn {
-      padding: 6px 16px; border-radius: 6px; font-size: 0.8rem;
-      font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0;
-      background: white; color: #64748b; transition: all 0.15s;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #e2e8f0;
+      background: white;
+      color: #64748b;
+      transition: all 0.15s;
     }
-    .tab-btn.active { background: #2563a8; color: white; border-color: #2563a8; }
+
+    .tab-btn.active {
+      background: #319bc2;
+      color: white;
+      border-color: #2563a8;
+    }
 
     .upload-status {
-      padding: 10px 16px; border-radius: 7px; font-size: 0.82rem;
-      margin-top: 10px; display: none;
+      padding: 10px 16px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      margin-top: 10px;
+      display: none;
     }
-    .upload-status.success { background: #dcfce7; color: #166534; display: block; }
-    .upload-status.error   { background: #fee2e2; color: #dc2626; display: block; }
-    .upload-status.loading { background: #eff6ff; color: #2563a8; display: block; }
+
+    .upload-status.success {
+      background: #dcfce7;
+      color: #166534;
+      display: block;
+    }
+
+    .upload-status.error {
+      background: #fee2e2;
+      color: #951717;
+      display: block;
+    }
+
+    .upload-status.loading {
+      background: #eff6ff;
+      color: #2563a8;
+      display: block;
+    }
   </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo-wrap">
-    <img src="/assets/solrei_logo.gif" alt="Solrei Behavioral Health" onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
-    <div id="logo-fallback" style="display:none;">
-      <h1>Solrei CPT Negotiation Dashboard</h1>
-      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
-    </div>
-    <div>
-      <h1>CPT Negotiation Dashboard</h1>
-      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
-    </div>
-  </div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <button class="btn btn-sm" onclick="loadAll()">↻ Refresh</button>
-    <div id="status-badge">Connecting…</div>
-  </div>
-</header>
-
-<main>
-  <div id="error-container"></div>
-
-  <!-- Summary cards -->
-  <div class="cards" id="cards">
-    <div class="card"><label>Payers Loaded</label><div class="value" id="c-payers">—</div></div>
-    <div class="card"><label>CPT Codes Tracked</label><div class="value" id="c-codes">—</div></div>
-    <div class="card gap"><label>Underpaid Codes</label><div class="value" id="c-underpaid">—</div></div>
-    <div class="card gap"><label>Est. Annual Revenue Gap</label><div class="value" id="c-gap">—</div></div>
-    <div class="card"><label>Est. Revenue at Target</label><div class="value" id="c-target">—</div></div>
-    <div class="card"><label>Target vs. Medicare</label><div class="value" id="c-pct">130%</div></div>
-  </div>
-
-  <!-- Payer Summary Table -->
-  <div class="section-title">
-    Payer Summary
-    <span>— click any row to see underpaid codes · use buttons to generate letters or export data</span>
-    <div style="margin-left:auto;display:flex;gap:8px;">
-      <button class="btn btn-sm" onclick="exportCSV()" title="Download full dashboard as CSV">⬇ Export CSV</button>
-    </div>
-  </div>
-  <div class="table-wrap">
-    <table id="payer-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Payer</th>
-          <th class="right">Codes w/ Rates</th>
-          <th class="right">Codes Underpaid</th>
-          <th class="right">Avg % of Medicare</th>
-          <th class="right">Current Revenue</th>
-          <th class="right">Revenue at Target</th>
-          <th class="right">Revenue Gap</th>
-          <th class="center">Actions</th>
-        </tr>
-      </thead>
-      <tbody id="payer-tbody">
-        <tr><td colspan="9" class="loading">Loading payer data…</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Letter Modal -->
-  <div id="letter-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;overflow-y:auto;">
-    <div style="background:white;max-width:820px;margin:40px auto;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
-      <div style="background:#1a3a5c;color:white;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-weight:700;font-size:1rem;" id="letter-modal-title">Negotiation Letter</div>
-          <div style="font-size:0.75rem;opacity:0.75;margin-top:2px;" id="letter-modal-subtitle"></div>
-        </div>
-        <div style="display:flex;gap:10px;align-items:center;">
-          <button class="btn btn-sm" id="letter-download-btn">⬇ Download .txt</button>
-          <button onclick="closeLetterModal()" style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:0.85rem;">✕ Close</button>
-        </div>
+  <header>
+    <div class="logo-wrap">
+      <img src="/assets/solrei_logo.gif" alt="Solrei Behavioral Health"
+        onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+      <div id="logo-fallback" style="display:none;">
+        <h1>Solrei CPT Negotiation Dashboard</h1>
+        <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
       </div>
-      <div id="letter-modal-body" style="padding:24px;">
-        <div class="loading">Generating letter…</div>
+      <div>
+        <h1>CPT Negotiation Dashboard</h1>
+        <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
       </div>
     </div>
-  </div>
-
-  <!-- Full Dashboard Table -->
-  <div class="section-title">
-    Rate Comparison by Payer — All Providers
-    <span>— showing underpaid codes only</span>
-    <label style="margin-left:auto;font-size:0.8rem;font-weight:500;cursor:pointer;">
-      <input type="checkbox" id="show-all" onchange="renderFullTable()"> Show all codes
-    </label>
-  </div>
-  <div class="table-wrap">
-    <table id="full-table">
-      <thead>
-        <tr>
-          <th>Payer</th>
-          <th>Code</th>
-          <th>Description</th>
-          <th class="right">Payer Rate</th>
-          <th class="right">Medicare</th>
-          <th class="right">% of Med</th>
-          <th class="right">Target</th>
-          <th class="right">Gap/Unit</th>
-          <th class="right">Volume</th>
-          <th class="right">Annual Gap $</th>
-          <th class="center">Status</th>
-        </tr>
-      </thead>
-      <tbody id="full-tbody">
-        <tr><td colspan="11" class="loading">Loading…</td></tr>
-      </tbody>
-
-    </table>
-  </div>
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- Billing Channel Comparison                            -->
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <div class="section-title" style="margin-top:12px;">
-    Billing Channel Comparison
-    <span>— Direct billing vs Headway · Alma · Grow Therapy</span>
-    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-      <button class="btn btn-sm" onclick="downloadChannelTemplate()"
-        style="background:#0891b2;" title="Download blank CSV template to fill in rates">
-        ⬇ Rate Template CSV
-      </button>
-      <button class="btn btn-sm" onclick="exportChannelCSV()"
-        style="background:#059669;" title="Export full comparison as CSV">
-        ⬇ Export Comparison
-      </button>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn btn-sm" onclick="loadAll()">↻ Refresh</button>
+      <div id="status-badge">Connecting…</div>
     </div>
-  </div>
+  </header>
 
-  <!-- Comparison table filters -->
-  <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
-    <div class="tab-bar" id="channel-payer-tabs">
-      <button class="tab-btn active" onclick="filterChannelTable(null, this)">All Payers</button>
-    </div>
-    <label style="font-size:0.8rem;font-weight:500;cursor:pointer;margin-left:auto;">
-      <input type="checkbox" id="channel-best-only" onchange="renderChannelTable()">
-      Show only where intermediary pays more
-    </label>
-  </div>
+  <main>
+    <div id="error-container"></div>
 
-  <!-- Comparison table -->
-  <div class="table-wrap">
-    <table id="channel-table">
-      <thead>
-        <tr>
-          <th>Payer</th>
-          <th>CPT</th>
-          <th>Description</th>
-          <th class="right">Medicare</th>
-          <th class="right">Direct</th>
-          <th class="right">Headway</th>
-          <th class="right">Alma</th>
-          <th class="right">Grow Therapy</th>
-          <th class="center">Best Channel</th>
-        </tr>
-      </thead>
-      <tbody id="channel-tbody">
-        <tr><td colspan="9" class="empty">
-          No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.
-        </td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Upload panel — at the bottom so all payer rows stay together above -->
-  <div class="table-wrap" style="padding:20px;margin-top:16px;">
-    <div style="font-weight:600;font-size:0.9rem;color:#1a2332;margin-bottom:14px;">📤 Upload Intermediary Rates</div>
-    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
-
-      <!-- Upload zone -->
-      <div style="flex:1;min-width:280px;">
-        <div style="font-weight:600;font-size:0.82rem;color:#475569;margin-bottom:8px;">
-          Upload Rates CSV
-        </div>
-
-        <!-- Intermediary selector for wide-format uploads -->
-        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
-          <label style="font-size:0.78rem;color:#475569;white-space:nowrap;">Platform:</label>
-          <select id="upload-intermediary" style="flex:1;padding:5px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;">
-            <option value="Headway">Headway</option>
-            <option value="Alma">Alma</option>
-            <option value="Grow Therapy">Grow Therapy</option>
-          </select>
-          <label style="font-size:0.75rem;color:#64748b;white-space:nowrap;" title="Use 'Auto-detect' for our standard template format">
-            <input type="checkbox" id="upload-auto-detect" checked> Auto-detect format
-          </label>
-        </div>
-
-        <div class="upload-zone" id="upload-zone"
-          ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
-          ondrop="handleDrop(event)" onclick="document.getElementById('rate-file-input').click()">
-          <div style="font-size:1.4rem;margin-bottom:4px;">📂</div>
-          <strong style="font-size:0.85rem;color:#1a2332;">Click or drag to upload rates CSV</strong>
-          <p>Upload the native Headway/Alma/Grow rate sheet (payers as columns),<br>
-             or use our Rate Template for a custom format. Safe to re-upload.</p>
-          <input type="file" id="rate-file-input" accept=".csv" onchange="uploadRatesCSV(this.files[0])">
-        </div>
-        <div id="upload-status" class="upload-status"></div>
+    <!-- Summary cards -->
+    <div class="cards" id="cards">
+      <div class="card"><label>Payers Loaded</label>
+        <div class="value" id="c-payers">—</div>
       </div>
-
-      <!-- How it works -->
-      <div style="flex:1;min-width:240px;background:#f8fafc;border-radius:8px;padding:16px;font-size:0.8rem;color:#475569;line-height:1.6;">
-        <strong style="color:#1a2332;font-size:0.85rem;">How to update rates:</strong><br><br>
-        1. Click <strong>⬇ Rate Template CSV</strong> above to download a pre-filled template<br>
-        2. Open in Excel or Numbers<br>
-        3. Fill in the <code>allowed_amount</code> column for each intermediary + CPT code<br>
-        4. Drag &amp; drop the saved file here (or click to browse)<br>
-        5. The comparison table updates automatically<br><br>
-        <strong>Columns:</strong> intermediary_name · payer_name (blank = all payers) ·
-        cpt_code · state · allowed_amount · effective_date · notes
+      <div class="card"><label>CPT Codes Tracked</label>
+        <div class="value" id="c-codes">—</div>
+      </div>
+      <div class="card gap"><label>Underpaid Codes</label>
+        <div class="value" id="c-underpaid">—</div>
+      </div>
+      <div class="card gap"><label>Est. Annual Revenue Gap</label>
+        <div class="value" id="c-gap">—</div>
+      </div>
+      <div class="card"><label>Est. Revenue at Target</label>
+        <div class="value" id="c-target">—</div>
+      </div>
+      <div class="card"><label>Target vs. Medicare</label>
+        <div class="value" id="c-pct">130%</div>
       </div>
     </div>
-  </div>
 
-</main>
+    <!-- Payer Summary Table -->
+    <div class="section-title">
+      Payer Summary
+      <span>— click any row to see underpaid codes · use buttons to generate letters or export data</span>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="exportCSV()" title="Download full dashboard as CSV">⬇ Export CSV</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="payer-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Payer</th>
+            <th class="right">Codes w/ Rates</th>
+            <th class="right">Codes Underpaid</th>
+            <th class="right">Avg % of Medicare</th>
+            <th class="right">Current Revenue</th>
+            <th class="right">Revenue at Target</th>
+            <th class="right">Revenue Gap</th>
+            <th class="center">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="payer-tbody">
+          <tr>
+            <td colspan="9" class="loading">Loading payer data…</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<footer>Solrei CPT Negotiation Helper · Jodene Jensen, PMHNP-BC · Medicare 2026 FL · Target: 130% of Medicare</footer>
+    <!-- Letter Modal -->
+    <div id="letter-modal"
+      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;overflow-y:auto;">
+      <div
+        style="background:white;max-width:820px;margin:40px auto;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+        <div
+          style="background:#1a3a5c;color:white;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:700;font-size:1rem;" id="letter-modal-title">Negotiation Letter</div>
+            <div style="font-size:0.75rem;opacity:0.75;margin-top:2px;" id="letter-modal-subtitle"></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button class="btn btn-sm" id="letter-download-btn">⬇ Download .txt</button>
+            <button onclick="closeLetterModal()"
+              style="background:rgba(255,255,255,0.15);border:none;color:white;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:0.85rem;">✕
+              Close</button>
+          </div>
+        </div>
+        <div id="letter-modal-body" style="padding:24px;">
+          <div class="loading">Generating letter…</div>
+        </div>
+      </div>
+    </div>
 
-<script>
-const API = '/api';
-let summaryData = [];
-let dashboardData = [];
+    <!-- Full Dashboard Table -->
+    <div class="section-title">
+      Rate Comparison by Payer — All Providers
+      <span>— showing underpaid codes only</span>
+      <label style="margin-left:auto;font-size:0.8rem;font-weight:500;cursor:pointer;">
+        <input type="checkbox" id="show-all" onchange="renderFullTable()"> Show all codes
+      </label>
+    </div>
+    <div class="table-wrap">
+      <table id="full-table">
+        <thead>
+          <tr>
+            <th>Payer</th>
+            <th>Code</th>
+            <th>Description</th>
+            <th class="right">Payer Rate</th>
+            <th class="right">Medicare</th>
+            <th class="right">% of Med</th>
+            <th class="right">Target</th>
+            <th class="right">Gap/Unit</th>
+            <th class="right">Volume</th>
+            <th class="right">Annual Gap $</th>
+            <th class="center">Status</th>
+          </tr>
+        </thead>
+        <tbody id="full-tbody">
+          <tr>
+            <td colspan="11" class="loading">Loading…</td>
+          </tr>
+        </tbody>
 
-// ── Payer color palette ───────────────────────────────────────
-// accent = muted brand color (used for left border accent & active tab)
-// rowA / rowB = very light alternating row tints
-const PAYER_PALETTE = {
-  'aetna':           { accent:'#8b6aa8', rowA:'#f7f1fc', rowB:'#ede3f5' },
-  'ambetter':        { accent:'#c4699a', rowA:'#fef0f7', rowB:'#fde8d5' },
-  'bcbs':            { accent:'#7a95a8', rowA:'#edf3f7', rowB:'#dde8f0' },
-  'carelon':         { accent:'#7264c4', rowA:'#f0eefb', rowB:'#e3dffa' },
-  'cigna':           { accent:'#6dba65', rowA:'#eef8ec', rowB:'#dff0de' },
-  'florida blue':    { accent:'#5a9dcc', rowA:'#e9f3fb', rowB:'#d5e9f7' },
-  'florida':         { accent:'#5a9dcc', rowA:'#e9f3fb', rowB:'#d5e9f7' },
-  'uhc':             { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
-  'oscar':           { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
-  'optum':           { accent:'#e07d5a', rowA:'#fef3ed', rowB:'#fde5d5' },
-  'wellmark':        { accent:'#4a7fa8', rowA:'#e6eef5', rowB:'#d5e2ee' },
-};
-const DEFAULT_PALETTE = { accent:'#8a9bb0', rowA:'#f4f6f8', rowB:'#eaecef' };
+      </table>
+    </div>
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Billing Channel Comparison                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <div class="section-title" style="margin-top:12px;">
+      Billing Channel Comparison
+      <span>— Direct billing vs Headway · Alma · Grow Therapy</span>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-sm" onclick="downloadChannelTemplate()" style="background:#0891b2;"
+          title="Download blank CSV template to fill in rates">
+          ⬇ Rate Template CSV
+        </button>
+        <button class="btn btn-sm" onclick="exportChannelCSV()" style="background:#059669;"
+          title="Export full comparison as CSV">
+          ⬇ Export Comparison
+        </button>
+      </div>
+    </div>
 
-function getPayerPalette(payerName) {
-  if (!payerName) return DEFAULT_PALETTE;
-  const lower = payerName.toLowerCase();
-  for (const [key, pal] of Object.entries(PAYER_PALETTE)) {
-    if (lower.includes(key)) return pal;
-  }
-  return DEFAULT_PALETTE;
-}
+    <!-- Comparison table filters -->
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+      <div class="tab-bar" id="channel-payer-tabs">
+        <button class="tab-btn active" onclick="filterChannelTable(null, this)">All Payers</button>
+      </div>
+      <label style="font-size:0.8rem;font-weight:500;cursor:pointer;margin-left:auto;">
+        <input type="checkbox" id="channel-best-only" onchange="renderChannelTable()">
+        Show only where intermediary pays more
+      </label>
+    </div>
 
-// ── Display filters ───────────────────────────────────────────
-const JODENE_NPI   = '1093433955';
-const DISPLAY_CPTS = ['99214','99215','90833','90836','90838','99204','99205','90785','98002','98003','98006','98007'];
-const CPT_ORDER    = Object.fromEntries(DISPLAY_CPTS.map((c, i) => [c, i]));
+    <!-- Comparison table -->
+    <div class="table-wrap">
+      <table id="channel-table">
+        <thead>
+          <tr>
+            <th>Payer</th>
+            <th>CPT</th>
+            <th>Description</th>
+            <th class="right">Medicare</th>
+            <th class="right">Direct</th>
+            <th class="right">Headway</th>
+            <th class="right">Alma</th>
+            <th class="right">Grow Therapy</th>
+            <th class="center">Best Channel</th>
+          </tr>
+        </thead>
+        <tbody id="channel-tbody">
+          <tr>
+            <td colspan="9" class="empty">
+              No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-// ── Utilities ─────────────────────────────────────────────
-const fmt$ = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-const fmtK = v => v == null ? '—' : '$' + (Number(v)/1000).toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1}) + 'K';
-const fmtPct = v => v == null ? '—' : Number(v).toFixed(1) + '%';
-const fmtN = v => v == null ? '—' : Number(v).toLocaleString('en-US');
+    <!-- Upload panel — at the bottom so all payer rows stay together above -->
+    <div class="table-wrap" style="padding:20px;margin-top:16px;">
+      <div style="font-weight:600;font-size:0.9rem;color:#1a2332;margin-bottom:14px;">📤 Upload Intermediary Rates</div>
+      <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
 
-function pctColor(pct, target) {
-  if (pct == null) return '#94a3b8';
-  const ratio = pct / (target || 130);
-  if (ratio >= 1)    return '#16a34a';
-  if (ratio >= 0.90) return '#b45309';
-  return '#dc2626';
-}
+        <!-- Upload zone -->
+        <div style="flex:1;min-width:280px;">
+          <div style="font-weight:600;font-size:0.82rem;color:#475569;margin-bottom:8px;">
+            Upload Rates CSV
+          </div>
 
-function pctBadge(pct, target) {
-  if (pct == null) return `<span class="badge badge-gray">—</span>`;
-  const ratio = pct / (target || 130);
-  const cls = ratio >= 1 ? 'badge-green' : ratio >= 0.90 ? 'badge-yellow' : 'badge-red';
-  return `<span class="badge ${cls}">${fmtPct(pct)}</span>`;
-}
+          <!-- Intermediary selector for wide-format uploads -->
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+            <label style="font-size:0.78rem;color:#475569;white-space:nowrap;">Platform:</label>
+            <select id="upload-intermediary"
+              style="flex:1;padding:5px 8px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.8rem;">
+              <option value="Headway">Headway</option>
+              <option value="Alma">Alma</option>
+              <option value="Grow Therapy">Grow Therapy</option>
+            </select>
+            <label style="font-size:0.75rem;color:#64748b;white-space:nowrap;"
+              title="Use 'Auto-detect' for our standard template format">
+              <input type="checkbox" id="upload-auto-detect" checked> Auto-detect format
+            </label>
+          </div>
 
-function statusBadge(isUnderpaid, pct, target) {
-  if (isUnderpaid === true)  return `<span class="badge badge-red">↓ Underpaid</span>`;
-  if (isUnderpaid === false) return `<span class="badge badge-green">✓ On Target</span>`;
-  return `<span class="badge badge-gray">No Data</span>`;
-}
+          <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)"
+            ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)"
+            onclick="document.getElementById('rate-file-input').click()">
+            <div style="font-size:1.4rem;margin-bottom:4px;">📂</div>
+            <strong style="font-size:0.85rem;color:#1a2332;">Click or drag to upload rates CSV</strong>
+            <p>Upload the native Headway/Alma/Grow rate sheet (payers as columns),<br>
+              or use our Rate Template for a custom format. Safe to re-upload.</p>
+            <input type="file" id="rate-file-input" accept=".csv" onchange="uploadRatesCSV(this.files[0])">
+          </div>
+          <div id="upload-status" class="upload-status"></div>
+        </div>
 
-async function fetchJSON(path) {
-  const r = await fetch(`${API}/${path}`);
-  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
-  return r.json();
-}
+        <!-- How it works -->
+        <div
+          style="flex:1;min-width:240px;background:#f8fafc;border-radius:8px;padding:16px;font-size:0.8rem;color:#475569;line-height:1.6;">
+          <strong style="color:#1a2332;font-size:0.85rem;">How to update rates:</strong><br><br>
+          1. Click <strong>⬇ Rate Template CSV</strong> above to download a pre-filled template<br>
+          2. Open in Excel or Numbers<br>
+          3. Fill in the <code>allowed_amount</code> column for each intermediary + CPT code<br>
+          4. Drag &amp; drop the saved file here (or click to browse)<br>
+          5. The comparison table updates automatically<br><br>
+          <strong>Columns:</strong> intermediary_name · payer_name (blank = all payers) ·
+          cpt_code · state · allowed_amount · effective_date · notes
+        </div>
+      </div>
+    </div>
 
-// ── Load everything ───────────────────────────────────────
-async function loadAll() {
-  setStatus('loading');
-  document.getElementById('error-container').innerHTML = '';
-  try {
-    const [summary, dashboard] = await Promise.all([
-      fetchJSON('dashboard/summary'),
-      fetchJSON('dashboard'),
-    ]);
-    summaryData   = summary;
-    dashboardData = dashboard;
-    renderCards();
-    renderPayerTable();
-    renderFullTable();
-    setStatus('ok');
-  } catch(e) {
-    setStatus('error');
-    document.getElementById('error-container').innerHTML =
-      `<div class="error-msg">⚠️ Could not connect to API. Make sure uvicorn is running: <code>uvicorn backend.main:app --reload</code><br><small>${e.message}</small></div>`;
-  }
-}
+  </main>
 
-// Also load health separately (it's at /health not /api/health)
-async function checkHealth() {
-  try {
-    const r = await fetch('/health');
-    const h = await r.json();
-    if (h.status === 'ok') setStatus('ok');
-  } catch(e) { /* handled by loadAll */ }
-}
+  <footer>Solrei CPT Negotiation Helper · Jodene Jensen, PMHNP-BC · Medicare 2026 FL · Target: 130% of Medicare</footer>
 
-function setStatus(state) {
-  const el = document.getElementById('status-badge');
-  el.className = 'status-badge';
-  if (state === 'ok')      { el.textContent = '● Live'; el.className = 'ok'; }
-  else if (state === 'error') { el.textContent = '● Offline'; el.className = 'error'; }
-  else                     { el.textContent = '○ Loading…'; el.className = ''; }
-  el.id = 'status-badge';
-}
+  <script>
+    const API = '/api';
+    let summaryData = [];
+    let dashboardData = [];
 
-// ── Summary cards ─────────────────────────────────────────
-function renderCards() {
-  const jData = dashboardData.filter(r =>
-    r.npi_number === JODENE_NPI && DISPLAY_CPTS.includes(r.cpt_code)
-  );
-  const totalGap       = summaryData.reduce((s,r) => s + (r.total_revenue_gap       || 0), 0);
-  const totalTarget    = summaryData.reduce((s,r) => s + (r.total_revenue_at_target || 0), 0);
-  const totalUnderpaid = jData.filter(r => r.is_underpaid === true).length;
-  const totalCodes     = new Set(jData.map(r => r.cpt_code)).size;
+    // ── Payer color palette ───────────────────────────────────────
+    // accent = muted brand color (used for left border accent & active tab)
+    // rowA / rowB = very light alternating row tints
+    const PAYER_PALETTE = {
+      'aetna': { accent: '#850AFF', rowA: '#EBD3FF', rowB: '#E7EFEB' },
+      'ambetter': { accent: '#F5F100', rowA: '#FFFFEB', rowB: '#E7EFEB' },
+      'bcbs': { accent: '#7DA1CA', rowA: '#DFE8F2', rowB: '#E7EFEB' },
+      'carelon': { accent: '#915B9A', rowA: '#CDB2D2', rowB: '#E7EFEB' },
+      'cigna': { accent: '#09D127', rowA: '#CAF7D1', rowB: '#E7EFEB' },
+      'florida blue': { accent: '#4CD2FF', rowA: '#D6F5FF', rowB: '#E7EFEB' },
+      'uhc': { accent: '#50A57D', rowA: '#9FD1BA', rowB: '#E7EFEB' },
+      'oscar': { accent: '#5A99AF', rowA: '#9FC4D1', rowB: '#E7EFEB' },
+      'optum': { accent: '#FFFFFF', rowA: '#FFFFFF', rowB: '#E7EFEB' },
+      'wellmark': { accent: '#0F4AC9', rowA: '#9FC4D1', rowB: '#E7EFEB' },
+    };
+    const DEFAULT_PALETTE = { accent: '#498397', rowA: '#9FC4D1', rowB: '#E7EFEB' };
 
-  document.getElementById('c-payers').textContent    = summaryData.length;
-  document.getElementById('c-codes').textContent     = totalCodes;
-  document.getElementById('c-underpaid').textContent = totalUnderpaid;
-  document.getElementById('c-gap').textContent       = fmtK(totalGap);
-  document.getElementById('c-target').textContent    = fmtK(totalTarget);
-}
+    function getPayerPalette(payerName) {
+      if (!payerName) return DEFAULT_PALETTE;
+      const lower = payerName.toLowerCase();
+      for (const [key, pal] of Object.entries(PAYER_PALETTE)) {
+        if (lower.includes(key)) return pal;
+      }
+      return DEFAULT_PALETTE;
+    }
 
-// ── Payer summary table ───────────────────────────────────
-function renderPayerTable() {
-  const tbody = document.getElementById('payer-tbody');
-  if (!summaryData.length) {
-    tbody.innerHTML = `<tr><td colspan="8" class="empty">No payer data loaded yet.</td></tr>`;
-    return;
-  }
+    // ── Display filters ───────────────────────────────────────────
+    const JODENE_NPI = '1093433955';
+    const DISPLAY_CPTS = ['99214', '99215', '90833', '90836', '90838', '99204', '99205', '90785', '98002', '98003', '98006', '98007'];
+    const CPT_ORDER = Object.fromEntries(DISPLAY_CPTS.map((c, i) => [c, i]));
 
-  tbody.innerHTML = summaryData.map(row => {
-    const gap = row.total_revenue_gap;
-    const gapFmt = gap ? `<strong style="color:#dc2626">${fmtK(gap)}</strong>` : '—';
-    return `
+    // ── Utilities ─────────────────────────────────────────────
+    const fmt$ = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtK = v => v == null ? '—' : '$' + (Number(v) / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'K';
+    const fmtPct = v => v == null ? '—' : Number(v).toFixed(1) + '%';
+    const fmtN = v => v == null ? '—' : Number(v).toLocaleString('en-US');
+
+    function pctColor(pct, target) {
+      if (pct == null) return '#94a3b8';
+      const ratio = pct / (target || 130);
+      if (ratio >= 1) return '#16a34a';
+      if (ratio >= 0.90) return '#b45309';
+      return '#dc2626';
+    }
+
+    function pctBadge(pct, target) {
+      if (pct == null) return `<span class="badge badge-gray">—</span>`;
+      const ratio = pct / (target || 130);
+      const cls = ratio >= 1 ? 'badge-green' : ratio >= 0.90 ? 'badge-yellow' : 'badge-red';
+      return `<span class="badge ${cls}">${fmtPct(pct)}</span>`;
+    }
+
+    function statusBadge(isUnderpaid, pct, target) {
+      if (isUnderpaid === true) return `<span class="badge badge-red">↓ Underpaid</span>`;
+      if (isUnderpaid === false) return `<span class="badge badge-green">✓ On Target</span>`;
+      return `<span class="badge badge-gray">No Data</span>`;
+    }
+
+    async function fetchJSON(path) {
+      const r = await fetch(`${API}/${path}`);
+      if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+      return r.json();
+    }
+
+    // ── Load everything ───────────────────────────────────────
+    async function loadAll() {
+      setStatus('loading');
+      document.getElementById('error-container').innerHTML = '';
+      try {
+        const [summary, dashboard] = await Promise.all([
+          fetchJSON('dashboard/summary'),
+          fetchJSON('dashboard'),
+        ]);
+        summaryData = summary;
+        dashboardData = dashboard;
+        renderCards();
+        renderPayerTable();
+        renderFullTable();
+        setStatus('ok');
+      } catch (e) {
+        setStatus('error');
+        document.getElementById('error-container').innerHTML =
+          `<div class="error-msg">⚠️ Could not connect to API. Make sure uvicorn is running: <code>uvicorn backend.main:app --reload</code><br><small>${e.message}</small></div>`;
+      }
+    }
+
+    // Also load health separately (it's at /health not /api/health)
+    async function checkHealth() {
+      try {
+        const r = await fetch('/health');
+        const h = await r.json();
+        if (h.status === 'ok') setStatus('ok');
+      } catch (e) { /* handled by loadAll */ }
+    }
+
+    function setStatus(state) {
+      const el = document.getElementById('status-badge');
+      el.className = 'status-badge';
+      if (state === 'ok') { el.textContent = '● Live'; el.className = 'ok'; }
+      else if (state === 'error') { el.textContent = '● Offline'; el.className = 'error'; }
+      else { el.textContent = '○ Loading…'; el.className = ''; }
+      el.id = 'status-badge';
+    }
+
+    // ── Summary cards ─────────────────────────────────────────
+    function renderCards() {
+      const jData = dashboardData.filter(r =>
+        r.npi_number === JODENE_NPI && DISPLAY_CPTS.includes(r.cpt_code)
+      );
+      const totalGap = summaryData.reduce((s, r) => s + (r.total_revenue_gap || 0), 0);
+      const totalTarget = summaryData.reduce((s, r) => s + (r.total_revenue_at_target || 0), 0);
+      const totalUnderpaid = jData.filter(r => r.is_underpaid === true).length;
+      const totalCodes = new Set(jData.map(r => r.cpt_code)).size;
+
+      document.getElementById('c-payers').textContent = summaryData.length;
+      document.getElementById('c-codes').textContent = totalCodes;
+      document.getElementById('c-underpaid').textContent = totalUnderpaid;
+      document.getElementById('c-gap').textContent = fmtK(totalGap);
+      document.getElementById('c-target').textContent = fmtK(totalTarget);
+    }
+
+    // ── Payer summary table ───────────────────────────────────
+    function renderPayerTable() {
+      const tbody = document.getElementById('payer-tbody');
+      if (!summaryData.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty">No payer data loaded yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = summaryData.map(row => {
+        const gap = row.total_revenue_gap;
+        const gapFmt = gap ? `<strong style="color:#dc2626">${fmtK(gap)}</strong>` : '—';
+        return `
       <tr class="payer-row" onclick="toggleDrilldown(${row.payer_id}, this)" data-payer="${row.payer_id}">
         <td><span class="expand-icon">▶</span></td>
         <td><span class="payer-name">${row.payer_name}</span></td>
@@ -596,7 +920,7 @@ function renderPayerTable() {
         <td class="right">
           <div class="pct-bar-wrap">
             <div class="pct-bar-bg">
-              <div class="pct-bar-fill" style="width:${Math.min(100, (row.avg_pct_of_medicare||0)/1.6)}%;background:${pctColor(row.avg_pct_of_medicare, 130)}"></div>
+              <div class="pct-bar-fill" style="width:${Math.min(100, (row.avg_pct_of_medicare || 0) / 1.6)}%;background:${pctColor(row.avg_pct_of_medicare, 130)}"></div>
             </div>
             ${pctBadge(row.avg_pct_of_medicare, 130)}
           </div>
@@ -620,48 +944,48 @@ function renderPayerTable() {
         </td>
       </tr>
     `;
-  }).join('');
-}
-
-// ── Payer drilldown ───────────────────────────────────────
-const openDrilldowns = new Set();
-
-async function toggleDrilldown(payerId, rowEl) {
-  const drillRow   = document.getElementById(`drilldown-${payerId}`);
-  const innerDiv   = document.getElementById(`drilldown-inner-${payerId}`);
-  const isOpen     = openDrilldowns.has(payerId);
-
-  // Toggle icon
-  rowEl.classList.toggle('expanded', !isOpen);
-
-  if (isOpen) {
-    drillRow.style.display = 'none';
-    openDrilldowns.delete(payerId);
-    return;
-  }
-
-  drillRow.style.display = 'table-row';
-  openDrilldowns.add(payerId);
-  innerDiv.innerHTML = '<div class="loading">Loading underpaid codes…</div>';
-
-  try {
-    const data = await fetchJSON(`dashboard/underpaid/${payerId}`);
-    // Filter to 12 tracked codes only, deduplicate by cpt_code, sort by CPT_ORDER
-    const seen12 = new Map();
-    (data.underpaid_codes || []).forEach(c => {
-      if (!DISPLAY_CPTS.includes(c.cpt_code)) return;
-      if (!seen12.has(c.cpt_code)) seen12.set(c.cpt_code, c);
-    });
-    const codes = DISPLAY_CPTS
-      .filter(c => seen12.has(c))
-      .map(c => seen12.get(c));
-
-    if (!codes.length) {
-      innerDiv.innerHTML = `<div class="empty">✓ No underpaid codes found for ${data.payer_name}.</div>`;
-      return;
+      }).join('');
     }
 
-    innerDiv.innerHTML = `
+    // ── Payer drilldown ───────────────────────────────────────
+    const openDrilldowns = new Set();
+
+    async function toggleDrilldown(payerId, rowEl) {
+      const drillRow = document.getElementById(`drilldown-${payerId}`);
+      const innerDiv = document.getElementById(`drilldown-inner-${payerId}`);
+      const isOpen = openDrilldowns.has(payerId);
+
+      // Toggle icon
+      rowEl.classList.toggle('expanded', !isOpen);
+
+      if (isOpen) {
+        drillRow.style.display = 'none';
+        openDrilldowns.delete(payerId);
+        return;
+      }
+
+      drillRow.style.display = 'table-row';
+      openDrilldowns.add(payerId);
+      innerDiv.innerHTML = '<div class="loading">Loading underpaid codes…</div>';
+
+      try {
+        const data = await fetchJSON(`dashboard/underpaid/${payerId}`);
+        // Filter to 12 tracked codes only, deduplicate by cpt_code, sort by CPT_ORDER
+        const seen12 = new Map();
+        (data.underpaid_codes || []).forEach(c => {
+          if (!DISPLAY_CPTS.includes(c.cpt_code)) return;
+          if (!seen12.has(c.cpt_code)) seen12.set(c.cpt_code, c);
+        });
+        const codes = DISPLAY_CPTS
+          .filter(c => seen12.has(c))
+          .map(c => seen12.get(c));
+
+        if (!codes.length) {
+          innerDiv.innerHTML = `<div class="empty">✓ No underpaid codes found for ${data.payer_name}.</div>`;
+          return;
+        }
+
+        innerDiv.innerHTML = `
       <div class="drilldown-title">
         ${data.payer_name} — ${codes.length} Underpaid Code${codes.length !== 1 ? 's' : ''}
         ${data.total_underpaid_codes > 0 ? `<span class="badge badge-red" style="margin-left:8px">${data.total_underpaid_codes} below 130% target</span>` : ''}
@@ -696,57 +1020,56 @@ async function toggleDrilldown(payerId, rowEl) {
         </tbody>
       </table>
     `;
-  } catch(e) {
-    innerDiv.innerHTML = `<div class="error-msg">Error loading data: ${e.message}</div>`;
-  }
-}
-
-// ── Full dashboard table ──────────────────────────────────
-function renderFullTable() {
-  const showAll = document.getElementById('show-all').checked;
-  const tbody   = document.getElementById('full-tbody');
-
-  // One row per (payer, CPT): prefer Jodene Jensen NPI1 rate where available,
-  // fall back to any other entity so future payers show up automatically.
-  const seen = new Map();
-  dashboardData.filter(r => DISPLAY_CPTS.includes(r.cpt_code)).forEach(r => {
-    const key = `${r.payer_name}|${r.cpt_code}`;
-    if (!seen.has(key)) {
-      seen.set(key, r);
-    } else {
-      const ex = seen.get(key);
-      // Promote to Jodene Jensen's rate if we find it
-      if (r.npi_number === JODENE_NPI && ex.npi_number !== JODENE_NPI) {
-        seen.set(key, r);
+      } catch (e) {
+        innerDiv.innerHTML = `<div class="error-msg">Error loading data: ${e.message}</div>`;
       }
     }
-  });
-  let rows = [...seen.values()];
 
-  if (!showAll) rows = rows.filter(r => r.is_underpaid === true);
+    // ── Full dashboard table ──────────────────────────────────
+    function renderFullTable() {
+      const showAll = document.getElementById('show-all').checked;
+      const tbody = document.getElementById('full-tbody');
 
-  // Sort: payer A→Z, then CPT in DISPLAY_CPTS order
-  rows.sort((a, b) => {
-    const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
-    if (pc !== 0) return pc;
-    return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
-  });
+      // One row per (payer, CPT): prefer Jodene Jensen NPI1 rate where available,
+      // fall back to any other entity so future payers show up automatically.
+      const seen = new Map();
+      dashboardData.filter(r => DISPLAY_CPTS.includes(r.cpt_code)).forEach(r => {
+        const key = `${r.payer_name}|${r.cpt_code}`;
+        if (!seen.has(key)) {
+          seen.set(key, r);
+        } else {
+          const ex = seen.get(key);
+          // Promote to Jodene Jensen's rate if we find it
+          if (r.npi_number === JODENE_NPI && ex.npi_number !== JODENE_NPI) {
+            seen.set(key, r);
+          }
+        }
+      });
+      let rows = [...seen.values()];
 
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="11" class="empty">${
-      showAll
-        ? 'No rate data loaded yet. Import payer fee schedules and make sure uvicorn is running.'
-        : 'No underpaid codes found. Check "Show all codes" to see all rates.'
-    }</td></tr>`;
-    return;
-  }
+      if (!showAll) rows = rows.filter(r => r.is_underpaid === true);
 
-  let _ftPayer = null, _ftIdx = 0;
-  tbody.innerHTML = rows.map(r => {
-    const pal = getPayerPalette(r.payer_name);
-    if (r.payer_name !== _ftPayer) { _ftPayer = r.payer_name; _ftIdx = 0; }
-    const bg = _ftIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
-    return `
+      // Sort: payer A→Z, then CPT in DISPLAY_CPTS order
+      rows.sort((a, b) => {
+        const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
+        if (pc !== 0) return pc;
+        return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
+      });
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="11" class="empty">${showAll
+          ? 'No rate data loaded yet. Import payer fee schedules and make sure uvicorn is running.'
+          : 'No underpaid codes found. Check "Show all codes" to see all rates.'
+          }</td></tr>`;
+        return;
+      }
+
+      let _ftPayer = null, _ftIdx = 0;
+      tbody.innerHTML = rows.map(r => {
+        const pal = getPayerPalette(r.payer_name);
+        if (r.payer_name !== _ftPayer) { _ftPayer = r.payer_name; _ftIdx = 0; }
+        const bg = _ftIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
+        return `
     <tr style="background:${bg};border-left:3px solid ${pal.accent};">
       <td>${r.payer_name}</td>
       <td><strong>${r.cpt_code}</strong></td>
@@ -761,27 +1084,27 @@ function renderFullTable() {
       <td class="center">${statusBadge(r.is_underpaid)}</td>
     </tr>
   `}).join('');
-}
+    }
 
-// ── Negotiation Letter ────────────────────────────────────
-async function openLetterModal(payerId, payerName) {
-  const modal    = document.getElementById('letter-modal');
-  const body     = document.getElementById('letter-modal-body');
-  const title    = document.getElementById('letter-modal-title');
-  const subtitle = document.getElementById('letter-modal-subtitle');
-  const dlBtn    = document.getElementById('letter-download-btn');
+    // ── Negotiation Letter ────────────────────────────────────
+    async function openLetterModal(payerId, payerName) {
+      const modal = document.getElementById('letter-modal');
+      const body = document.getElementById('letter-modal-body');
+      const title = document.getElementById('letter-modal-title');
+      const subtitle = document.getElementById('letter-modal-subtitle');
+      const dlBtn = document.getElementById('letter-download-btn');
 
-  title.textContent    = `Negotiation Letter — ${payerName}`;
-  subtitle.textContent = 'Generating from live dashboard data…';
-  body.innerHTML       = '<div class="loading">Generating letter…</div>';
-  modal.style.display  = 'block';
+      title.textContent = `Negotiation Letter — ${payerName}`;
+      subtitle.textContent = 'Generating from live dashboard data…';
+      body.innerHTML = '<div class="loading">Generating letter…</div>';
+      modal.style.display = 'block';
 
-  try {
-    const data = await fetchJSON(`letters/preview/${payerId}`);
-    subtitle.textContent = `${data.underpaid_codes} underpaid codes · Est. gap: ${fmtK(data.total_gap_estimate)}`;
-    dlBtn.onclick = () => window.open(`/api/letters/download/${payerId}`, '_blank');
+      try {
+        const data = await fetchJSON(`letters/preview/${payerId}`);
+        subtitle.textContent = `${data.underpaid_codes} underpaid codes · Est. gap: ${fmtK(data.total_gap_estimate)}`;
+        dlBtn.onclick = () => window.open(`/api/letters/download/${payerId}`, '_blank');
 
-    body.innerHTML = `
+        body.innerHTML = `
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px;font-size:0.8rem;color:#475569;">
         <strong>Ready to send?</strong> Review the letter below, copy it into Word or your email client,
         and personalise the contact details. Hit <strong>⬇ Download .txt</strong> to save it.
@@ -790,176 +1113,176 @@ async function openLetterModal(payerId, payerName) {
                   background:white;border:1px solid #e2e8f0;border-radius:8px;padding:24px;
                   max-height:60vh;overflow-y:auto;">${escapeHtml(data.letter)}</pre>
     `;
-  } catch(e) {
-    body.innerHTML = `<div class="error-msg">Could not generate letter: ${e.message}<br>
+      } catch (e) {
+        body.innerHTML = `<div class="error-msg">Could not generate letter: ${e.message}<br>
       Make sure fee schedule data is loaded for this payer.</div>`;
-  }
-}
-
-function closeLetterModal() {
-  document.getElementById('letter-modal').style.display = 'none';
-}
-
-// Close modal on backdrop click
-document.getElementById('letter-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeLetterModal();
-});
-
-function escapeHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ── CSV Export ────────────────────────────────────────────
-function exportCSV(payerId = null) {
-  const url = payerId
-    ? `/api/dashboard/export?payer_id=${payerId}&underpaid_only=false`
-    : `/api/dashboard/export`;
-  window.open(url, '_blank');
-}
-
-// ── Channel Comparison ────────────────────────────────────
-let channelData       = [];
-let channelPayerFilter = null;
-
-async function loadChannelComparison() {
-  try {
-    const raw = await fetchJSON('channel-comparison');
-
-    // Deduplicate by (payer_name, cpt_code).
-    // Normalize payer name: trim + lowercase key so "Florida Blue" and
-    // "Florida Blue " (trailing space) collapse to one entry.
-    // Keep the row with the highest rate values.
-    const seen = new Map();
-    raw.forEach(row => {
-      if (!DISPLAY_CPTS.includes(row.cpt_code)) return;  // skip non-display codes
-      const normPayer = (row.payer_name || '').trim();
-      const key = `${normPayer.toLowerCase()}|${row.cpt_code}`;
-      if (!seen.has(key)) {
-        seen.set(key, Object.assign({}, row, { payer_name: normPayer }));
-      } else {
-        const ex = seen.get(key);
-        if ((row.headway_rate || 0) > (ex.headway_rate || 0)) ex.headway_rate = row.headway_rate;
-        if ((row.alma_rate    || 0) > (ex.alma_rate    || 0)) ex.alma_rate    = row.alma_rate;
-        if ((row.grow_rate    || 0) > (ex.grow_rate    || 0)) ex.grow_rate    = row.grow_rate;
-        if ((row.direct_rate  || 0) > (ex.direct_rate  || 0)) ex.direct_rate  = row.direct_rate;
       }
-    });
-
-    // Sort: payer name A→Z, then CPT in DISPLAY_CPTS order
-    channelData = [...seen.values()].sort((a, b) => {
-      const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
-      if (pc !== 0) return pc;
-      return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
-    });
-
-    buildChannelPayerTabs();
-    renderChannelTable();
-  } catch(e) {
-    // Not an error if no data yet — just show empty state
-    if (!e.message.includes('404')) {
-      console.warn('Channel comparison:', e.message);
     }
-  }
-}
 
-function buildChannelPayerTabs() {
-  const tabBar = document.getElementById('channel-payer-tabs');
-  const payers = [...new Set(channelData.map(r => r.payer_name))].filter(Boolean).sort();
-  const allActive = channelPayerFilter === null;
-  tabBar.innerHTML =
-    `<button class="tab-btn ${allActive ? 'active' : ''}"
+    function closeLetterModal() {
+      document.getElementById('letter-modal').style.display = 'none';
+    }
+
+    // Close modal on backdrop click
+    document.getElementById('letter-modal').addEventListener('click', function (e) {
+      if (e.target === this) closeLetterModal();
+    });
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── CSV Export ────────────────────────────────────────────
+    function exportCSV(payerId = null) {
+      const url = payerId
+        ? `/api/dashboard/export?payer_id=${payerId}&underpaid_only=false`
+        : `/api/dashboard/export`;
+      window.open(url, '_blank');
+    }
+
+    // ── Channel Comparison ────────────────────────────────────
+    let channelData = [];
+    let channelPayerFilter = null;
+
+    async function loadChannelComparison() {
+      try {
+        const raw = await fetchJSON('channel-comparison');
+
+        // Deduplicate by (payer_name, cpt_code).
+        // Normalize payer name: trim + lowercase key so "Florida Blue" and
+        // "Florida Blue " (trailing space) collapse to one entry.
+        // Keep the row with the highest rate values.
+        const seen = new Map();
+        raw.forEach(row => {
+          if (!DISPLAY_CPTS.includes(row.cpt_code)) return;  // skip non-display codes
+          const normPayer = (row.payer_name || '').trim();
+          const key = `${normPayer.toLowerCase()}|${row.cpt_code}`;
+          if (!seen.has(key)) {
+            seen.set(key, Object.assign({}, row, { payer_name: normPayer }));
+          } else {
+            const ex = seen.get(key);
+            if ((row.headway_rate || 0) > (ex.headway_rate || 0)) ex.headway_rate = row.headway_rate;
+            if ((row.alma_rate || 0) > (ex.alma_rate || 0)) ex.alma_rate = row.alma_rate;
+            if ((row.grow_rate || 0) > (ex.grow_rate || 0)) ex.grow_rate = row.grow_rate;
+            if ((row.direct_rate || 0) > (ex.direct_rate || 0)) ex.direct_rate = row.direct_rate;
+          }
+        });
+
+        // Sort: payer name A→Z, then CPT in DISPLAY_CPTS order
+        channelData = [...seen.values()].sort((a, b) => {
+          const pc = (a.payer_name || '').localeCompare(b.payer_name || '');
+          if (pc !== 0) return pc;
+          return (CPT_ORDER[a.cpt_code] ?? 99) - (CPT_ORDER[b.cpt_code] ?? 99);
+        });
+
+        buildChannelPayerTabs();
+        renderChannelTable();
+      } catch (e) {
+        // Not an error if no data yet — just show empty state
+        if (!e.message.includes('404')) {
+          console.warn('Channel comparison:', e.message);
+        }
+      }
+    }
+
+    function buildChannelPayerTabs() {
+      const tabBar = document.getElementById('channel-payer-tabs');
+      const payers = [...new Set(channelData.map(r => r.payer_name))].filter(Boolean).sort();
+      const allActive = channelPayerFilter === null;
+      tabBar.innerHTML =
+        `<button class="tab-btn ${allActive ? 'active' : ''}"
       onclick="filterChannelTable(null, this)">All Payers</button>` +
-    payers.map(name => {
-      const pal     = getPayerPalette(name);
-      const isActive = channelPayerFilter === name;
-      const inlineStyle = isActive
-        ? `background:${pal.accent};color:white;border-color:${pal.accent};`
-        : '';
-      return `<button class="tab-btn ${isActive ? 'active' : ''}"
+        payers.map(name => {
+          const pal = getPayerPalette(name);
+          const isActive = channelPayerFilter === name;
+          const inlineStyle = isActive
+            ? `background:${pal.accent};color:white;border-color:${pal.accent};`
+            : '';
+          return `<button class="tab-btn ${isActive ? 'active' : ''}"
         style="${inlineStyle}"
         data-accent="${pal.accent}"
-        onclick="filterChannelTable('${name.replace(/'/g,"\\'")}', this)">${name}</button>`;
-    }).join('');
-}
-
-function filterChannelTable(payerName, btn) {
-  channelPayerFilter = payerName;
-  // Reset all tabs to default style
-  document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => {
-    b.classList.remove('active');
-    b.style.background  = '';
-    b.style.color       = '';
-    b.style.borderColor = '';
-  });
-  // Activate clicked tab
-  btn.classList.add('active');
-  if (payerName && btn.dataset.accent) {
-    btn.style.background  = btn.dataset.accent;
-    btn.style.color       = 'white';
-    btn.style.borderColor = btn.dataset.accent;
-  }
-  renderChannelTable();
-}
-
-function renderChannelTable() {
-  const tbody    = document.getElementById('channel-tbody');
-  const bestOnly = document.getElementById('channel-best-only').checked;
-
-  let rows = channelData;
-  if (channelPayerFilter != null) rows = rows.filter(r => r.payer_name === channelPayerFilter);
-  if (bestOnly) rows = rows.filter(r => r.best_channel_type === 'Intermediary');
-
-  if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="9" class="empty">
-      ${channelData.length === 0
-        ? 'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.'
-        : 'No rows match the current filter.'}
-    </td></tr>`;
-    return;
-  }
-
-  let _ctPayer = null, _ctIdx = 0;
-  tbody.innerHTML = rows.map(r => {
-    const pal = getPayerPalette(r.payer_name);
-    if (r.payer_name !== _ctPayer) { _ctPayer = r.payer_name; _ctIdx = 0; }
-    const bg = _ctIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
-
-    const direct  = r.direct_rate;
-    const headway = r.headway_rate;
-    const alma    = r.alma_rate;
-    const grow    = r.grow_rate;
-
-    // Find best rate value for highlighting
-    const candidates = [direct, headway, alma, grow].filter(v => v != null);
-    const best = candidates.length ? Math.max(...candidates) : null;
-
-    function rateCell(val) {
-      if (val == null) return `<span style="color:#cbd5e1">—</span>`;
-      const cls = (best != null && val === best && candidates.filter(v => v === best).length === 1)
-        ? 'rate-best' : (val < best ? 'rate-lower' : '');
-      return `<span class="${cls}">${fmt$(val)}</span>`;
+        onclick="filterChannelTable('${name.replace(/'/g, "\\'")}', this)">${name}</button>`;
+        }).join('');
     }
 
-    // Best channel badge — use named classes per channel
-    let channelBadge;
-    if (r.best_channel_type === 'Direct') {
-      channelBadge = `<span class="channel-badge channel-direct">Direct</span>`;
-    } else if (r.best_channel_type === 'Intermediary') {
-      const best3 = [['Headway', headway], ['Alma', alma], ['Grow', grow]];
-      const winners = best3.filter(([,v]) => v === best).map(([n]) => n);
-      if (winners.length === 1) {
-        const cls = 'channel-' + winners[0].toLowerCase();
-        channelBadge = `<span class="channel-badge ${cls}">▲ ${winners[0]}</span>`;
-      } else if (winners.length > 1) {
-        channelBadge = `<span class="channel-badge channel-tie">▲ ${winners.join(' / ')}</span>`;
-      } else {
-        channelBadge = `<span class="channel-badge channel-tie">▲ Intermediary</span>`;
+    function filterChannelTable(payerName, btn) {
+      channelPayerFilter = payerName;
+      // Reset all tabs to default style
+      document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = '';
+        b.style.color = '';
+        b.style.borderColor = '';
+      });
+      // Activate clicked tab
+      btn.classList.add('active');
+      if (payerName && btn.dataset.accent) {
+        btn.style.background = btn.dataset.accent;
+        btn.style.color = 'white';
+        btn.style.borderColor = btn.dataset.accent;
       }
-    } else {
-      channelBadge = `<span class="channel-badge channel-na">No data</span>`;
+      renderChannelTable();
     }
 
-    return `
+    function renderChannelTable() {
+      const tbody = document.getElementById('channel-tbody');
+      const bestOnly = document.getElementById('channel-best-only').checked;
+
+      let rows = channelData;
+      if (channelPayerFilter != null) rows = rows.filter(r => r.payer_name === channelPayerFilter);
+      if (bestOnly) rows = rows.filter(r => r.best_channel_type === 'Intermediary');
+
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty">
+      ${channelData.length === 0
+            ? 'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.'
+            : 'No rows match the current filter.'}
+    </td></tr>`;
+        return;
+      }
+
+      let _ctPayer = null, _ctIdx = 0;
+      tbody.innerHTML = rows.map(r => {
+        const pal = getPayerPalette(r.payer_name);
+        if (r.payer_name !== _ctPayer) { _ctPayer = r.payer_name; _ctIdx = 0; }
+        const bg = _ctIdx++ % 2 === 0 ? pal.rowA : pal.rowB;
+
+        const direct = r.direct_rate;
+        const headway = r.headway_rate;
+        const alma = r.alma_rate;
+        const grow = r.grow_rate;
+
+        // Find best rate value for highlighting
+        const candidates = [direct, headway, alma, grow].filter(v => v != null);
+        const best = candidates.length ? Math.max(...candidates) : null;
+
+        function rateCell(val) {
+          if (val == null) return `<span style="color:#cbd5e1">—</span>`;
+          const cls = (best != null && val === best && candidates.filter(v => v === best).length === 1)
+            ? 'rate-best' : (val < best ? 'rate-lower' : '');
+          return `<span class="${cls}">${fmt$(val)}</span>`;
+        }
+
+        // Best channel badge — use named classes per channel
+        let channelBadge;
+        if (r.best_channel_type === 'Direct') {
+          channelBadge = `<span class="channel-badge channel-direct">Direct</span>`;
+        } else if (r.best_channel_type === 'Intermediary') {
+          const best3 = [['Headway', headway], ['Alma', alma], ['Grow', grow]];
+          const winners = best3.filter(([, v]) => v === best).map(([n]) => n);
+          if (winners.length === 1) {
+            const cls = 'channel-' + winners[0].toLowerCase();
+            channelBadge = `<span class="channel-badge ${cls}">▲ ${winners[0]}</span>`;
+          } else if (winners.length > 1) {
+            channelBadge = `<span class="channel-badge channel-tie">▲ ${winners.join(' / ')}</span>`;
+          } else {
+            channelBadge = `<span class="channel-badge channel-tie">▲ Intermediary</span>`;
+          }
+        } else {
+          channelBadge = `<span class="channel-badge channel-na">No data</span>`;
+        }
+
+        return `
       <tr style="background:${bg};border-left:3px solid ${pal.accent};">
         <td style="font-size:0.8rem;">${r.payer_name || '—'}</td>
         <td><strong>${r.cpt_code}</strong></td>
@@ -972,72 +1295,73 @@ function renderChannelTable() {
         <td class="center">${channelBadge}</td>
       </tr>
     `;
-  }).join('');
-}
+      }).join('');
+    }
 
-// ── Template download ─────────────────────────────────────
-function downloadChannelTemplate() {
-  window.open('/api/intermediaries/template', '_blank');
-}
+    // ── Template download ─────────────────────────────────────
+    function downloadChannelTemplate() {
+      window.open('/api/intermediaries/template', '_blank');
+    }
 
-function exportChannelCSV() {
-  const url = channelPayerFilter
-    ? `/api/channel-comparison/export?payer_id=${channelPayerFilter}`
-    : '/api/channel-comparison/export';
-  window.open(url, '_blank');
-}
+    function exportChannelCSV() {
+      const url = channelPayerFilter
+        ? `/api/channel-comparison/export?payer_id=${channelPayerFilter}`
+        : '/api/channel-comparison/export';
+      window.open(url, '_blank');
+    }
 
-// ── CSV upload ────────────────────────────────────────────
-function handleDragOver(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.add('drag-over');
-}
-function handleDragLeave(e) {
-  document.getElementById('upload-zone').classList.remove('drag-over');
-}
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('upload-zone').classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) uploadRatesCSV(file);
-}
+    // ── CSV upload ────────────────────────────────────────────
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.add('drag-over');
+    }
+    function handleDragLeave(e) {
+      document.getElementById('upload-zone').classList.remove('drag-over');
+    }
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('upload-zone').classList.remove('drag-over');
+      const file = e.dataTransfer.files[0];
+      if (file) uploadRatesCSV(file);
+    }
 
-async function uploadRatesCSV(file) {
-  if (!file) return;
-  const statusEl   = document.getElementById('upload-status');
-  statusEl.className = 'upload-status loading';
-  statusEl.textContent = `⏳ Uploading ${file.name}…`;
+    async function uploadRatesCSV(file) {
+      if (!file) return;
+      const statusEl = document.getElementById('upload-status');
+      statusEl.className = 'upload-status loading';
+      statusEl.textContent = `⏳ Uploading ${file.name}…`;
 
-  const intermediary = document.getElementById('upload-intermediary').value;
-  const url = `/api/intermediaries/import?intermediary_name=${encodeURIComponent(intermediary)}`;
+      const intermediary = document.getElementById('upload-intermediary').value;
+      const url = `/api/intermediaries/import?intermediary_name=${encodeURIComponent(intermediary)}`;
 
-  const formData = new FormData();
-  formData.append('file', file);
+      const formData = new FormData();
+      formData.append('file', file);
 
-  try {
-    const r = await fetch(url, { method: 'POST', body: formData });
-    const result = await r.json();
+      try {
+        const r = await fetch(url, { method: 'POST', body: formData });
+        const result = await r.json();
 
-    if (!r.ok) throw new Error(result.detail || 'Upload failed');
+        if (!r.ok) throw new Error(result.detail || 'Upload failed');
 
-    statusEl.className = 'upload-status success';
-    statusEl.innerHTML = `✓ ${result.message}` +
-      (result.errors.length ? `<br><small style="color:#b45309">Warnings: ${result.errors.join('; ')}</small>` : '');
+        statusEl.className = 'upload-status success';
+        statusEl.innerHTML = `✓ ${result.message}` +
+          (result.errors.length ? `<br><small style="color:#b45309">Warnings: ${result.errors.join('; ')}</small>` : '');
 
-    // Refresh the channel comparison table
-    await loadChannelComparison();
+        // Refresh the channel comparison table
+        await loadChannelComparison();
 
-    // Reset file input
-    document.getElementById('rate-file-input').value = '';
-  } catch(e) {
-    statusEl.className = 'upload-status error';
-    statusEl.textContent = `✗ Upload failed: ${e.message}`;
-  }
-}
+        // Reset file input
+        document.getElementById('rate-file-input').value = '';
+      } catch (e) {
+        statusEl.className = 'upload-status error';
+        statusEl.textContent = `✗ Upload failed: ${e.message}`;
+      }
+    }
 
-// ── Boot ──────────────────────────────────────────────────
-loadAll();
-loadChannelComparison();
-</script>
+    // ── Boot ──────────────────────────────────────────────────
+    loadAll();
+    loadChannelComparison();
+  </script>
 </body>
+
 </html>
