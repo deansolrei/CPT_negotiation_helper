@@ -1,197 +1,232 @@
 """
 load_florida_blue.py
 --------------------
-Imports Florida Blue (BCBS Florida) fee schedule rates for Solrei Behavioral Health.
+Loads Florida Blue fee schedule rates from the payer_rates_template CSV.
 
-Rate policy (per Florida Blue contract document):
-  - APRNs/NPs: 80% of CMS Medicare Physician Fee Schedule, FL locality 99
-  - EXCEPT for MAT codes with HF modifier (Table 1 fixed rates)
+The CSV (payer_rates_template_*.csv in the project root) is the single
+source of truth for Florida Blue rates. Edit that file with your actual
+contracted amounts, then run this script to push them to the database.
 
-This script:
-  1. Fetches Medicare 2026 benchmark rates from the local database
-  2. Calculates 80% of each rate for Florida Blue standard NP rates
-  3. Imports fixed Table 1 MAT rates with HF modifier
-  4. Loads for BOTH Florida Blue contracts:
-       - Contract: Florida Blue × Solrei Behavioral Health, Inc. (Group NPI2)
-       - Contract: Florida Blue × Jodene Jensen (Individual NPI1)
+What this script does:
+  1. Finds the most recent payer_rates_template_*.csv in the project root
+  2. Reads all rows where payer_name contains "Florida Blue"
+  3. DELETES all existing Florida Blue fee schedule lines (clean slate)
+  4. Inserts the fresh rates into BOTH Florida Blue contracts:
+       - Florida Blue × Jodene Jensen, PMHNP-BC       (NPI1 / individual)
+       - Florida Blue × Solrei Behavioral Health, Inc. (NPI2 / group)
+
+Deleting before inserting prevents the duplicate-rate problem where old
+estimated rates and new actual rates coexist and cause sections of the
+dashboard to disagree.
 
 Run from the project root:
     cd /Users/deanpedersen/Projects/solrei/CPT_App
     python3 backend/load_florida_blue.py
 """
 
-import json
-import urllib.request
-import urllib.error
-import urllib.parse
+import csv
+import os
+import sys
+from datetime import datetime
 
-BASE_URL = "http://localhost:8000/api"
-IMPORT_URL = f"{BASE_URL}/import-fee-schedule"
+# ── Path setup ────────────────────────────────────────────────────────────────
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJ_ROOT  = os.path.dirname(_SCRIPT_DIR)
+sys.path.insert(0, _PROJ_ROOT)
 
-# ── Florida Blue NP rate policy ────────────────────────────────
-# 80% of Medicare Physician Fee Schedule, FL locality 99
-FL_BLUE_NP_FACTOR = 0.80
-
-# ── Table 1: Fixed MAT rates (HF modifier required) ───────────
-# Source: Florida Blue fee schedule document, Table 1
-MAT_RATES = [
-    {"cpt_code": "99203", "modifier": "HF", "allowed_amount": 118.45,
-     "notes": "MAT new patient 30-44 min. Table 1 fixed rate."},
-    {"cpt_code": "99204", "modifier": "HF", "allowed_amount": 177.53,
-     "notes": "MAT new patient 45-59 min. Table 1 fixed rate."},
-    {"cpt_code": "99205", "modifier": "HF", "allowed_amount": 234.66,
-     "notes": "MAT new patient 60-74 min. Table 1 fixed rate."},
-    {"cpt_code": "99213", "modifier": "HF", "allowed_amount": 86.75,
-     "notes": "MAT established patient 30-44 min. Table 1 fixed rate."},
-    {"cpt_code": "99214", "modifier": "HF", "allowed_amount": 123.22,
-     "notes": "MAT established patient 45-59 min. Table 1 fixed rate."},
-    {"cpt_code": "99215", "modifier": "HF", "allowed_amount": 172.53,
-     "notes": "MAT established patient 60-74 min. Table 1 fixed rate."},
-]
+from backend.database import get_db   # noqa: E402  (import after path setup)
 
 
-def api_get(path):
-    url = f"{BASE_URL}/{urllib.parse.quote(path, safe='=&?/')}"
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req) as r:
-        return json.loads(r.read().decode())
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
-
-def api_post(url, payload):
-    data = json.dumps(payload).encode("utf-8")
-    req = urllib.request.Request(
-        url, data=data,
-        headers={"Content-Type": "application/json"},
-        method="POST"
+def find_csv() -> str:
+    """Return path to the most recent payer_rates_template_*.csv."""
+    candidates = sorted(
+        [f for f in os.listdir(_PROJ_ROOT)
+         if f.startswith("payer_rates_template") and f.endswith(".csv")],
+        reverse=True,   # newest name first (YYYY-MM-DD sorts lexicographically)
     )
-    with urllib.request.urlopen(req) as r:
-        return json.loads(r.read().decode())
+    if not candidates:
+        raise FileNotFoundError(
+            "No payer_rates_template_*.csv found in the project root.\n"
+            "Expected a file named like: payer_rates_template_2026-04-06.csv"
+        )
+    return os.path.join(_PROJ_ROOT, candidates[0])
 
+
+def parse_date(raw: str) -> str | None:
+    """Accept M/D/YY, M/D/YYYY, or YYYY-MM-DD; return YYYY-MM-DD or None."""
+    if not raw or not raw.strip():
+        return None
+    for fmt in ("%m/%d/%y", "%m/%d/%Y", "%Y-%m-%d"):
+        try:
+            return datetime.strptime(raw.strip(), fmt).strftime("%Y-%m-%d")
+        except ValueError:
+            pass
+    print(f"  ⚠  Could not parse date '{raw}' — will store as NULL")
+    return None
+
+
+def read_florida_blue_rows(csv_path: str) -> list[dict]:
+    """
+    Read the CSV and return only Florida Blue rows that have an allowed_amount.
+    Skips comment lines (starting with #) and blank rows.
+    """
+    rows = []
+    with open(csv_path, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            payer = (row.get("payer_name") or "").strip()
+            if not payer or payer.startswith("#"):
+                continue
+            if "florida" not in payer.lower():
+                continue
+
+            amount_raw = (row.get("allowed_amount") or "").strip()
+            if not amount_raw or amount_raw.startswith("#"):
+                continue   # no rate entered yet — skip silently
+
+            try:
+                amount = float(amount_raw)
+            except ValueError:
+                print(f"  ⚠  Skipping row — bad allowed_amount: '{amount_raw}'")
+                continue
+
+            cpt = (row.get("cpt_code") or "").strip()
+            if not cpt:
+                continue
+
+            rows.append({
+                "cpt_code":         cpt,
+                "modifier":         (row.get("modifier") or "").strip() or None,
+                "place_of_service": (row.get("place_of_service") or "10").strip() or "10",
+                "unit_type":        "per_service",
+                "allowed_amount":   amount,
+                "effective_date":   parse_date(row.get("effective_date") or ""),
+                "end_date":         None,
+                "notes":            (row.get("notes") or "").strip() or None,
+            })
+    return rows
+
+
+# ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    print("=" * 60)
-    print("Florida Blue Fee Schedule Import")
-    print("Rate policy: 80% of Medicare FL locality 99 (NP/APRN)")
-    print("=" * 60)
-    print()
+    print("=" * 65)
+    print("Florida Blue Fee Schedule Loader")
+    print("Source: payer_rates_template CSV  →  PostgreSQL")
+    print("=" * 65)
 
-    # ── Step 1: Find Florida Blue contracts ───────────────────────
-    print("Step 1: Finding Florida Blue contracts...")
-    contracts = api_get("contracts?active_only=true")
-    fl_blue_contracts = [
-        c for c in contracts if "Florida Blue" in c["payer_name"]]
+    # ── 1. Find CSV ───────────────────────────────────────────────
+    csv_path = find_csv()
+    print(f"\nCSV: {os.path.basename(csv_path)}")
 
-    if not fl_blue_contracts:
-        print("ERROR: No Florida Blue contracts found. Run 09_seed_data.sql first.")
-        return
+    # ── 2. Read Florida Blue rows from CSV ────────────────────────
+    fl_rows = read_florida_blue_rows(csv_path)
+    if not fl_rows:
+        print("\nERROR: No Florida Blue rows with rates found in the CSV.")
+        print("  Make sure rows have 'Florida Blue' in the payer_name column")
+        print("  and a numeric value in the allowed_amount column.")
+        sys.exit(1)
 
-    for c in fl_blue_contracts:
-        print(f"  Found: [{c['contract_id']}] {c['payer_name']} × {c['provider_name']} "
-              f"({c['entity_type']}, PID: {c.get('payer_contract_id', 'N/A')})")
-    print()
+    print(f"  {len(fl_rows)} Florida Blue rate rows found in CSV.")
+    for r in fl_rows:
+        print(f"    {r['cpt_code']:8s}  ${r['allowed_amount']:>8.2f}"
+              f"  mod={r['modifier'] or '—'}  eff={r['effective_date'] or 'NULL'}")
 
-    # ── Step 2: Get Medicare 2026 benchmark rates ──────────────────
-    print("Step 2: Fetching Medicare 2026 benchmark rates...")
-    benchmarks = api_get(
-        "benchmark?source_name=Medicare 2026&locality=FL&year=2026")
+    # ── 3. Find Florida Blue contracts in the database ────────────
+    print("\nLooking up Florida Blue contracts in database...")
+    with get_db() as cur:
+        cur.execute("""
+            SELECT c.contract_id, p.payer_name, pe.legal_name, pe.entity_type, pe.npi_number
+            FROM contracts c
+            JOIN payers            p  ON c.payer_id           = p.payer_id
+            JOIN provider_entities pe ON c.provider_entity_id = pe.provider_entity_id
+            WHERE lower(p.payer_name) LIKE '%florida%'
+              AND c.active = TRUE
+            ORDER BY pe.entity_type
+        """)
+        contracts = cur.fetchall()
 
-    if not benchmarks:
-        print("ERROR: No Medicare 2026 benchmark rates found.")
-        print("  Run: python3 backend/load_medicare_2026.py")
-        return
+    if not contracts:
+        print("ERROR: No active Florida Blue contracts found in the database.")
+        print("  Run 09_seed_data.sql first to set up the contracts.")
+        sys.exit(1)
 
-    print(f"  Found {len(benchmarks)} benchmark rates.")
-    print()
+    for c in contracts:
+        print(f"  [{c['contract_id']}] {c['payer_name']} × {c['legal_name']}"
+              f"  ({c['entity_type']} · NPI {c['npi_number']})")
 
-    # ── Step 3: Build standard NP rate lines (80% of Medicare) ────
-    standard_lines = []
-    for b in benchmarks:
-        rate = round(float(b["allowed_amount"]) * FL_BLUE_NP_FACTOR, 2)
-        standard_lines.append({
-            "cpt_code":       b["cpt_code"],
-            "modifier":       "95",   # telehealth synchronous
-            "place_of_service": "10",  # telehealth in patient home
-            "unit_type":      "per_service",
-            "allowed_amount": rate,
-            "effective_date": "2026-01-01",
-            "end_date":       None,
-            "notes": (
-                f"FL Blue NP rate: 80% × Medicare ${float(b['allowed_amount']):.2f} "
-                f"= ${rate:.2f}. FL locality 99."
-            ),
-        })
+    contract_ids = [c["contract_id"] for c in contracts]
 
-    # ── Step 4: Add Table 1 MAT fixed rates ───────────────────────
-    mat_lines = []
-    for mat in MAT_RATES:
-        mat_lines.append({
-            "cpt_code":         mat["cpt_code"],
-            "modifier":         mat["modifier"],
-            "place_of_service": "10",
-            "unit_type":        "per_service",
-            "allowed_amount":   mat["allowed_amount"],
-            "effective_date":   "2026-01-01",
-            "end_date":         None,
-            "notes":            mat["notes"],
-        })
+    # ── 4. Delete ALL existing Florida Blue fee schedule lines ────
+    print(f"\nDeleting existing Florida Blue fee schedule lines "
+          f"(contracts: {contract_ids})...")
+    with get_db() as cur:
+        cur.execute(
+            "DELETE FROM fee_schedule_lines WHERE contract_id = ANY(%s)",
+            (contract_ids,)
+        )
+        deleted = cur.rowcount
+    print(f"  Deleted {deleted} old rows.")
 
-    all_lines = standard_lines + mat_lines
-    print(
-        f"Step 3: Built {len(standard_lines)} standard NP lines (80% of Medicare)")
-    print(
-        f"        + {len(mat_lines)} Table 1 MAT lines (HF modifier, fixed rates)")
-    print(f"        = {len(all_lines)} total lines per contract")
-    print()
+    # ── 5. Insert fresh rates for every contract ──────────────────
+    print(f"\nInserting {len(fl_rows)} rates into {len(contracts)} contracts...")
+    total_inserted = 0
 
-    # ── Step 5: Import for each Florida Blue contract ─────────────
-    print("Step 4: Importing to all Florida Blue contracts...")
-    total_imported = 0
-    for contract in fl_blue_contracts:
-        payload = {
-            "contract_id": contract["contract_id"],
-            "lines": all_lines,
-        }
-        try:
-            result = api_post(IMPORT_URL, payload)
-            print(f"  ✓ Contract [{contract['contract_id']}] "
-                  f"{contract['provider_name']}: {result['lines_upserted']} lines imported")
-            total_imported += result["lines_upserted"]
-        except urllib.error.HTTPError as e:
-            print(
-                f"  ✗ Contract [{contract['contract_id']}] error: {e.read().decode()}")
+    with get_db() as cur:
+        for contract in contracts:
+            cid = contract["contract_id"]
+            for line in fl_rows:
+                cur.execute("""
+                    INSERT INTO fee_schedule_lines
+                        (contract_id, cpt_code, modifier, place_of_service,
+                         unit_type, allowed_amount, effective_date, end_date, notes)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    cid,
+                    line["cpt_code"],
+                    line["modifier"],
+                    line["place_of_service"],
+                    line["unit_type"],
+                    line["allowed_amount"],
+                    line["effective_date"],
+                    line["end_date"],
+                    line["notes"],
+                ))
+                total_inserted += 1
+            print(f"  ✓ [{cid}] {contract['legal_name']} ({contract['entity_type']})"
+                  f" — {len(fl_rows)} lines inserted")
 
-    print()
-    print("=" * 60)
-    print(f"✓ Import complete: {total_imported} total lines across "
-          f"{len(fl_blue_contracts)} Florida Blue contracts")
-    print()
+    # ── 6. Verify: no duplicates should exist ─────────────────────
+    print("\nVerifying — no duplicates should exist...")
+    with get_db() as cur:
+        cur.execute("""
+            SELECT COUNT(*) AS dupes
+            FROM (
+                SELECT contract_id, cpt_code
+                FROM fee_schedule_lines
+                WHERE contract_id = ANY(%s)
+                GROUP BY contract_id, cpt_code
+                HAVING COUNT(*) > 1
+            ) d
+        """, (contract_ids,))
+        dupes = cur.fetchone()["dupes"]
 
-    # ── Step 6: Show a preview of the rate gaps ───────────────────
-    print("Rate gap preview (your highest-volume codes):")
-    print(
-        f"  {'Code':<8} {'Medicare':>10} {'FL Blue':>10} {'% of Med':>10} {'Gap/Unit':>10}")
-    print(f"  {'-'*8} {'-'*10} {'-'*10} {'-'*10} {'-'*10}")
+    if dupes == 0:
+        print("  ✓ Zero duplicate rows — clean.")
+    else:
+        print(f"  ⚠  {dupes} duplicate (contract, CPT) pairs still found.")
+        print("     This should not happen — please report this.")
 
-    highlight_codes = ["99214", "99213", "99215",
-                       "90833", "90837", "90792", "90791"]
-    bench_map = {b["cpt_code"]: float(b["allowed_amount"]) for b in benchmarks}
-
-    for code in highlight_codes:
-        if code in bench_map:
-            medicare = bench_map[code]
-            fl_blue = round(medicare * FL_BLUE_NP_FACTOR, 2)
-            pct = round((fl_blue / medicare) * 100, 1)
-            gap = round(medicare * 1.30 - fl_blue, 2)   # gap to 130% target
-            print(
-                f"  {code:<8} ${medicare:>9.2f} ${fl_blue:>9.2f} {pct:>9.1f}% ${gap:>9.2f}")
-
-    print()
-    print("These are gaps to your 130% target. Every row above is a negotiation opportunity.")
-    print()
-    print("Next steps:")
-    print("  1. View full dashboard: http://localhost:8000/api/dashboard?payer_id=1")
-    print("  2. View underpaid codes: http://localhost:8000/api/dashboard/underpaid/1")
-    print("  3. View payer summary:   http://localhost:8000/api/dashboard/summary")
+    print(f"\n{'=' * 65}")
+    print(f"✓ Done — {total_inserted} rows inserted across {len(contracts)} contracts.")
+    print("\nNext steps:")
+    print("  1. Restart uvicorn if it's running:")
+    print("       lsof -ti:8000 | xargs kill -9")
+    print("       uvicorn backend.main:app --reload")
+    print("  2. Refresh the dashboard (↻ button) — Rate Comparison and")
+    print("     Billing Channel Comparison should now show the same rates.")
 
 
 if __name__ == "__main__":
