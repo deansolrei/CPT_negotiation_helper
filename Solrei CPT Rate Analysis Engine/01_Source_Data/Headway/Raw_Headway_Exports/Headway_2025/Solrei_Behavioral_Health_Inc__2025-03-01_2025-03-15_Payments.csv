@@ -1,0 +1,5 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-03-14,204.00,43599,Jodene Jensen,MD,Ervin Simmons,Insurance,Cigna,2025-02-28,2025-03-01,"99214,90838","F90.0,F41.1,F33.0"
+2025-03-14,206.36,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-02-25,2025-03-01,"99214,90833","F41.1,F33.0"
+2025-03-14,206.36,43599,Jodene Jensen,MD,Catherine Hennessy,Insurance,Aetna,2025-02-24,2025-02-28,"99214,90833","F90.2,F41.1,F33.1"
+2025-03-14,156.00,43599,Jodene Jensen,MD,Taylor Bruno,Insurance,Cigna,2025-02-18,2025-02-21,"99214,90833",F90.0

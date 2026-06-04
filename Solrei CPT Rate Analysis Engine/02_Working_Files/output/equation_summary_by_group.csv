@@ -1,0 +1,262 @@
+billing_platform,service_year,provider_name,state,payer,row_type,single_code,em_code,psych_code,avg_payment_amount,claim_count
+Headway,2025,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99205,90838,274.0,1
+Headway,2025,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99214,90833,150.0,2
+Headway,2025,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99214,90836,181.0,1
+Headway,2025,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99214,90838,211.0,1
+Headway,2025,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99215,90838,246.0,1
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99204,90838,306.0,1
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99205,90838,347.0,1
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99214,90833,172.0,6
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99214,90838,251.0,2
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99215,90836,248.0,1
+Headway,2025,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99215,90838,287.0,1
+Headway,2025,Jodene Jensen,CO,Cigna,pair,,99215,90836,211.0,1
+Headway,2025,Jodene Jensen,CO,Cigna,single,99214,,,97.0,1
+Headway,2025,Jodene Jensen,CO,United Healthcare (Optum),pair,,99215,90838,246.0,1
+Headway,2025,Jodene Jensen,DC,Aetna,pair,,99204,90838,287.53,1
+Headway,2025,Jodene Jensen,DC,United Healthcare (Optum),pair,,99214,90833,160.0,5
+Headway,2025,Jodene Jensen,DC,United Healthcare (Optum),pair,,99214,90836,175.0,2
+Headway,2025,Jodene Jensen,DC,United Healthcare (Optum),pair,,99214,90838,197.0,3
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99204,90838,287.53,1
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99214,90833,206.36,11
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99214,90836,235.47,8
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99214,90838,256.0,12
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99215,90833,224.34,2
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99215,90836,247.05,1
+Headway,2025,Jodene Jensen,FL,Aetna,pair,,99215,90838,267.58,3
+Headway,2025,Jodene Jensen,FL,Blue Cross Blue Shield of Massachusetts,pair,,99214,90833,203.0,6
+Headway,2025,Jodene Jensen,FL,Blue Cross Blue Shield of Massachusetts,pair,,99214,90836,221.0,2
+Headway,2025,Jodene Jensen,FL,Blue Cross Blue Shield of Massachusetts,pair,,99214,90838,243.0,1
+Headway,2025,Jodene Jensen,FL,Cigna,pair,,99214,90833,156.0,7
+Headway,2025,Jodene Jensen,FL,Cigna,pair,,99214,90836,177.0,3
+Headway,2025,Jodene Jensen,FL,Cigna,pair,,99215,90833,190.0,1
+Headway,2025,Jodene Jensen,FL,Cigna,pair,,99215,90836,221.0,1
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99204,90838,209.33,1
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99205,90838,248.98,1
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99214,90833,144.58,3
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99214,90836,157.91,6
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99214,90838,179.22,17
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99215,90833,183.2,4
+Headway,2025,Jodene Jensen,FL,Florida Blue,pair,,99215,90838,217.84,6
+Headway,2025,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99204,90838,295.88,1
+Headway,2025,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90833,196.58,4
+Headway,2025,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90836,215.11,4
+Headway,2025,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99215,90836,246.53,1
+Headway,2025,Jodene Jensen,FL,Independence Blue Cross Pennsylvania,pair,,99205,90838,265.42,1
+Headway,2025,Jodene Jensen,FL,Independence Blue Cross Pennsylvania,pair,,99215,90833,199.27,4
+Headway,2025,Jodene Jensen,FL,Independence Blue Cross Pennsylvania,pair,,99215,90838,234.13,1
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99205,90838,290.11,1
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90833,160.0,3
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90836,176.16,3
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90838,206.0,3
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99215,90833,200.0,1
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99215,90836,216.16,1
+Headway,2025,Jodene Jensen,FL,United Healthcare (Optum),pair,,99215,90838,246.0,2
+Headway,2025,Jodene Jensen,IA,Cigna,pair,,99214,90836,157.0,1
+Headway,2025,Jodene Jensen,MD,Aetna,pair,,99214,90833,206.36,5
+Headway,2025,Jodene Jensen,MD,Aetna,pair,,99214,90836,235.47,5
+Headway,2025,Jodene Jensen,MD,Aetna,pair,,99214,90838,257.71,6
+Headway,2025,Jodene Jensen,MD,Aetna,pair,,99215,90836,247.05,1
+Headway,2025,Jodene Jensen,MD,Cigna,pair,,99214,90833,156.0,11
+Headway,2025,Jodene Jensen,MD,Cigna,pair,,99214,90836,177.0,5
+Headway,2025,Jodene Jensen,MD,Cigna,pair,,99214,90838,204.0,9
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99205,90838,395.09,1
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99214,90833,230.0,2
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99214,90836,252.04,1
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99215,90833,294.81,4
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99215,90836,312.94,5
+Headway,2025,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99215,90838,346.6,9
+Headway,2025,Jodene Jensen,OR,Aetna,pair,,99214,90833,212.0,3
+Headway,2025,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99205,90838,487.0,1
+Headway,2025,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90833,269.0,2
+Headway,2025,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90838,344.56,9
+Headway,2025,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99215,90836,353.0,1
+Headway,2025,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99215,90838,397.0,1
+Headway,2025,Jodene Jensen,WA,Aetna,pair,,99214,90833,206.36,2
+Headway,2025,Jodene Jensen,WA,Aetna,pair,,99214,90836,235.47,1
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99204,90838,310.08,1
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99205,90838,356.67,1
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99214,90833,196.93,18
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99214,90836,217.29,9
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99214,90838,248.61,17
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99215,90833,237.65,3
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99215,90836,258.01,5
+Headway,2025,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99215,90838,291.68,7
+Headway,2025,Katherine Robins,FL,Aetna,pair,,99205,90838,332.31,2
+Headway,2025,Katherine Robins,FL,Aetna,pair,,99214,90833,206.36,5
+Headway,2025,Katherine Robins,FL,Aetna,pair,,99215,90836,247.05,1
+Headway,2025,Katherine Robins,OR,Aetna,pair,,99205,90838,291.0,1
+Headway,2025,Katherine Robins,OR,Aetna,pair,,99214,90833,212.0,1
+Headway,2025,Katherine Robins,OR,Aetna,pair,,99214,90838,252.0,1
+Headway,2025,Katherine Robins,OR,Cigna,pair,,99204,90836,216.0,1
+Headway,2025,Katherine Robins,OR,Cigna,pair,,99205,90838,280.0,1
+Headway,2025,Katherine Robins,OR,Cigna,pair,,99214,90833,148.0,1
+Headway,2025,Katherine Robins,OR,Cigna,pair,,99214,90836,168.0,1
+Headway,2025,Katherine Robins,OR,Cigna,pair,,99214,90838,194.0,1
+Headway,2025,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99204,90838,425.0,1
+Headway,2025,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99205,90838,487.0,4
+Headway,2025,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90833,269.0,18
+Headway,2025,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90836,298.0,6
+Headway,2025,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90838,342.0,6
+Headway,2025,Katherine Robins,WA,Aetna,pair,,99204,90836,267.0,1
+Headway,2025,Katherine Robins,WA,Aetna,pair,,99205,90838,332.31,1
+Headway,2025,Katherine Robins,WA,Aetna,pair,,99214,90833,206.36,2
+Headway,2025,Katherine Robins,WA,Aetna,pair,,99214,90838,256.0,4
+Headway,2025,Katherine Robins,WA,Ambetter Washington,pair,,99205,90838,248.76,2
+Headway,2025,Katherine Robins,WA,Ambetter Washington,pair,,99214,90833,146.37,2
+Headway,2025,Katherine Robins,WA,Ambetter Washington,pair,,99214,90838,181.82,2
+Headway,2025,Katherine Robins,WA,Cigna,pair,,99205,90838,295.0,1
+Headway,2025,Katherine Robins,WA,Cigna,pair,,99214,90833,156.0,16
+Headway,2025,Katherine Robins,WA,Cigna,pair,,99214,90836,177.0,2
+Headway,2025,Katherine Robins,WA,Cigna,pair,,99214,90838,204.0,1
+Headway,2025,Katherine Robins,WA,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90833,196.58,6
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99204,90836,239.0,1
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99204,90838,267.0,2
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99205,90838,314.0,9
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90833,160.0,18
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90836,179.0,7
+Headway,2025,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90838,207.0,37
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99204,90836,278.76,1
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99204,90838,310.08,1
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99205,90838,356.67,4
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90833,196.93,24
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90836,217.29,9
+Headway,2025,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90838,248.61,15
+Headway,2025,Katherine Robins,WA,United Healthcare (Optum),pair,,99214,90833,160.0,7
+Headway,2025,Katherine Robins,WA,United Healthcare (Optum),pair,,99214,90836,176.16,2
+Headway,2026,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99214,90833,150.0,1
+Headway,2026,Jodene Jensen,AZ,Blue Cross Blue Shield of Arizona,pair,,99214,90838,211.0,1
+Headway,2026,Jodene Jensen,AZ,Cigna,pair,,99214,90833,157.0,1
+Headway,2026,Jodene Jensen,AZ,Cigna,pair,,99214,90836,179.0,1
+Headway,2026,Jodene Jensen,AZ,United Healthcare (Optum),pair,,99214,90838,204.59,2
+Headway,2026,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99214,90833,172.0,1
+Headway,2026,Jodene Jensen,CO,Anthem Blue Cross and Blue Shield Colorado,pair,,99214,90836,212.0,2
+Headway,2026,Jodene Jensen,CO,Cigna,pair,,99214,90833,156.0,2
+Headway,2026,Jodene Jensen,CO,Cigna,pair,,99214,90836,177.0,1
+Headway,2026,Jodene Jensen,CO,Cigna,pair,,99214,90838,204.0,3
+Headway,2026,Jodene Jensen,CO,Cigna,pair,,99215,90838,238.0,2
+Headway,2026,Jodene Jensen,CO,United Healthcare (Optum),pair,,99214,90833,170.4,4
+Headway,2026,Jodene Jensen,CO,United Healthcare (Optum),pair,,99214,90836,182.16,1
+Headway,2026,Jodene Jensen,CO,United Healthcare (Optum),pair,,99214,90838,212.0,2
+Headway,2026,Jodene Jensen,DC,Aetna,pair,,99214,90833,206.36,4
+Headway,2026,Jodene Jensen,DC,Aetna,pair,,99214,90838,256.0,1
+Headway,2026,Jodene Jensen,DC,Aetna,pair,,99215,90833,217.94,1
+Headway,2026,Jodene Jensen,DC,United Healthcare (Optum),pair,,99204,90838,238.1,1
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99204,90838,287.53,1
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99214,90833,206.36,6
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99214,90836,235.47,8
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99214,90838,256.0,5
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99215,90836,247.05,1
+Headway,2026,Jodene Jensen,FL,Aetna,pair,,99215,90838,267.58,1
+Headway,2026,Jodene Jensen,FL,Blue Cross Blue Shield of Massachusetts,pair,,99214,90833,203.0,2
+Headway,2026,Jodene Jensen,FL,Blue Cross Blue Shield of Massachusetts,pair,,99214,90836,221.0,1
+Headway,2026,Jodene Jensen,FL,Cigna,pair,,99214,90833,156.0,10
+Headway,2026,Jodene Jensen,FL,Cigna,pair,,99214,90836,177.0,4
+Headway,2026,Jodene Jensen,FL,Cigna,pair,,99214,90838,207.33,3
+Headway,2026,Jodene Jensen,FL,Cigna,pair,,99215,90836,211.0,1
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99204,90838,209.33,1
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99205,90838,248.98,1
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99214,90833,144.58,7
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99214,90836,157.91,2
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99214,90838,165.93,7
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99215,90833,183.2,3
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99215,90836,196.53,1
+Headway,2026,Jodene Jensen,FL,Florida Blue,pair,,99215,90838,217.84,1
+Headway,2026,Jodene Jensen,FL,Florida Blue,single,99214,,,93.0,1
+Headway,2026,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90833,196.58,3
+Headway,2026,Jodene Jensen,FL,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90836,215.11,1
+Headway,2026,Jodene Jensen,FL,Oxford (Optum),pair,,99214,90833,160.0,1
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99204,90838,252.34,1
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90833,160.86,15
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90836,176.16,5
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99214,90838,206.0,8
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99215,90833,202.58,5
+Headway,2026,Jodene Jensen,FL,United Healthcare (Optum),pair,,99215,90838,246.0,1
+Headway,2026,Jodene Jensen,IA,Cigna,pair,,99214,90833,139.0,1
+Headway,2026,Jodene Jensen,IA,United Healthcare (Optum),pair,,99214,90838,217.41,1
+Headway,2026,Jodene Jensen,MD,Aetna,pair,,99214,90833,206.36,2
+Headway,2026,Jodene Jensen,MD,Aetna,pair,,99214,90836,235.47,1
+Headway,2026,Jodene Jensen,MD,Aetna,pair,,99214,90838,256.0,3
+Headway,2026,Jodene Jensen,MD,Cigna,pair,,99214,90833,156.0,7
+Headway,2026,Jodene Jensen,MD,Cigna,pair,,99214,90836,177.0,3
+Headway,2026,Jodene Jensen,MD,Cigna,pair,,99214,90838,204.0,5
+Headway,2026,Jodene Jensen,MN,Aetna,pair,,99214,90833,180.0,1
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99205,90838,395.09,1
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99214,90833,230.0,2
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99214,90836,252.04,1
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99214,90838,285.7,1
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99215,90833,290.9,2
+Headway,2026,Jodene Jensen,MN,Blue Cross and Blue Shield of Minnesota,pair,,99215,90836,312.94,1
+Headway,2026,Jodene Jensen,MN,Cigna,pair,,99214,90833,130.0,1
+Headway,2026,Jodene Jensen,MN,Cigna,pair,,99214,90838,170.0,2
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99204,90838,236.43,1
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99214,90833,165.02,5
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99214,90836,179.49,3
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99214,90838,203.62,3
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99215,90836,223.88,1
+Headway,2026,Jodene Jensen,MN,United Healthcare (Optum),pair,,99215,90838,248.01,1
+Headway,2026,Jodene Jensen,MT,United Healthcare (Optum),pair,,99214,90833,176.17,1
+Headway,2026,Jodene Jensen,OR,Aetna,pair,,99214,90833,212.0,1
+Headway,2026,Jodene Jensen,OR,Aetna,pair,,99214,90836,231.0,1
+Headway,2026,Jodene Jensen,OR,Cigna,pair,,99214,90836,168.0,1
+Headway,2026,Jodene Jensen,OR,Oxford (Optum),pair,,99214,90838,231.0,3
+Headway,2026,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90833,269.0,1
+Headway,2026,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90836,298.0,1
+Headway,2026,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99215,90833,324.0,1
+Headway,2026,Jodene Jensen,OR,Regence BlueCross BlueShield of Oregon,pair,,99215,90836,353.0,1
+Headway,2026,Jodene Jensen,OR,United Healthcare (Optum),pair,,99214,90833,204.25,4
+Headway,2026,Jodene Jensen,OR,United Healthcare (Optum),pair,,99214,90836,206.0,3
+Headway,2026,Jodene Jensen,OR,United Healthcare (Optum),pair,,99214,90838,231.0,4
+Headway,2026,Jodene Jensen,WA,Aetna,pair,,99214,90833,206.36,1
+Headway,2026,Jodene Jensen,WA,Aetna,pair,,99214,90836,235.47,4
+Headway,2026,Jodene Jensen,WA,Cigna,pair,,99215,90838,238.0,1
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99204,90838,310.08,1
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99205,90838,356.67,1
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99214,90833,196.93,10
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99214,90838,248.61,8
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99215,90836,258.01,4
+Headway,2026,Jodene Jensen,WA,Regence BlueShield of Washington,pair,,99215,90838,289.33,2
+Headway,2026,Jodene Jensen,WA,United Healthcare (Optum),pair,,99214,90838,212.0,2
+Headway,2026,Katherine Robins,AK,Aetna,pair,,99205,90838,291.0,1
+Headway,2026,Katherine Robins,AK,Cigna,pair,,99205,90838,262.0,1
+Headway,2026,Katherine Robins,FL,Aetna,pair,,99214,90833,206.36,2
+Headway,2026,Katherine Robins,FL,Aetna,pair,,99214,90838,256.0,5
+Headway,2026,Katherine Robins,FL,Cigna,pair,,99205,90838,295.0,1
+Headway,2026,Katherine Robins,OR,Aetna,pair,,99205,90838,291.0,1
+Headway,2026,Katherine Robins,OR,Aetna,pair,,99214,90833,212.0,2
+Headway,2026,Katherine Robins,OR,Aetna,pair,,99214,90838,252.0,2
+Headway,2026,Katherine Robins,OR,Cigna,pair,,99214,90833,148.0,2
+Headway,2026,Katherine Robins,OR,Cigna,pair,,99214,90838,194.0,1
+Headway,2026,Katherine Robins,OR,Cigna,pair,,99215,90836,200.0,1
+Headway,2026,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99205,90838,487.0,5
+Headway,2026,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90833,269.0,8
+Headway,2026,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90836,298.0,5
+Headway,2026,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99214,90838,342.0,10
+Headway,2026,Katherine Robins,OR,Regence BlueCross BlueShield of Oregon,pair,,99215,90838,397.0,1
+Headway,2026,Katherine Robins,OR,United Healthcare (Optum),pair,,99214,90833,176.17,1
+Headway,2026,Katherine Robins,OR,United Healthcare (Optum),pair,,99215,90838,248.01,1
+Headway,2026,Katherine Robins,WA,Aetna,pair,,99205,90838,332.31,1
+Headway,2026,Katherine Robins,WA,Aetna,pair,,99214,90833,206.36,1
+Headway,2026,Katherine Robins,WA,Aetna,pair,,99214,90838,256.0,2
+Headway,2026,Katherine Robins,WA,Ambetter Washington,pair,,99214,90833,146.37,4
+Headway,2026,Katherine Robins,WA,Ambetter Washington,pair,,99214,90836,160.23,1
+Headway,2026,Katherine Robins,WA,Cigna,pair,,99205,90838,295.0,1
+Headway,2026,Katherine Robins,WA,Cigna,pair,,99214,90833,156.0,2
+Headway,2026,Katherine Robins,WA,Cigna,pair,,99214,90836,177.0,1
+Headway,2026,Katherine Robins,WA,Cigna,pair,,99214,90838,204.0,2
+Headway,2026,Katherine Robins,WA,Cigna,pair,,99215,90838,238.0,1
+Headway,2026,Katherine Robins,WA,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99205,90838,341.02,1
+Headway,2026,Katherine Robins,WA,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90833,196.58,2
+Headway,2026,Katherine Robins,WA,Horizon Blue Cross and Blue Shield of New Jersey,pair,,99214,90838,244.0,1
+Headway,2026,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99205,90838,314.0,7
+Headway,2026,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90833,160.0,11
+Headway,2026,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90836,179.0,3
+Headway,2026,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99214,90838,207.0,21
+Headway,2026,Katherine Robins,WA,Premera Blue Cross Washington,pair,,99215,90836,217.0,1
+Headway,2026,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99205,90838,356.67,3
+Headway,2026,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90833,196.93,4
+Headway,2026,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90836,217.29,1
+Headway,2026,Katherine Robins,WA,Regence BlueShield of Washington,pair,,99214,90838,248.61,15
+Headway,2026,Katherine Robins,WA,United Healthcare (Optum),pair,,99205,90838,290.11,2
+Headway,2026,Katherine Robins,WA,United Healthcare (Optum),pair,,99214,90833,160.0,3
+Headway,2026,Katherine Robins,WA,United Healthcare (Optum),pair,,99214,90838,206.0,4

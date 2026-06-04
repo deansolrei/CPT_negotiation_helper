@@ -1,0 +1,27 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-08-15,314.00,64465,Katherine Robins,WA,Emily Yurich,Insurance,Premera Blue Cross Washington,2025-07-25,2025-08-01,"99205,90838","F41.1,F50.00,F43.20"
+2025-08-15,314.00,64465,Katherine Robins,WA,Madison Fees,Insurance,Premera Blue Cross Washington,2025-07-25,2025-08-01,"99205,90838","F43.10,F32.81,F41.1"
+2025-08-15,269.00,64465,Katherine Robins,OR,RANDALL COLLETT,Insurance,Regence BlueCross BlueShield of Oregon,2025-07-25,2025-08-01,"99214,90833",F33.1
+2025-08-15,235.47,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-07-25,2025-07-28,"99214,90836","F41.1,F33.0"
+2025-08-15,269.00,64465,Katherine Robins,OR,Hannah Kaplan,Insurance,Regence BlueCross BlueShield of Oregon,2025-07-21,2025-08-01,"99214,90833",F33.1
+2025-08-15,342.00,64465,Katherine Robins,OR,Pitchapa Sornsena,Insurance,Regence BlueCross BlueShield of Oregon,2025-07-21,2025-08-01,"99214,90838","F43.20,F41.9"
+2025-08-15,290.11,64465,Katherine Robins,WA,Cara Mathews,Insurance,United Healthcare (Optum),2025-07-21,2025-07-31,"99205,90838","F33.1,F43.10"
+2025-08-15,291.00,64465,Katherine Robins,AK,Kristine Carman,Insurance,Aetna,2025-07-19,2025-07-31,"99205,90838","F39,F41.1,F90.2,F60.3,G47.00"
+2025-08-15,217.00,64465,Katherine Robins,WA,Julianne Alyssa Tolentino,Insurance,Premera Blue Cross Washington,2025-07-19,2025-07-31,"99215,90836","F33.1,F41.1,F43.10"
+2025-08-15,295.00,64465,Katherine Robins,FL,Jordan Hodge,Insurance,Cigna,2025-07-18,2025-07-31,"99205,90838","F39,F41.1,F50.9,F19.10"
+2025-08-15,248.61,64465,Katherine Robins,WA,AMY SASSARA,Insurance,Regence BlueShield of Washington,2025-07-18,2025-07-21,"99214,90838","F41.1,F33.1"
+2025-08-15,235.47,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-07-18,2025-07-27,"99214,90836","F41.1,F33.0"
+2025-08-15,179.00,64465,Katherine Robins,WA,Catherine Gibson,Insurance,Premera Blue Cross Washington,2025-07-14,2025-07-31,"99214,90836","F42.2,F41.1,F45.22"
+2025-08-15,342.00,64465,Katherine Robins,OR,Hannah Kaplan,Insurance,Regence BlueCross BlueShield of Oregon,2025-07-14,2025-07-31,"99214,90838",F33.1
+2025-08-15,207.00,64465,Katherine Robins,WA,Daniel Smith,Insurance,Premera Blue Cross Washington,2025-07-14,2025-07-21,"99214,90838",F33.1
+2025-08-15,235.47,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-07-10,2025-07-21,"99214,90836","F41.1,F33.0"
+2025-08-15,204.00,64465,Katherine Robins,WA,Shannon Pellegrini,Insurance,Cigna,2025-07-07,2025-07-21,"99214,90838","F41.1,F32.0"
+2025-08-15,487.00,64465,Katherine Robins,OR,Hannah Kaplan,Insurance,Regence BlueCross BlueShield of Oregon,2025-07-07,2025-07-21,"99205,90838","F33.1,F41.1"
+2025-08-15,206.36,43599,Jodene Jensen,MD,Catherine Hennessy,Insurance,Aetna,2025-07-01,2025-08-01,"99214,90833","F90.2,F41.1,F33.0"
+2025-08-15,230.00,43599,Jodene Jensen,MN,Katie Scheidt,Insurance,Blue Cross and Blue Shield of Minnesota,2025-07-01,2025-07-30,"99214,90833","F33.1,F41.1,F90.2"
+2025-08-15,196.93,43599,Jodene Jensen,WA,Mason Kelly,Insurance,Regence BlueShield of Washington,2025-06-30,2025-07-30,"99214,90833","F90.0,F33.0,F41.1"
+2025-08-15,248.61,43599,Jodene Jensen,WA,MICHAEL LAROSA,Insurance,Regence BlueShield of Washington,2025-06-25,2025-07-25,"99214,90838","F41.1,F33.0"
+2025-08-15,156.00,43599,Jodene Jensen,MD,Taylor Bruno,Insurance,Cigna,2025-06-24,2025-07-23,"99214,90833",F90.0
+2025-08-15,200.00,43599,Jodene Jensen,FL,Chana Handler,Insurance,United Healthcare (Optum),2025-06-24,2025-07-23,"99215,90833","F41.1,F43.10,F31.30,F90.0"
+2025-08-15,212.00,43599,Jodene Jensen,OR,Michael Pollet,Insurance,Aetna,2025-06-23,2025-07-18,"99214,90833","F33.0,F41.1"
+2025-08-15,248.98,43599,Jodene Jensen,FL,Sylvan Peck,Insurance,Florida Blue,2025-06-19,2025-07-18,"99205,90838","F31.60,F41.1,F43.10"

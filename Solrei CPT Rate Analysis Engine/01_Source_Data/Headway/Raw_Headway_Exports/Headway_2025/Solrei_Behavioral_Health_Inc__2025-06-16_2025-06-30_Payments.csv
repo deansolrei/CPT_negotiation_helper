@@ -1,0 +1,17 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-06-30,217.29,43599,Jodene Jensen,WA,Melanie Greenberg,Insurance,Regence BlueShield of Washington,2025-06-13,2025-06-13,"99214,90836","F41.1,F43.10,F90.2"
+2025-06-30,267.00,64465,Katherine Robins,WA,Julianne Alyssa Tolentino,Insurance,Premera Blue Cross Washington,2025-06-07,2025-06-15,"99204,90838","F39,F41.1,F43.10"
+2025-06-30,207.00,64465,Katherine Robins,WA,Catherine Gibson,Insurance,Premera Blue Cross Washington,2025-06-06,2025-06-16,"99214,90838","F41.1,F42.9,F32.9"
+2025-06-30,256.00,43599,Jodene Jensen,FL,Paul Norridge,Insurance,Aetna,2025-06-04,2025-06-11,"99214,90838","F33.0,F41.1"
+2025-06-30,248.61,64465,Katherine Robins,WA,AMY SASSARA,Insurance,Regence BlueShield of Washington,2025-05-31,2025-06-16,"99214,90838","F41.1,F33.1,F90.9"
+2025-06-30,267.00,64465,Katherine Robins,WA,Catherine Gibson,Insurance,Premera Blue Cross Washington,2025-05-30,2025-06-16,"99204,90838","F41.1,F42.9,F32.9"
+2025-06-30,278.76,64465,Katherine Robins,WA,AMY SASSARA,Insurance,Regence BlueShield of Washington,2025-05-30,2025-06-16,"99204,90836","F41.1,F33.1,F90.9"
+2025-06-30,160.00,43599,Jodene Jensen,FL,Chana Handler,Insurance,United Healthcare (Optum),2025-05-23,2025-06-11,"99214,90833","F41.1,F43.10,F31.30,F90.0"
+2025-06-30,235.47,43599,Jodene Jensen,MD,Catherine Hennessy,Insurance,Aetna,2025-05-23,2025-06-03,"99214,90836","F90.2,F41.1,F33.0"
+2025-06-30,256.00,43599,Jodene Jensen,FL,Paul Norridge,Insurance,Aetna,2025-05-22,2025-06-04,"99214,90838","F33.0,F41.1"
+2025-06-30,196.93,43599,Jodene Jensen,WA,Melanie Greenberg,Insurance,Regence BlueShield of Washington,2025-05-16,2025-06-09,"99214,90833","F41.1,F43.10,F90.2"
+2025-06-30,209.33,43599,Jodene Jensen,FL,Daniel Caccavale,Insurance,Florida Blue,2025-05-16,2025-06-04,"99204,90838","F41.1,F42.9,F90.9"
+2025-06-30,177.00,43599,Jodene Jensen,MD,Ervin Simmons,Insurance,Cigna,2025-05-16,2025-06-09,"99214,90836","F90.0,F41.1,F33.1"
+2025-06-30,157.91,43599,Jodene Jensen,FL,Katie Gordon,Insurance,Florida Blue,2025-05-16,2025-06-09,"99214,90836","F33.0,F40.10"
+2025-06-30,248.61,43599,Jodene Jensen,WA,MICHAEL LAROSA,Insurance,Regence BlueShield of Washington,2025-05-13,2025-06-06,"99214,90838","F41.1,F33.9"
+2025-06-30,175.00,43599,Jodene Jensen,,Melanie Greenberg,Insurance,,2025-05-13,,,

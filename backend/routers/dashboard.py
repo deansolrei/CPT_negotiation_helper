@@ -10,7 +10,7 @@ These are the heart of the tool — they answer:
 
 import csv
 import io
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from backend.database import get_db
 from ..models import (
@@ -22,6 +22,21 @@ from ..models import (
 
 router = APIRouter(prefix="/api", tags=["Negotiation Dashboard"])
 
+# Valid state codes — the 23 states where Solrei has licensed providers
+VALID_STATES = {
+    "AK","AZ","CO","DC","FL","HI","ID","IA","KS","ME","MD",
+    "MN","MT","NE","NV","NH","NM","ND","OR","SD","VT","WA","WY",
+}
+
+
+def _set_locality(cur, state: str):
+    """Set the benchmark locality session variable for multi-state view support."""
+    state_upper = state.upper() if state else "FL"
+    if state_upper not in VALID_STATES:
+        state_upper = "FL"
+    cur.execute("SET app.benchmark_locality = %s", (state_upper,))
+    return state_upper
+
 
 # ── Full Dashboard ────────────────────────────────────────────
 
@@ -30,6 +45,7 @@ def get_dashboard(
     payer_id: int = None,
     underpaid_only: bool = False,
     min_gap: float = None,
+    state: str = Query(default="FL", description="Two-letter state code (e.g. FL, AZ, WA)"),
 ):
     """
     Return the full negotiation dashboard from v_negotiation_dashboard.
@@ -38,6 +54,7 @@ def get_dashboard(
       - payer_id: filter to a specific payer
       - underpaid_only: if true, return only codes where payer rate < target
       - min_gap: only return rows where rate_gap_per_unit >= this value
+      - state: two-letter state code for Medicare benchmark locality (default: FL)
     """
     filters = []
     params = []
@@ -54,6 +71,7 @@ def get_dashboard(
     where = ("WHERE " + " AND ".join(filters)) if filters else ""
 
     with get_db() as cur:
+        _set_locality(cur, state)
         cur.execute(f"SELECT * FROM v_negotiation_dashboard {where}", params)
         return cur.fetchall()
 
@@ -61,7 +79,10 @@ def get_dashboard(
 # ── Payer Summary ─────────────────────────────────────────────
 
 @router.get("/dashboard/summary", response_model=list[DashboardSummaryRow])
-def get_dashboard_summary(payer_id: int = None):
+def get_dashboard_summary(
+    payer_id: int = None,
+    state: str = Query(default="FL", description="Two-letter state code for Medicare benchmark"),
+):
     """
     Return payer-level summary from v_negotiation_summary.
     Sorted by total revenue gap (biggest opportunity first).
@@ -71,6 +92,7 @@ def get_dashboard_summary(payer_id: int = None):
     params = [payer_id] if payer_id else []
 
     with get_db() as cur:
+        _set_locality(cur, state)
         cur.execute(f"SELECT * FROM v_negotiation_summary {where}", params)
         return cur.fetchall()
 
@@ -201,7 +223,11 @@ def delete_target(target_id: int):
 # ── CSV Export ────────────────────────────────────────────────
 
 @router.get("/dashboard/export")
-def export_dashboard_csv(payer_id: int = None, underpaid_only: bool = False):
+def export_dashboard_csv(
+    payer_id: int = None,
+    underpaid_only: bool = False,
+    state: str = Query(default="FL"),
+):
     """
     Export the full negotiation dashboard as a CSV file.
     Optional filters: payer_id, underpaid_only.
@@ -217,6 +243,7 @@ def export_dashboard_csv(payer_id: int = None, underpaid_only: bool = False):
     where = ("WHERE " + " AND ".join(filters)) if filters else ""
 
     with get_db() as cur:
+        _set_locality(cur, state)
         cur.execute(f"SELECT * FROM v_negotiation_dashboard {where}", params)
         rows = cur.fetchall()
 

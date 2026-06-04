@@ -1,0 +1,18 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2026-01-30,160.00,64465,Katherine Robins,WA,Natalie Myers,Insurance,Premera Blue Cross Washington,2026-01-09,2026-01-13,"99214,90833","F33.1,F41.1"
+2026-01-30,160.00,64465,Katherine Robins,WA,Audra Brooke,Insurance,Premera Blue Cross Washington,2026-01-03,2026-01-13,"99214,90833","F32.0,G47.00"
+2026-01-30,207.00,64465,Katherine Robins,WA,Daniel Smith,Insurance,Premera Blue Cross Washington,2026-01-03,2026-01-13,"99214,90838",F33.1
+2026-01-30,196.93,64465,Katherine Robins,WA,Ciara McNally,Insurance,Regence BlueShield of Washington,2026-01-02,2026-01-13,"99214,90833","F33.1,F41.1,F90.0"
+2026-01-30,160.00,64465,Katherine Robins,WA,SARAH BATTLE,Insurance,Premera Blue Cross Washington,2026-01-02,2026-01-13,"99214,90833","F33.1,F41.1,F51.01"
+2026-01-30,200.00,64465,Katherine Robins,OR,Erika Cromwell,Insurance,Cigna,2025-12-29,2026-01-06,"99215,90836","F33.1,F43.10,F50.9,F41.9"
+2026-01-30,342.00,64465,Katherine Robins,OR,Haylie Rahm,Insurance,Regence BlueCross BlueShield of Oregon,2025-12-26,2026-01-02,"99214,90838","F39,F41.1,F50.810"
+2026-01-30,183.20,43599,Jodene Jensen,FL,Bridgitte Williams,Insurance,Florida Blue,2025-12-23,2026-01-09,"99215,90833","F33.0,F41.1,F43.10,F90.0"
+2026-01-30,207.00,64465,Katherine Robins,WA,Sofia Iacono,Insurance,Premera Blue Cross Washington,2025-12-22,2026-01-06,"99214,90838","F41.1,F32.1,F50.9"
+2026-01-30,196.93,64465,Katherine Robins,WA,Taci Bordenave,Insurance,Regence BlueShield of Washington,2025-12-22,2026-01-06,"99214,90833","F33.1,F41.1,F90.0"
+2026-01-30,196.53,43599,Jodene Jensen,FL,Melody Rose,Insurance,Florida Blue,2025-12-19,2026-01-12,"99215,90836","F90.0,F33.0,F41.1"
+2026-01-30,217.84,43599,Jodene Jensen,FL,Abbey LaMee,Insurance,Florida Blue,2025-12-18,2026-01-12,"99215,90838","F33.0,F41.1"
+2026-01-30,86.22,43599,Jodene Jensen,FL,Maria Gutierrez,Insurance,Florida Blue,2025-12-12,2026-01-07,"98006,90838","F33.0,F41.1"
+2026-01-30,269.00,64465,Katherine Robins,OR,Sophie Helsinger,Insurance,Regence BlueCross BlueShield of Oregon,2025-12-11,2026-01-13,"99214,90833","F51.01,F41.1,F31.0"
+2026-01-30,247.05,43599,Jodene Jensen,FL,Chana Handler,Insurance,Aetna,2025-12-09,2026-01-08,"99215,90836","F41.1,F43.10,F31.30,F90.0"
+2026-01-30,258.01,43599,Jodene Jensen,WA,Summer R Kennard,Insurance,Regence BlueShield of Washington,2025-12-08,2026-01-07,"99215,90836","F31.30,F41.1,F43.10,F50.019"
+2026-01-30,256.00,43599,Jodene Jensen,DC,Danielle Deiseroth,Insurance,Aetna,2025-12-04,2026-01-07,"99214,90838","F90.0,F41.1"

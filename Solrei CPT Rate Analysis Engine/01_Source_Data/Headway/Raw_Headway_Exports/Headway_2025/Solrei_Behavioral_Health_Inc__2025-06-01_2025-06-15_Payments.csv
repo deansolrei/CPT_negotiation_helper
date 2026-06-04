@@ -1,0 +1,13 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-06-13,269.00,64465,Katherine Robins,OR,RANDALL COLLETT,Insurance,Regence BlueCross BlueShield of Oregon,2025-05-23,2025-06-01,"99214,90833",F33.0
+2025-06-13,256.00,43599,Jodene Jensen,MD,Catherine Hennessy,Insurance,Aetna,2025-05-13,2025-05-23,"99214,90838","F90.2,F41.1,F33.0"
+2025-06-13,156.00,43599,Jodene Jensen,MD,Taylor Bruno,Insurance,Cigna,2025-05-12,2025-05-25,"99214,90833",F90.0
+2025-06-13,256.00,43599,Jodene Jensen,FL,Paul Norridge,Insurance,Aetna,2025-05-12,2025-05-23,"99214,90838","F33.0,F41.1"
+2025-06-13,235.47,43599,Jodene Jensen,FL,Paul Norridge,Insurance,Aetna,2025-05-06,2025-05-23,"99214,90836","F33.0,F41.1"
+2025-06-13,235.47,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-05-05,2025-05-24,"99214,90836","F41.1,F33.0"
+2025-06-13,217.29,64465,Katherine Robins,WA,Tommy Tobin,Insurance,Regence BlueShield of Washington,2025-05-05,2025-06-01,"99214,90836",F43.81
+2025-06-13,196.93,43599,Jodene Jensen,WA,Mason Kelly,Insurance,Regence BlueShield of Washington,2025-05-05,2025-05-25,"99214,90833","F90.0,F33.0,F41.1"
+2025-06-13,203.00,43599,Jodene Jensen,FL,Emily Barnett,Insurance,Blue Cross Blue Shield of Massachusetts,2025-05-05,2025-05-25,"99214,90833","F41.1,F33.0,F90.0"
+2025-06-13,310.08,64465,Katherine Robins,WA,Tommy Tobin,Insurance,Regence BlueShield of Washington,2025-05-02,2025-05-31,"99204,90838",F43.81
+2025-06-13,425.00,64465,Katherine Robins,OR,RANDALL COLLETT,Insurance,Regence BlueCross BlueShield of Oregon,2025-05-02,2025-05-31,"99204,90838",F33.1
+2025-06-13,269.00,43599,Jodene Jensen,OR,Kathryn Barrett,Insurance,Regence BlueCross BlueShield of Oregon,2025-04-29,2025-05-24,"99214,90833","F90.0,F41.1"

@@ -1,0 +1,12 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-04-30,177.00,43599,Jodene Jensen,FL,kyra liebertz,Insurance,Cigna,2025-04-07,2025-04-08,"99214,90836","F41.1,F33.1"
+2025-04-30,196.93,43599,Jodene Jensen,WA,Mason Kelly,Insurance,Regence BlueShield of Washington,2025-04-07,2025-04-08,"99214,90833","F90.0,F33.0,F41.1"
+2025-04-30,212.00,43599,Jodene Jensen,OR,Michael Pollet,Insurance,Aetna,2025-04-07,2025-04-08,"99214,90833","F33.0,F41.1"
+2025-04-30,221.00,43599,Jodene Jensen,FL,Emily Barnett,Insurance,Blue Cross Blue Shield of Massachusetts,2025-04-07,2025-04-08,"99214,90836","F41.1,F33.0,F90.0"
+2025-04-30,248.61,43599,Jodene Jensen,WA,MICHAEL LAROSA,Insurance,Regence BlueShield of Washington,2025-04-07,2025-04-08,"99214,90838","F41.1,F33.9"
+2025-04-30,256.00,43599,Jodene Jensen,FL,Paul Norridge,Insurance,Aetna,2025-04-07,2025-04-07,"99214,90838","F33.0,F41.1"
+2025-04-30,206.00,43599,Jodene Jensen,FL,Chana Handler,Insurance,United Healthcare (Optum),2025-04-03,2025-04-04,"99214,90838","F41.1,F43.10,F31.30,F90.0"
+2025-04-30,248.61,43599,Jodene Jensen,WA,MICHAEL LAROSA,Insurance,Regence BlueShield of Washington,2025-04-02,2025-04-04,"99214,90838","F41.1,F33.9"
+2025-04-30,287.53,43599,Jodene Jensen,FL,Jamie Maisel,Insurance,Aetna,2025-04-02,2025-04-04,"99204,90838","F33.3,F41.1,F90.0,F43.10"
+2025-04-30,204.00,43599,Jodene Jensen,MD,Ervin Simmons,Insurance,Cigna,2025-04-02,2025-04-04,"99214,90838","F90.0,F41.1,F33.2"
+2025-04-30,160.00,43599,Jodene Jensen,FL,Chana Handler,Insurance,United Healthcare (Optum),2025-03-31,2025-04-03,"99214,90833","F41.1,F43.10,F31.30"

@@ -1,0 +1,13 @@
+Payment date,Payment amount,Provider ID,Provider name,Appointment location state,Patient name,Billing type,Payer,Appointment date,Session confirmation date,CPT code(s),Diagnosis code(s)
+2025-05-30,248.61,43599,Jodene Jensen,WA,MICHAEL LAROSA,Insurance,Regence BlueShield of Washington,2025-04-30,2025-05-07,"99214,90838","F41.1,F33.9"
+2025-05-30,206.36,43599,Jodene Jensen,MD,Catherine Hennessy,Insurance,Aetna,2025-04-29,2025-05-14,"99214,90833","F90.2,F41.1,F33.0"
+2025-05-30,177.00,43599,Jodene Jensen,FL,kyra liebertz,Insurance,Cigna,2025-04-29,2025-05-14,"99214,90836","F41.1,F33.2"
+2025-05-30,204.00,43599,Jodene Jensen,MD,Ervin Simmons,Insurance,Cigna,2025-04-29,2025-05-14,"99214,90838","F90.0,F41.1,F33.2"
+2025-05-30,156.00,43599,Jodene Jensen,MD,Taylor Bruno,Insurance,Cigna,2025-04-28,2025-05-07,"99214,90833",F90.0
+2025-05-30,216.00,64465,Katherine Robins,OR,Erika Paul,Insurance,Cigna,2025-04-25,2025-05-09,"99204,90836","F33.0,F41.1"
+2025-05-30,179.22,43599,Jodene Jensen,FL,Bridgitte Williams,Insurance,Florida Blue,2025-04-22,2025-05-08,"99214,90838","F33.0,F41.1,F43.10"
+2025-05-30,157.91,43599,Jodene Jensen,FL,Katie Gordon,Insurance,Florida Blue,2025-04-22,2025-05-07,"99214,90836","F33.0,F40.10"
+2025-05-30,295.88,43599,Jodene Jensen,FL,Matthew Lee,Insurance,Horizon Blue Cross and Blue Shield of New Jersey,2025-04-18,2025-05-04,"99204,90838","F90.0,F41.1"
+2025-05-30,235.47,43599,Jodene Jensen,FL,Robert Almaraz,Insurance,Aetna,2025-04-17,2025-05-04,"99214,90836","F41.1,F90.2"
+2025-05-30,235.47,43599,Jodene Jensen,FL,Nicole Hanna,Insurance,Aetna,2025-04-15,2025-05-04,"99214,90836","F41.1,F33.0"
+2025-05-30,200.00,43599,Jodene Jensen,FL,Jamie Maisel,Insurance,,2025-04-11,,,
