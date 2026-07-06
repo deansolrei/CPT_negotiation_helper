@@ -17,6 +17,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from backend.routers import payers, contracts, fee_schedules, dashboard, letters, intermediaries
+from backend.routers import sheets_sync
 
 # Paths relative to this file
 _APP_ROOT      = os.path.dirname(os.path.dirname(__file__))
@@ -48,6 +49,7 @@ app.include_router(fee_schedules.router)
 app.include_router(dashboard.router)
 app.include_router(letters.router)
 app.include_router(intermediaries.router)
+app.include_router(sheets_sync.router)
 
 
 # Serve static assets (logo, etc.) — mount AFTER routers so /api routes take priority
@@ -58,7 +60,11 @@ app.mount("/assets", StaticFiles(directory=ASSETS_PATH), name="assets")
 @app.get("/dashboard", tags=["Dashboard"], include_in_schema=False)
 def serve_dashboard():
     """Serve the negotiation dashboard HTML file."""
-    return FileResponse(DASHBOARD_PATH, media_type="text/html")
+    return FileResponse(
+        DASHBOARD_PATH,
+        media_type="text/html",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
 
 
 @app.get("/", tags=["Health"])

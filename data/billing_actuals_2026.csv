@@ -1,0 +1,308 @@
+intermediary,provider_name,insurance_plan,state,primary_cpt,addon_cpt,avg_payment,session_count,min_payment,max_payment,effective_year
+Alma,Jodene Jensen,Aetna,DC,99214,90833,199.1,1,199.1,199.1,2026
+Alma,Jodene Jensen,Aetna,DC,99214,90838,256.0,1,256.0,256.0,2026
+Alma,Jodene Jensen,Aetna,DC,99215,90836,247.05,1,247.05,247.05,2026
+Alma,Jodene Jensen,Aetna,FL,99214,90838,240.0,4,240.0,240.0,2026
+Alma,Jodene Jensen,Aetna,FL,99215,90833,198.68,2,198.68,198.68,2026
+Alma,Jodene Jensen,Aetna,MD,99215,90838,267.58,1,267.58,267.58,2026
+Alma,Jodene Jensen,Aetna,MN,99214,90833,199.1,1,199.1,199.1,2026
+Alma,Jodene Jensen,Aetna,WA,99214,90833,211.1,1,211.1,211.1,2026
+Alma,Jodene Jensen,Aetna,WA,99214,90836,247.47,1,247.47,247.47,2026
+Alma,Jodene Jensen,Aetna,WA,99214,90838,268.0,1,268.0,268.0,2026
+Alma,Jodene Jensen,Aetna Choice POS II - Meritain Health plan,FL,99214,90833,179.1,1,179.1,179.1,2026
+Alma,Jodene Jensen,Aetna Choice POS II - Meritain Health plan,FL,99215,90836,240.05,1,240.05,240.05,2026
+Alma,Jodene Jensen,Ambetter,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,BCBS - Anthem,CO,99215,90838,280.0,1,280.0,280.0,2026
+Alma,Jodene Jensen,Blue Cross Blue Shield,FL,99214,90836,196.56,1,196.56,196.56,2026
+Alma,Jodene Jensen,Blue Cross Blue Shield of Massachusetts,FL,99214,90833,177.34,1,177.34,177.34,2026
+Alma,Jodene Jensen,Blue Cross Blue Shield of Massachusetts,MT,99215,90838,265.6,1,265.6,265.6,2026
+Alma,Jodene Jensen,Blue Cross Blue Shield of Massachusetts,WA,99214,90838,219.18,1,219.18,219.18,2026
+Alma,Jodene Jensen,Cigna,CO,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna,CO,99214,90836,208.0,1,208.0,208.0,2026
+Alma,Jodene Jensen,Cigna,FL,99214,90833,190.0,9,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna,FL,99214,90836,208.0,2,208.0,208.0,2026
+Alma,Jodene Jensen,Cigna,FL,99214,90838,241.0,1,241.0,241.0,2026
+Alma,Jodene Jensen,Cigna,MD,99214,90833,190.0,3,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna,MD,99214,90836,208.0,2,208.0,208.0,2026
+Alma,Jodene Jensen,Cigna,MD,99214,90838,241.0,2,241.0,241.0,2026
+Alma,Jodene Jensen,Cigna,MD,99215,90838,280.0,1,280.0,280.0,2026
+Alma,Jodene Jensen,Cigna,MN,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna,OR,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna,OR,99214,90836,208.0,1,208.0,208.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,CO,99214,90838,241.0,2,241.0,241.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,CO,99215,90836,247.0,2,247.0,247.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,FL,99214,90833,190.0,5,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,FL,99215,90833,229.0,1,229.0,229.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,FL,99215,90838,280.0,1,280.0,280.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,IA,99214,90833,190.0,2,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,MD,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna - Open Access Plus,NM,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna - PPO - HSA Plus,FL,99214,90833,190.0,2,190.0,190.0,2026
+Alma,Jodene Jensen,Cigna - PPO - HSA Plus,FL,99215,90836,247.0,1,247.0,247.0,2026
+Alma,Jodene Jensen,Cigna - PPO - HSA Plus,FL,99215,90838,280.0,1,280.0,280.0,2026
+Alma,Jodene Jensen,Florida Blue,FL,99214,90838,266.13,2,266.13,266.13,2026
+Alma,Jodene Jensen,Medica - United Healthcare,FL,99215,90836,267.97,1,267.97,267.97,2026
+Alma,Jodene Jensen,Meritain Health,FL,99214,90838,240.0,1,240.0,240.0,2026
+Alma,Jodene Jensen,Meritain Health,WA,99214,90833,211.1,1,211.1,211.1,2026
+Alma,Jodene Jensen,Meritain Health,WA,99214,90836,247.47,1,247.47,247.47,2026
+Alma,Jodene Jensen,NALC Health Benefit Plan,IA,99214,90838,258.67,1,258.67,258.67,2026
+Alma,Jodene Jensen,Oscar Health Insurance,FL,99214,90838,266.13,2,266.13,266.13,2026
+Alma,Jodene Jensen,Oxford,NM,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Jodene Jensen,Surest,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,Surest,OR,99214,90838,258.67,1,258.67,258.67,2026
+Alma,Jodene Jensen,Surest - United Healthcare Choice Network,FL,99214,90838,266.13,1,266.13,266.13,2026
+Alma,Jodene Jensen,UMR,WA,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Jodene Jensen,UMR - United Healthcare Choice Plus network,MN,99215,90833,240.56,1,240.56,240.56,2026
+Alma,Jodene Jensen,United Health Care - Choice Plus,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,United Health Care - Choice Plus,FL,99215,90836,275.69,4,275.69,275.69,2026
+Alma,Jodene Jensen,United Health Care - Choice Plus,ND,99214,90833,182.81,1,182.81,182.81,2026
+Alma,Jodene Jensen,United Health Care - Choice Plus,OR,99214,90833,192.81,3,192.81,192.81,2026
+Alma,Jodene Jensen,United Health Care - Optum,NE,99214,90833,182.81,1,182.81,182.81,2026
+Alma,Jodene Jensen,United Healthcare,AZ,99215,90838,306.42,1,306.42,306.42,2026
+Alma,Jodene Jensen,United Healthcare,CO,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Jodene Jensen,United Healthcare,CO,99214,90836,220.22,1,220.22,220.22,2026
+Alma,Jodene Jensen,United Healthcare,CO,99215,90838,306.42,2,306.42,306.42,2026
+Alma,Jodene Jensen,United Healthcare,CT,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,United Healthcare,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,United Healthcare,FL,99214,90836,208.0,2,208.0,208.0,2026
+Alma,Jodene Jensen,United Healthcare,FL,99214,90838,266.13,1,266.13,266.13,2026
+Alma,Jodene Jensen,United Healthcare,FL,99215,90833,247.49,1,247.49,247.49,2026
+Alma,Jodene Jensen,United Healthcare,FL,99215,90836,275.69,2,275.69,275.69,2026
+Alma,Jodene Jensen,United Healthcare,FL,99215,90838,315.26,1,315.26,315.26,2026
+Alma,Jodene Jensen,United Healthcare,ID,99214,90833,182.81,1,182.81,182.81,2026
+Alma,Jodene Jensen,United Healthcare,MN,99214,90833,192.81,2,192.81,192.81,2026
+Alma,Jodene Jensen,United Healthcare,MN,99214,90836,220.22,1,220.22,220.22,2026
+Alma,Jodene Jensen,United Healthcare,MN,99214,90838,258.67,1,258.67,258.67,2026
+Alma,Jodene Jensen,United Healthcare,MN,99215,90833,240.56,1,240.56,240.56,2026
+Alma,Jodene Jensen,United Healthcare,MN,99215,90836,267.97,1,267.97,267.97,2026
+Alma,Jodene Jensen,United Healthcare,OR,99214,90838,258.67,2,258.67,258.67,2026
+Alma,Jodene Jensen,United Healthcare,OR,99215,90833,247.44,2,247.44,247.44,2026
+Alma,Jodene Jensen,United Healthcare - Medica Esentia Choice Care PPO,FL,99214,90838,258.67,2,258.67,258.67,2026
+Alma,Jodene Jensen,United Healthcare - Navigate,OR,99214,90833,192.81,3,192.81,192.81,2026
+Alma,Jodene Jensen,United Healthcare - Oxford Non-Gated PPO Freedom Network,OR,99214,90838,258.67,2,258.67,258.67,2026
+Alma,Jodene Jensen,United Healthcare - Select Plus,WA,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,FL,99214,90836,226.56,1,226.56,226.56,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,FL,99215,90833,247.49,1,247.49,247.49,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,FL,99215,90838,315.26,1,315.26,315.26,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,NE,99214,90838,241.67,1,241.67,241.67,2026
+Alma,Jodene Jensen,United Healthcare Choice Plus,WA,99215,90838,313.3,1,313.3,313.3,2026
+Alma,Katherine Robins,Aetna,WA,99205,90838,343.42,2,343.42,343.42,2026
+Alma,Katherine Robins,Aetna,WA,99214,90833,211.1,16,211.1,211.1,2026
+Alma,Katherine Robins,Aetna,WA,99214,90836,247.47,4,247.47,247.47,2026
+Alma,Katherine Robins,Aetna,WA,99214,90838,268.0,11,268.0,268.0,2026
+Alma,Katherine Robins,Aetna,WA,99215,90838,279.58,1,279.58,279.58,2026
+Alma,Katherine Robins,Cigna,FL,99204,90838,299.0,1,299.0,299.0,2026
+Alma,Katherine Robins,Cigna,FL,99214,90833,190.0,2,190.0,190.0,2026
+Alma,Katherine Robins,Cigna,FL,99214,90838,241.0,16,241.0,241.0,2026
+Alma,Katherine Robins,Cigna,FL,99215,90838,280.0,2,280.0,280.0,2026
+Alma,Katherine Robins,Cigna,OR,99204,90838,299.0,2,299.0,299.0,2026
+Alma,Katherine Robins,Cigna,OR,99214,90833,190.0,16,190.0,190.0,2026
+Alma,Katherine Robins,Cigna,OR,99214,90836,208.0,3,208.0,208.0,2026
+Alma,Katherine Robins,Cigna,OR,99214,90838,241.0,6,241.0,241.0,2026
+Alma,Katherine Robins,Cigna,OR,99215,90833,229.0,1,229.0,229.0,2026
+Alma,Katherine Robins,Cigna,WA,99214,90833,190.0,6,190.0,190.0,2026
+Alma,Katherine Robins,Cigna,WA,99214,90838,241.0,1,241.0,241.0,2026
+Alma,Katherine Robins,Cigna - LocalPlus IN,FL,99205,90838,352.0,1,352.0,352.0,2026
+Alma,Katherine Robins,Cigna - LocalPlus IN,FL,99214,90833,190.0,3,190.0,190.0,2026
+Alma,Katherine Robins,Cigna - LocalPlus IN,FL,99214,90836,208.0,1,208.0,208.0,2026
+Alma,Katherine Robins,Cigna - Open Access Plus,FL,99214,90833,190.0,15,190.0,190.0,2026
+Alma,Katherine Robins,Cigna - Open Access Plus,FL,99214,90836,208.0,6,208.0,208.0,2026
+Alma,Katherine Robins,Cigna - Open Access Plus,FL,99214,90838,241.0,14,241.0,241.0,2026
+Alma,Katherine Robins,Medica - United Healthcare,FL,99214,90833,198.36,1,198.36,198.36,2026
+Alma,Katherine Robins,Medica - United Healthcare,FL,99214,90836,226.56,2,226.56,226.56,2026
+Alma,Katherine Robins,Medica - United Healthcare,FL,99214,90838,266.13,3,266.13,266.13,2026
+Alma,Katherine Robins,Oscar Health Insurance,FL,99214,90836,226.56,2,226.56,226.56,2026
+Alma,Katherine Robins,Oscar Health Insurance,FL,99214,90838,266.13,4,266.13,266.13,2026
+Alma,Katherine Robins,Oscar Health Insurance,FL,99215,90838,315.26,1,315.26,315.26,2026
+Alma,Katherine Robins,PacificSource - No remaining insurance sessions,OR,99214,90833,190.0,1,190.0,190.0,2026
+Alma,Katherine Robins,Surest,AK,99205,90838,378.9,1,378.9,378.9,2026
+Alma,Katherine Robins,Surest,AK,99214,90833,182.81,5,182.81,182.81,2026
+Alma,Katherine Robins,Surest,AK,99214,90838,241.67,1,241.67,241.67,2026
+Alma,Katherine Robins,Surest,WA,99204,90836,298.37,1,298.37,298.37,2026
+Alma,Katherine Robins,Surest,WA,99214,90833,192.81,23,192.81,192.81,2026
+Alma,Katherine Robins,Surest,WA,99214,90836,220.22,4,220.22,220.22,2026
+Alma,Katherine Robins,Surest,WA,99214,90838,258.67,5,258.67,258.67,2026
+Alma,Katherine Robins,Surest,WA,99214,,118.8,1,118.8,118.8,2026
+Alma,Katherine Robins,Surest,WA,99215,90838,313.3,1,313.3,313.3,2026
+Alma,Katherine Robins,UHC - expired,WA,99205,90838,388.19,1,388.19,388.19,2026
+Alma,Katherine Robins,UHC - expired,WA,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Katherine Robins,United Healthcare,FL,99205,90838,372.12,2,352.0,392.23,2026
+Alma,Katherine Robins,United Healthcare,FL,99214,90833,195.02,15,190.0,198.36,2026
+Alma,Katherine Robins,United Healthcare,FL,99214,90836,217.28,2,208.0,226.56,2026
+Alma,Katherine Robins,United Healthcare,FL,99214,90838,262.26,13,241.0,266.13,2026
+Alma,Katherine Robins,United Healthcare,FL,99214,,254.28,1,254.28,254.28,2026
+Alma,Katherine Robins,United Healthcare,FL,99215,90838,315.26,2,315.26,315.26,2026
+Alma,Katherine Robins,United Healthcare,OR,99214,90833,192.81,1,192.81,192.81,2026
+Alma,Katherine Robins,United Healthcare,OR,99214,90836,220.22,2,220.22,220.22,2026
+Alma,Katherine Robins,United Healthcare,OR,99214,90838,258.67,8,258.67,258.67,2026
+Alma,Katherine Robins,United Healthcare,OR,99215,90838,313.3,1,313.3,313.3,2026
+Alma,Katherine Robins,United Healthcare Student Resources,AK,99214,90833,182.81,5,182.81,182.81,2026
+Alma,Katherine Robins,United Healthcare Student Resources,AK,99214,90836,210.22,2,210.22,210.22,2026
+Alma,Katherine Robins,United Healthcare Student Resources,AK,99214,90838,241.67,4,241.67,241.67,2026
+Headway,Jodene Jensen,Aetna,DC,99214,90833,206.36,10,206.36,206.36,2026
+Headway,Jodene Jensen,Aetna,DC,99214,90836,235.47,3,235.47,235.47,2026
+Headway,Jodene Jensen,Aetna,DC,99215,90833,217.94,1,217.94,217.94,2026
+Headway,Jodene Jensen,Aetna,DC,99215,90838,267.58,1,267.58,267.58,2026
+Headway,Jodene Jensen,Aetna,FL,99205,90838,332.31,1,332.31,332.31,2026
+Headway,Jodene Jensen,Aetna,FL,99214,90833,206.36,21,206.36,206.36,2026
+Headway,Jodene Jensen,Aetna,FL,99214,90836,235.47,8,235.47,235.47,2026
+Headway,Jodene Jensen,Aetna,FL,99214,90838,256.0,19,256.0,256.0,2026
+Headway,Jodene Jensen,Aetna,FL,99215,90833,230.74,1,230.74,230.74,2026
+Headway,Jodene Jensen,Aetna,FL,99215,90836,247.05,1,247.05,247.05,2026
+Headway,Jodene Jensen,Aetna,FL,99215,90838,267.58,4,267.58,267.58,2026
+Headway,Jodene Jensen,Aetna,IA,99204,90838,269.0,1,269.0,269.0,2026
+Headway,Jodene Jensen,Aetna,MD,99214,90833,206.36,3,206.36,206.36,2026
+Headway,Jodene Jensen,Aetna,MD,99214,90836,235.47,1,235.47,235.47,2026
+Headway,Jodene Jensen,Aetna,MD,99214,90838,256.0,5,256.0,256.0,2026
+Headway,Jodene Jensen,Aetna,MN,99214,90833,180.0,4,180.0,180.0,2026
+Headway,Jodene Jensen,Aetna,MN,99214,90838,233.0,1,233.0,233.0,2026
+Headway,Jodene Jensen,Aetna,WA,99214,90833,206.36,8,206.36,206.36,2026
+Headway,Jodene Jensen,Aetna,WA,99214,90836,235.47,7,235.47,235.47,2026
+Headway,Jodene Jensen,Aetna,WA,99214,90838,256.0,3,256.0,256.0,2026
+Headway,Jodene Jensen,Anthem Blue Cross and Blue Shield Colorado,CO,99214,90833,172.0,3,172.0,172.0,2026
+Headway,Jodene Jensen,Anthem Blue Cross and Blue Shield Colorado,CO,99214,90836,212.0,3,212.0,212.0,2026
+Headway,Jodene Jensen,Anthem Blue Cross and Blue Shield Colorado,CO,99214,90838,251.0,2,251.0,251.0,2026
+Headway,Jodene Jensen,Blue Cross Blue Shield of Arizona,AZ,99214,90833,150.0,4,150.0,150.0,2026
+Headway,Jodene Jensen,Blue Cross Blue Shield of Arizona,AZ,99214,90838,211.0,1,211.0,211.0,2026
+Headway,Jodene Jensen,Blue Cross Blue Shield of Massachusetts,FL,99214,90833,203.0,5,203.0,203.0,2026
+Headway,Jodene Jensen,Blue Cross Blue Shield of Massachusetts,FL,99215,90833,256.0,1,256.0,256.0,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99214,90833,230.0,3,230.0,230.0,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99214,90836,252.04,2,252.04,252.04,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99214,90838,285.7,2,285.7,285.7,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99215,90833,293.13,7,290.9,306.53,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99215,90836,316.07,5,312.94,328.57,2026
+Headway,Jodene Jensen,Blue Cross and Blue Shield of Minnesota,MN,99215,90838,346.6,4,346.6,346.6,2026
+Headway,Jodene Jensen,Cigna,AZ,99214,90833,157.0,1,157.0,157.0,2026
+Headway,Jodene Jensen,Cigna,AZ,99214,90836,179.0,2,179.0,179.0,2026
+Headway,Jodene Jensen,Cigna,CO,99214,90833,156.0,9,156.0,156.0,2026
+Headway,Jodene Jensen,Cigna,CO,99214,90836,177.0,3,177.0,177.0,2026
+Headway,Jodene Jensen,Cigna,CO,99214,90838,204.0,5,204.0,204.0,2026
+Headway,Jodene Jensen,Cigna,CO,99215,90836,211.0,1,211.0,211.0,2026
+Headway,Jodene Jensen,Cigna,CO,99215,90838,238.0,4,238.0,238.0,2026
+Headway,Jodene Jensen,Cigna,FL,99214,90833,156.0,25,156.0,156.0,2026
+Headway,Jodene Jensen,Cigna,FL,99214,90836,177.0,17,177.0,177.0,2026
+Headway,Jodene Jensen,Cigna,FL,99214,90838,205.67,6,204.0,214.0,2026
+Headway,Jodene Jensen,Cigna,FL,99215,90833,190.0,3,190.0,190.0,2026
+Headway,Jodene Jensen,Cigna,FL,99215,90836,214.33,3,211.0,221.0,2026
+Headway,Jodene Jensen,Cigna,FL,99215,90838,238.0,1,238.0,238.0,2026
+Headway,Jodene Jensen,Cigna,IA,99214,90833,139.0,2,139.0,139.0,2026
+Headway,Jodene Jensen,Cigna,IA,99214,90836,157.0,1,157.0,157.0,2026
+Headway,Jodene Jensen,Cigna,IA,99214,90838,181.0,1,181.0,181.0,2026
+Headway,Jodene Jensen,Cigna,MD,99214,90833,156.0,8,156.0,156.0,2026
+Headway,Jodene Jensen,Cigna,MD,99214,90836,177.0,10,177.0,177.0,2026
+Headway,Jodene Jensen,Cigna,MD,99214,90838,204.0,11,204.0,204.0,2026
+Headway,Jodene Jensen,Cigna,MD,99215,90836,211.0,1,211.0,211.0,2026
+Headway,Jodene Jensen,Cigna,MN,99214,90833,130.0,1,130.0,130.0,2026
+Headway,Jodene Jensen,Cigna,MN,99214,90836,148.0,1,148.0,148.0,2026
+Headway,Jodene Jensen,Cigna,MN,99214,90838,170.0,7,170.0,170.0,2026
+Headway,Jodene Jensen,Cigna,OR,99214,90833,148.0,1,148.0,148.0,2026
+Headway,Jodene Jensen,Cigna,OR,99214,90836,168.0,2,168.0,168.0,2026
+Headway,Jodene Jensen,Cigna,WA,99215,90838,238.0,1,238.0,238.0,2026
+Headway,Jodene Jensen,Florida Blue,FL,98006,90836,157.91,1,157.91,157.91,2026
+Headway,Jodene Jensen,Florida Blue,FL,98006,90838,179.22,4,179.22,179.22,2026
+Headway,Jodene Jensen,Florida Blue,FL,98007,90836,196.53,1,196.53,196.53,2026
+Headway,Jodene Jensen,Florida Blue,FL,99205,90838,248.98,1,248.98,248.98,2026
+Headway,Jodene Jensen,Florida Blue,FL,99214,90833,144.58,14,144.58,144.58,2026
+Headway,Jodene Jensen,Florida Blue,FL,99214,90836,157.91,8,157.91,157.91,2026
+Headway,Jodene Jensen,Florida Blue,FL,99214,90838,179.22,15,179.22,179.22,2026
+Headway,Jodene Jensen,Florida Blue,FL,99214,,93.0,1,93.0,93.0,2026
+Headway,Jodene Jensen,Florida Blue,FL,99215,90833,183.2,5,183.2,183.2,2026
+Headway,Jodene Jensen,Horizon Blue Cross and Blue Shield of New Jersey,FL,99214,90833,196.58,4,196.58,196.58,2026
+Headway,Jodene Jensen,Horizon Blue Cross and Blue Shield of New Jersey,FL,99214,90836,215.11,1,215.11,215.11,2026
+Headway,Jodene Jensen,Independence Blue Cross Pennsylvania,FL,99215,90833,199.27,3,199.27,199.27,2026
+Headway,Jodene Jensen,Oxford (Optum),FL,99214,90833,160.0,1,160.0,160.0,2026
+Headway,Jodene Jensen,Oxford (Optum),FL,99214,90836,176.16,2,176.16,176.16,2026
+Headway,Jodene Jensen,Oxford (Optum),OR,99214,90838,231.0,8,231.0,231.0,2026
+Headway,Jodene Jensen,Regence BlueCross BlueShield of Oregon,OR,99214,90833,269.0,2,269.0,269.0,2026
+Headway,Jodene Jensen,Regence BlueCross BlueShield of Oregon,OR,99214,90836,298.0,1,298.0,298.0,2026
+Headway,Jodene Jensen,Regence BlueCross BlueShield of Oregon,OR,99214,90838,344.3,10,342.0,365.0,2026
+Headway,Jodene Jensen,Regence BlueCross BlueShield of Oregon,OR,99215,90833,324.0,1,324.0,324.0,2026
+Headway,Jodene Jensen,Regence BlueCross BlueShield of Oregon,OR,99215,90836,353.0,2,353.0,353.0,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99204,90838,310.08,1,310.08,310.08,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99214,90833,198.3,12,196.93,213.37,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99214,90836,220.03,6,217.29,233.73,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99214,90838,250.34,19,248.61,265.05,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99215,90833,237.65,3,237.65,237.65,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99215,90836,258.01,3,258.01,258.01,2026
+Headway,Jodene Jensen,Regence BlueShield of Washington,WA,99215,90838,289.33,3,289.33,289.33,2026
+Headway,Jodene Jensen,United Healthcare (Optum),AZ,99214,90836,181.43,1,181.43,181.43,2026
+Headway,Jodene Jensen,United Healthcare (Optum),AZ,99214,90838,204.59,4,204.59,204.59,2026
+Headway,Jodene Jensen,United Healthcare (Optum),CO,99214,90833,170.4,10,170.4,170.4,2026
+Headway,Jodene Jensen,United Healthcare (Optum),CO,99214,90836,182.16,6,182.16,182.16,2026
+Headway,Jodene Jensen,United Healthcare (Optum),CO,99214,90838,213.61,8,212.0,224.9,2026
+Headway,Jodene Jensen,United Healthcare (Optum),CO,99215,90838,246.0,1,246.0,246.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),DC,99214,90833,160.0,5,160.0,160.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),DC,99215,90833,203.0,1,203.0,203.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99204,90838,252.34,2,252.34,252.34,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99214,90833,161.02,38,160.0,172.9,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99214,90836,176.16,19,176.16,176.16,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99214,90838,206.0,28,206.0,206.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99215,90833,203.22,4,200.0,212.9,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99215,90836,216.16,2,216.16,216.16,2026
+Headway,Jodene Jensen,United Healthcare (Optum),FL,99215,90838,246.0,3,246.0,246.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),IA,99214,90833,176.17,1,176.17,176.17,2026
+Headway,Jodene Jensen,United Healthcare (Optum),IA,99214,90838,221.76,3,217.41,230.45,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99204,90838,236.43,1,236.43,236.43,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99214,90833,165.02,17,165.02,165.02,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99214,90836,179.49,15,179.49,179.49,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99214,90838,203.62,17,203.62,203.62,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99215,90836,223.88,1,223.88,223.88,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MN,99215,90838,254.28,2,248.01,260.56,2026
+Headway,Jodene Jensen,United Healthcare (Optum),MT,99214,90833,176.17,4,176.17,176.17,2026
+Headway,Jodene Jensen,United Healthcare (Optum),OR,99214,90833,201.87,15,201.0,214.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),OR,99214,90836,206.0,7,206.0,206.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),OR,99214,90838,231.0,11,231.0,231.0,2026
+Headway,Jodene Jensen,United Healthcare (Optum),WA,99214,90833,168.46,3,168.46,168.46,2026
+Headway,Jodene Jensen,United Healthcare (Optum),WA,99214,90836,182.16,3,182.16,182.16,2026
+Headway,Jodene Jensen,United Healthcare (Optum),WA,99214,90838,212.0,3,212.0,212.0,2026
+Headway,Katherine Robins,Aetna,FL,99205,90838,332.31,2,332.31,332.31,2026
+Headway,Katherine Robins,Aetna,FL,99214,90833,206.36,5,206.36,206.36,2026
+Headway,Katherine Robins,Aetna,FL,99214,90836,235.47,1,235.47,235.47,2026
+Headway,Katherine Robins,Aetna,FL,99214,90838,256.0,12,256.0,256.0,2026
+Headway,Katherine Robins,Aetna,OR,99205,90838,291.0,2,291.0,291.0,2026
+Headway,Katherine Robins,Aetna,OR,99214,90833,212.0,5,212.0,212.0,2026
+Headway,Katherine Robins,Aetna,OR,99214,90836,231.0,1,231.0,231.0,2026
+Headway,Katherine Robins,Aetna,OR,99214,90838,252.0,6,252.0,252.0,2026
+Headway,Katherine Robins,Aetna,WA,99205,90838,332.31,2,332.31,332.31,2026
+Headway,Katherine Robins,Aetna,WA,99214,90833,206.36,1,206.36,206.36,2026
+Headway,Katherine Robins,Aetna,WA,99214,90836,235.47,3,235.47,235.47,2026
+Headway,Katherine Robins,Aetna,WA,99214,90838,256.0,3,256.0,256.0,2026
+Headway,Katherine Robins,Ambetter Washington,WA,99205,90838,248.76,1,248.76,248.76,2026
+Headway,Katherine Robins,Ambetter Washington,WA,99214,90833,146.37,9,146.37,146.37,2026
+Headway,Katherine Robins,Ambetter Washington,WA,99214,90836,160.23,2,160.23,160.23,2026
+Headway,Katherine Robins,Cigna,AK,99205,90838,262.0,1,262.0,262.0,2026
+Headway,Katherine Robins,Cigna,AK,99214,90833,139.0,2,139.0,139.0,2026
+Headway,Katherine Robins,Cigna,OR,99214,90833,148.0,5,148.0,148.0,2026
+Headway,Katherine Robins,Cigna,OR,99214,90836,168.0,1,168.0,168.0,2026
+Headway,Katherine Robins,Cigna,OR,99214,90838,194.0,1,194.0,194.0,2026
+Headway,Katherine Robins,Cigna,OR,99215,90836,200.0,1,200.0,200.0,2026
+Headway,Katherine Robins,Cigna,WA,99214,90833,156.0,8,156.0,156.0,2026
+Headway,Katherine Robins,Horizon Blue Cross and Blue Shield of New Jersey,WA,99214,90833,196.58,5,196.58,196.58,2026
+Headway,Katherine Robins,Oscar (Optum),FL,99205,90838,279.96,2,279.96,279.96,2026
+Headway,Katherine Robins,Oscar (Optum),FL,99214,90833,162.13,2,162.13,162.13,2026
+Headway,Katherine Robins,Oscar (Optum),FL,99214,90838,201.69,1,201.69,201.69,2026
+Headway,Katherine Robins,Oxford (Optum),WA,99205,90838,290.11,1,290.11,290.11,2026
+Headway,Katherine Robins,Oxford (Optum),WA,99214,90833,160.0,2,160.0,160.0,2026
+Headway,Katherine Robins,Oxford (Optum),WA,99214,90836,176.16,2,176.16,176.16,2026
+Headway,Katherine Robins,Premera Blue Cross Washington,WA,99205,90838,314.0,5,314.0,314.0,2026
+Headway,Katherine Robins,Premera Blue Cross Washington,WA,99214,90833,160.0,26,160.0,160.0,2026
+Headway,Katherine Robins,Premera Blue Cross Washington,WA,99214,90836,179.0,2,179.0,179.0,2026
+Headway,Katherine Robins,Premera Blue Cross Washington,WA,99214,90838,207.0,30,207.0,207.0,2026
+Headway,Katherine Robins,Regence BlueCross BlueShield of Oregon,OR,99205,90838,487.0,3,487.0,487.0,2026
+Headway,Katherine Robins,Regence BlueCross BlueShield of Oregon,OR,99214,90833,269.0,15,269.0,269.0,2026
+Headway,Katherine Robins,Regence BlueCross BlueShield of Oregon,OR,99214,90836,298.0,6,298.0,298.0,2026
+Headway,Katherine Robins,Regence BlueCross BlueShield of Oregon,OR,99214,90838,342.0,7,342.0,342.0,2026
+Headway,Katherine Robins,Regence BlueCross BlueShield of Oregon,OR,99215,90838,397.0,1,397.0,397.0,2026
+Headway,Katherine Robins,Regence BlueShield of Washington,WA,99205,90838,356.67,1,356.67,356.67,2026
+Headway,Katherine Robins,Regence BlueShield of Washington,WA,99214,90833,196.93,11,196.93,196.93,2026
+Headway,Katherine Robins,Regence BlueShield of Washington,WA,99214,90836,217.29,2,217.29,217.29,2026
+Headway,Katherine Robins,Regence BlueShield of Washington,WA,99214,90838,248.61,11,248.61,248.61,2026
+Headway,Katherine Robins,United Healthcare (Optum),FL,99205,90838,279.96,1,279.96,279.96,2026
+Headway,Katherine Robins,United Healthcare (Optum),FL,99214,90833,162.13,2,162.13,162.13,2026
+Headway,Katherine Robins,United Healthcare (Optum),FL,99214,90838,201.69,2,201.69,201.69,2026
+Headway,Katherine Robins,United Healthcare (Optum),OR,99205,90838,281.79,1,281.79,281.79,2026
+Headway,Katherine Robins,United Healthcare (Optum),OR,99214,90833,176.17,1,176.17,176.17,2026
+Headway,Katherine Robins,United Healthcare (Optum),OR,99214,90838,211.18,1,211.18,211.18,2026
+Headway,Katherine Robins,United Healthcare (Optum),OR,99215,90838,248.01,1,248.01,248.01,2026
+Headway,Katherine Robins,United Healthcare (Optum),WA,99214,90833,160.0,6,160.0,160.0,2026

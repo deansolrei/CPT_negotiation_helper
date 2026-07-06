@@ -1,0 +1,27 @@
+payer_name,cpt_code,state,allowed_amount,effective_date
+Optum/UHC/Oscar,99214,FL,109.17,2026-06-01
+Aetna,99214,FL,94.76,2026-06-01
+Cigna,99214,FL,80.56,2026-06-01
+BCBS - Massachusetts (virtual network),99214,FL,108.02,2026-06-01
+Optum/UHC/Oscar,99215,FL,152.95,2026-06-01
+Aetna,99215,FL,128.13,2026-06-01
+Cigna,99215,FL,117.66,2026-06-01
+BCBS - Massachusetts (virtual network),99215,FL,153.5,2026-06-01
+Optum/UHC/Oscar,90833,FL,64.63,2026-06-01
+Aetna,90833,FL,60.78,2026-06-01
+Cigna,90833,FL,38.0,2026-06-01
+BCBS - Massachusetts (virtual network),90833,FL,65.36,2026-06-01
+Optum/UHC/Oscar,90836,FL,74.89,2026-06-01
+Aetna,90836,FL,76.51,2026-06-01
+Cigna,90836,FL,62.0,2026-06-01
+BCBS - Massachusetts (virtual network),90836,FL,82.65,2026-06-01
+Optum/UHC/Oscar,90838,FL,99.08,2026-06-01
+Aetna,90838,FL,101.21,2026-06-01
+Cigna,90838,FL,101.0,2026-06-01
+BCBS - Massachusetts (virtual network),90838,FL,109.6,2026-06-01
+BCBS - Massachusetts (virtual network),99214,IA,155.8,2026-06-01
+BCBS - Massachusetts (virtual network),90833,IA,77.2,2026-06-01
+Aetna,99214,MN,94.76,2026-06-01
+Aetna,90838,MN,101.21,2026-06-01
+Aetna,99214,DC,94.76,2026-06-01
+Aetna,90838,DC,101.21,2026-06-01

@@ -210,19 +210,27 @@ mark{background:#fef08a;border-radius:2px;padding:0 1px}
   </div>
   <div style="display:flex;align-items:center;gap:12px;">
     <div style="display:flex;align-items:center;gap:6px;">
+      <label for="provider-selector" style="font-size:.78rem;font-weight:600;color:#94a3b8;letter-spacing:.5px;white-space:nowrap;">PROVIDER</label>
+      <select id="provider-selector" onchange="onProviderChange()" style="background:#1e3a5f;border:1px solid rgba(255,255,255,.18);color:white;border-radius:6px;padding:4px 8px;font-size:.85rem;font-weight:600;cursor:pointer;outline:none;min-width:120px;">
+        <option value="All">All Providers</option>
+        <option value="Jodene Jensen">Jodene Jensen</option>
+        <option value="Katherine Robins">Katherine Robins</option>
+        <option value="Lori Kistler">Lori Kistler</option>
+      </select>
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;">
       <label for="state-selector" style="font-size:.78rem;font-weight:600;color:#94a3b8;letter-spacing:.5px;white-space:nowrap;">STATE</label>
       <select id="state-selector" onchange="onStateChange()" style="background:#1e3a5f;border:1px solid rgba(255,255,255,.18);color:white;border-radius:6px;padding:4px 8px;font-size:.85rem;font-weight:600;cursor:pointer;outline:none;min-width:60px;">
         <option value="AK">AK — Alaska</option>
         <option value="AZ">AZ — Arizona</option>
         <option value="CO">CO — Colorado</option>
+        <option value="CT">CT — Connecticut</option>
         <option value="DC">DC — Washington DC</option>
         <option value="FL" selected>FL — Florida</option>
         <option value="HI">HI — Hawaii</option>
         <option value="IA">IA — Iowa</option>
         <option value="ID">ID — Idaho</option>
-        <option value="KS">KS — Kansas</option>
         <option value="MD">MD — Maryland</option>
-        <option value="ME">ME — Maine</option>
         <option value="MN">MN — Minnesota</option>
         <option value="MT">MT — Montana</option>
         <option value="ND">ND — North Dakota</option>
@@ -232,7 +240,7 @@ mark{background:#fef08a;border-radius:2px;padding:0 1px}
         <option value="NV">NV — Nevada</option>
         <option value="OR">OR — Oregon</option>
         <option value="SD">SD — South Dakota</option>
-        <option value="VT">VT — Vermont</option>
+        <option value="UT">UT — Utah</option>
         <option value="WA">WA — Washington</option>
         <option value="WY">WY — Wyoming</option>
       </select>
@@ -376,6 +384,43 @@ mark{background:#fef08a;border-radius:2px;padding:0 1px}
   </div>
 
   <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ACTUAL BILLING ANALYSIS                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="section-title" style="margin-top:20px;">
+    Actual Billing Analysis
+    <span id="billing-actuals-subtitle">— Real 2026 session payments from Headway &amp; Alma</span>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+    <label style="font-size:.8rem;font-weight:600;color:#475569;white-space:nowrap;">Session Type:</label>
+    <select id="billing-session-select" onchange="loadBillingActuals()" style="padding:5px 10px;border:1px solid #e2e8f0;border-radius:6px;font-size:.82rem;color:#1a2332;background:#fff;">
+      <option value="">Loading…</option>
+    </select>
+    <div style="margin-left:auto;font-size:.75rem;color:#64748b;" id="billing-actuals-note">
+      Amounts shown are provider take-home after intermediary fee · Outliers &lt;$50 excluded
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="billing-actuals-table">
+      <thead><tr>
+        <th>Insurance Plan</th>
+        <th class="right">Headway Avg</th>
+        <th class="right" style="width:72px;">Sessions</th>
+        <th class="right">Alma Avg</th>
+        <th class="right" style="width:72px;">Sessions</th>
+        <th class="right">Difference</th>
+        <th class="center">Best Intermediary</th>
+      </tr></thead>
+      <tbody id="billing-actuals-tbody">
+        <tr><td colspan="7" class="empty">Select a state and session type above to load actual billing data.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="font-size:.73rem;color:#94a3b8;padding:6px 0 0;text-align:right;" id="billing-actuals-footer"></div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
   <!-- CPT CODE EXPLORER                                       -->
   <!-- ═══════════════════════════════════════════════════════ -->
   <div class="explorer-panel" id="cpt-explorer">
@@ -516,13 +561,77 @@ mark{background:#fef08a;border-radius:2px;padding:0 1px}
 const API='/api';
 let summaryData=[];
 let dashboardData=[];
-const CANONICAL_PAYERS=['Aetna','Ambetter','BCBS - Florida','Cigna','Optum/UHC/Oscar','Wellmark Iowa'];
+const CANONICAL_PAYERS=[
+  'Aetna','Ambetter','Ambetter (Washington)',
+  'Cigna','UHC / Oscar / Optum','Carelon Behavioral Health',
+  'BCBS - Florida Blue','BCBS - Florida Blue Medicare Advantage',
+  'BCBS - of Arizona','BCBS - of Massachusetts','BCBS - of Minnesota',
+  'BCBS - Minnesota Medicaid','BCBS - Minnesota Medicaid Advantage',
+  'BCBS - Anthem (Colorado HMO)','BCBS - Anthem (Colorado PPO)',
+  'BCBS - Anthem (Connecticut)','BCBS - Anthem (Indiana)',
+  'BCBS - Anthem (Maine)','BCBS - Anthem (Nevada)',
+  'BCBS - Anthem (New Hampshire)','BCBS - Horizon (New Jersey)',
+  'BCBS - Independence (Pennsylvania)','BCBS - Premera (Washington)',
+  'BCBS - Regence (Washington)','BCBS - Regence (Oregon)',
+  'BCBS - Wellmark (Iowa)'
+];
+// Additional payers that appear in Payer Summary only when the matching state is selected
+const STATE_SUMMARY_PAYERS={};
+function getActivePayers(){
+  const base=[...CANONICAL_PAYERS,...(STATE_SUMMARY_PAYERS[selectedState]||[])];
+  if(!selectedProvider||selectedProvider==='All')return base;
+  const provPayers=PROVIDER_PAYERS[selectedProvider];
+  if(!provPayers)return base;
+  return base.filter(p=>{const sts=provPayers[p];return sts&&sts.includes(selectedState);});
+}
 const _ALIAS_KEYS=[
-  ['florida blue','BCBS - Florida'],['florida bcbs','BCBS - Florida'],
+  ['bcbs - florida blue medicare advantage','BCBS - Florida Blue Medicare Advantage'],
+  ['florida blue medicare advantage','BCBS - Florida Blue Medicare Advantage'],
+  ['florida blue medicare','BCBS - Florida Blue Medicare Advantage'],
+  ['florida blue','BCBS - Florida Blue'],['florida bcbs','BCBS - Florida Blue'],['bcbs - florida','BCBS - Florida Blue'],
+  ['bcbs - of massachusetts','BCBS - of Massachusetts'],
+  ['blue cross blue shield of massachusetts','BCBS - of Massachusetts'],
+  ['bcbs - of arizona','BCBS - of Arizona'],
+  ['blue cross blue shield of arizona','BCBS - of Arizona'],
+  ['bcbs - minnesota medicaid advantage','BCBS - Minnesota Medicaid Advantage'],
+  ['bcbs - minnesota medicaid','BCBS - Minnesota Medicaid'],
+  ['blue cross blue shield of minnesota medicare','BCBS - Minnesota Medicaid Advantage'],
+  ['blue cross blue shield of minnesota medicaid','BCBS - Minnesota Medicaid'],
+  ['blue cross blue shield of minnesota','BCBS - of Minnesota'],
+  ['bcbs minnesota medicare','BCBS - Minnesota Medicaid Advantage'],
+  ['bcbs minnesota medicaid','BCBS - Minnesota Medicaid'],
+  ['bcbs minnesota','BCBS - of Minnesota'],
+  ['anthem blue cross and blue shield colorado hmo','BCBS - Anthem (Colorado HMO)'],
+  ['anthem bcbs colorado hmo','BCBS - Anthem (Colorado HMO)'],
+  ['anthem blue cross and blue shield colorado ppo','BCBS - Anthem (Colorado PPO)'],
+  ['anthem bcbs colorado ppo','BCBS - Anthem (Colorado PPO)'],
+  ['anthem blue cross & blue shield indiana','BCBS - Anthem (Indiana)'],
+  ['anthem blue cross and blue shield indiana','BCBS - Anthem (Indiana)'],
+  ['anthem bcbs indiana','BCBS - Anthem (Indiana)'],
+  ['anthem blue cross blue shield maine','BCBS - Anthem (Maine)'],
+  ['anthem bcbs maine','BCBS - Anthem (Maine)'],
+  ['horizon blue cross and blue shield','BCBS - Horizon (New Jersey)'],
+  ['horizon blue cross blue shield','BCBS - Horizon (New Jersey)'],
+  ['independence blue cross','BCBS - Independence (Pennsylvania)'],
+  ['bcbs - regence (oregon)','BCBS - Regence (Oregon)'],
+  ['regence bluecross blueshield of oregon','BCBS - Regence (Oregon)'],
+  ['regence bluecross','BCBS - Regence (Oregon)'],
+  ['bcbs - regence (washington)','BCBS - Regence (Washington)'],
+  ['regence blueshield of washington','BCBS - Regence (Washington)'],
+  ['regence bs washington','BCBS - Regence (Washington)'],
+  ['regence','BCBS - Regence (Washington)'],
+  ['bcbs - premera (washington)','BCBS - Premera (Washington)'],
+  ['premera','BCBS - Premera (Washington)'],
+  ['bcbs - wellmark (iowa)','BCBS - Wellmark (Iowa)'],
+  ['wellmark','BCBS - Wellmark (Iowa)'],['iowa','BCBS - Wellmark (Iowa)'],
+  ['ambetter (washington)','Ambetter (Washington)'],
   ['aetna','Aetna'],['ambetter','Ambetter'],
-  ['bcbs','BCBS - Florida'],['blue cross','BCBS - Florida'],
+  ['carelon behavioral health','Carelon Behavioral Health'],
+  ['carelon','Carelon Behavioral Health'],['beacon','Carelon Behavioral Health'],
   ['cigna','Cigna'],
-  ['optum','Optum/UHC/Oscar'],['uhc','Optum/UHC/Oscar'],['oscar','Optum/UHC/Oscar'],['united','Optum/UHC/Oscar'],['wellmark','Wellmark Iowa'],['iowa','Wellmark Iowa'],
+  ['uhc / oscar / optum','UHC / Oscar / Optum'],
+  ['optum','UHC / Oscar / Optum'],['uhc','UHC / Oscar / Optum'],
+  ['oscar','UHC / Oscar / Optum'],['united','UHC / Oscar / Optum'],
 ];
 function canonicalizePayer(name){
   if(!name)return name;
@@ -530,14 +639,23 @@ function canonicalizePayer(name){
   for(const[key,canonical]of _ALIAS_KEYS){if(lower.includes(key))return canonical;}
   return name.trim();
 }
-function payerSortIdx(name){const idx=CANONICAL_PAYERS.indexOf(name);return idx===-1?999:idx;}
+function payerSortIdx(name){const idx=getActivePayers().indexOf(name);return idx===-1?999:idx;}
 const PAYER_PALETTE={
   'aetna':{accent:'#B01C2E',rowA:'#fdf5f6',rowB:'#f9eaec'},
   'ambetter':{accent:'#007B87',rowA:'#f0fafb',rowB:'#e2f4f6'},
   'bcbs':{accent:'#00338D',rowA:'#f0f4fb',rowB:'#e2ebf9'},
+  'florida blue':{accent:'#0053A0',rowA:'#f0f5fb',rowB:'#dce8f6'},
   'cigna':{accent:'#006B8F',rowA:'#f0f7fa',rowB:'#e0eef5'},
   'optum':{accent:'#002677',rowA:'#f0f3fb',rowB:'#dce4f6'},
   'wellmark':{accent:'#005587',rowA:'#f0f6fb',rowB:'#deeaf5'},
+  'anthem':{accent:'#1B4584',rowA:'#f0f4fb',rowB:'#dce5f6'},
+  'regence':{accent:'#00517C',rowA:'#f0f6fb',rowB:'#dce9f5'},
+  'premera':{accent:'#005EB8',rowA:'#f0f5fb',rowB:'#dce8f6'},
+  'horizon':{accent:'#0075B0',rowA:'#f0f6fb',rowB:'#dce8f5'},
+  'independence':{accent:'#003087',rowA:'#f0f4fb',rowB:'#dce4f7'},
+  'blue cross blue shield of arizona':{accent:'#003DA5',rowA:'#f0f4fb',rowB:'#dce4f7'},
+  'blue cross blue shield of minnesota':{accent:'#0066B3',rowA:'#f0f5fb',rowB:'#dce8f7'},
+  'blue cross blue shield of massachusetts':{accent:'#004B87',rowA:'#f0f5fb',rowB:'#dce6f5'},
 };
 const DEFAULT_PALETTE={accent:'#334155',rowA:'#f8fafc',rowB:'#f1f5f9'};
 function getPayerPalette(payerName){
@@ -558,15 +676,138 @@ function pctBadge(pct,target){if(pct==null)return`<span class="badge badge-gray"
 function statusBadge(isUnderpaid){if(isUnderpaid===true)return`<span class="badge badge-red">↓ Underpaid</span>`;if(isUnderpaid===false)return`<span class="badge badge-green">✓ On Target</span>`;return`<span class="badge badge-gray">No Data</span>`;}
 async function handleRefresh(btn){btn.disabled=true;btn.textContent='↻ Refreshing…';await loadAll();btn.textContent='✓ Done';setTimeout(()=>{btn.textContent='↻ Refresh';btn.disabled=false;},1200);}
 let selectedState='FL';
-function onStateChange(){const sel=document.getElementById('state-selector');selectedState=sel.value;document.querySelectorAll('.medicare-state-label').forEach(el=>{el.textContent=`Medicare 2026 ${selectedState}`;});loadAll();}
+let selectedProvider='All';
+
+// Providers who do direct/clinic-submit billing
+const DIRECT_BILLING_PROVIDERS = ['Jodene Jensen'];
+
+// Licensed states per provider (null = all states)
+const PROVIDER_LICENSED_STATES = {
+  'All':              null,
+  'Jodene Jensen':    null,
+  'Katherine Robins': ['AK','FL','OR','WA'],
+  'Lori Kistler':     ['FL'],
+};
+
+// Full state list for restoring dropdown when switching back to All/Jodene
+const ALL_STATE_OPTIONS = [
+  ['AK','AK — Alaska'],['AZ','AZ — Arizona'],['CO','CO — Colorado'],
+  ['CT','CT — Connecticut'],['DC','DC — Washington DC'],['FL','FL — Florida'],
+  ['HI','HI — Hawaii'],['IA','IA — Iowa'],['ID','ID — Idaho'],
+  ['KS','KS — Kansas'],['ME','ME — Maine'],['MD','MD — Maryland'],
+  ['MN','MN — Minnesota'],['MT','MT — Montana'],
+  ['ND','ND — North Dakota'],['NE','NE — Nebraska'],['NH','NH — New Hampshire'],
+  ['NM','NM — New Mexico'],['NV','NV — Nevada'],['OR','OR — Oregon'],
+  ['SD','SD — South Dakota'],['UT','UT — Utah'],['VT','VT — Vermont'],
+  ['WA','WA — Washington'],['WY','WY — Wyoming'],
+];
+
+// Per-provider payer availability by state (canonical payer names → state codes)
+// Represents union of all intermediary channels (Direct/Alma/Headway) per provider
+const PROVIDER_PAYERS = {
+  'Jodene Jensen': {
+    'Aetna':                              ['AK','AZ','CO','CT','DC','FL','HI','ID','IA','KS','ME','MD','MN','MT','NE','NV','NH','NM','ND','OR','SD','UT','VT','WA','WY'],
+    'Ambetter':                           ['AZ','FL','IA','NE','NV','NH','NM','WA'],
+    'BCBS - Anthem (Colorado HMO)':       ['CO'],
+    'BCBS - Anthem (Colorado PPO)':       ['CO'],
+    'BCBS - Anthem (Connecticut)':        ['CT'],
+    'BCBS - Anthem (Maine)':              ['ME'],
+    'BCBS - Anthem (Nevada)':             ['NV'],
+    'BCBS - Anthem (New Hampshire)':      ['NH'],
+    'BCBS - Florida Blue':                ['FL'],
+    'BCBS - Florida Blue Medicare Advantage': ['FL'],
+    'BCBS - Horizon (New Jersey)':        ['AK','FL'],
+    'BCBS - Independence (Pennsylvania)': ['AK','FL'],
+    'BCBS - of Arizona':                  ['AZ'],
+    'BCBS - of Massachusetts':            ['AK','AZ','FL','IA','MN','NM','OR','WA'],
+    'BCBS - of Minnesota':                ['MN'],
+    'BCBS - Regence (Oregon)':            ['OR'],
+    'BCBS - Regence (Washington)':        ['WA'],
+    'BCBS - Wellmark (Iowa)':             ['IA','SD'],
+    'Carelon Behavioral Health':          ['AK','AZ','CO','CT','DC','FL','HI','ID','IA','KS','ME','MD','MN','MT','NE','NV','NH','NM','ND','OR','SD','UT','VT','WA','WY'],
+    'Cigna':                              ['AK','AZ','CO','CT','DC','FL','HI','ID','IA','KS','ME','MD','MN','MT','NE','NV','NH','NM','ND','OR','SD','UT','VT','WA','WY'],
+    'UHC / Oscar / Optum':               ['AK','AZ','CO','CT','DC','FL','HI','ID','IA','MD','MN','MT','NE','NV','NH','NM','ND','OR','SD','UT','WA','WY'],
+  },
+  'Katherine Robins': {
+    'Aetna':                              ['AK','FL','OR','WA'],
+    'Ambetter':                           ['WA'],
+    'BCBS - Horizon (New Jersey)':        ['FL','WA'],
+    'BCBS - Independence (Pennsylvania)': ['FL','WA'],
+    'BCBS - of Massachusetts':            ['FL','WA'],
+    'BCBS - Premera (Washington)':        ['WA'],
+    'BCBS - Regence (Oregon)':            ['OR'],
+    'BCBS - Regence (Washington)':        ['WA'],
+    'Carelon Behavioral Health':          ['AK','FL','OR','WA'],
+    'Cigna':                              ['AK','FL','OR','WA'],
+    'UHC / Oscar / Optum':               ['AK','FL','OR','WA'],
+  },
+  'Lori Kistler': {
+    'Aetna':                 ['FL'],
+    'Carelon Behavioral Health': ['FL'],
+    'Cigna':                 ['FL'],
+    'UHC / Oscar / Optum':   ['FL'],
+  },
+};
+
+function updateStateDropdownForProvider() {
+  const allowed = PROVIDER_LICENSED_STATES[selectedProvider] ?? null;
+  const stateSel = document.getElementById('state-selector');
+  const visibleStates = allowed ? ALL_STATE_OPTIONS.filter(([v]) => allowed.includes(v)) : ALL_STATE_OPTIONS;
+
+  stateSel.innerHTML = visibleStates
+    .map(([v, label]) => `<option value="${v}"${v === selectedState ? ' selected' : ''}>${label}</option>`)
+    .join('');
+
+  // If current state isn't valid for this provider, switch to FL or first valid state
+  if (allowed && !allowed.includes(selectedState)) {
+    const fallback = allowed.includes('FL') ? 'FL' : allowed[0];
+    stateSel.value = fallback;
+    selectedState = fallback;
+    document.querySelectorAll('.medicare-state-label').forEach(el => {
+      el.textContent = `Medicare 2026 ${selectedState}`;
+    });
+  }
+}
+
+function onStateChange(){const sel=document.getElementById('state-selector');selectedState=sel.value;document.querySelectorAll('.medicare-state-label').forEach(el=>{el.textContent=`Medicare 2026 ${selectedState}`;});loadAll();initBillingActuals();}
+
+function onProviderChange(){
+  const sel=document.getElementById('provider-selector');
+  selectedProvider=sel.value;
+  channelPayerFilter=null;
+  updateStateDropdownForProvider();
+  updateProviderBanner();
+  loadAll();
+  loadChannelComparison();
+  initBillingActuals();
+}
+
+function updateProviderBanner(){
+  let banner=document.getElementById('provider-banner');
+  if(!banner){
+    banner=document.createElement('div');
+    banner.id='provider-banner';
+    banner.style.cssText='background:#fef3c7;border:1px solid #fbbf24;border-radius:8px;padding:8px 14px;font-size:.8rem;color:#92400e;margin-bottom:12px;';
+    document.getElementById('error-container').after(banner);
+  }
+  if(selectedProvider==='All'||selectedProvider===''){
+    banner.style.display='none';
+  } else if(DIRECT_BILLING_PROVIDERS.includes(selectedProvider)){
+    banner.style.display='block';
+    banner.textContent=`📋 Viewing: ${selectedProvider} — Direct billing provider. Payer Summary and Rate Comparison reflect her clinic-submit contracts.`;
+  } else {
+    banner.style.display='block';
+    banner.textContent=`📋 Viewing: ${selectedProvider} — Bills through Headway and Alma only. Payer Summary and Rate Comparison show direct contract rates (Jodene Jensen) for reference. Actual Billing Analysis below reflects ${selectedProvider}'s real session payments.`;
+  }
+}
 async function fetchJSON(path){const sep=path.includes('?')?'&':'?';const r=await fetch(`${API}/${path}${sep}state=${selectedState}`);if(!r.ok)throw new Error(`${r.status} ${r.statusText}`);return r.json();}
 async function loadAll(){setStatus('loading');document.getElementById('error-container').innerHTML='';try{const[summary,dashboard]=await Promise.all([fetchJSON('dashboard/summary'),fetchJSON('dashboard')]);summaryData=summary;dashboardData=dashboard;renderCards();renderPayerTable();renderFullTable();setStatus('ok');}catch(e){setStatus('error');document.getElementById('error-container').innerHTML=`<div class="error-msg">⚠️ Could not connect to API. Make sure uvicorn is running: <code>uvicorn backend.main:app --reload</code><br><small>${e.message}</small></div>`;}await loadChannelComparison();syncPayerRateCards();}
 function setStatus(state){const el=document.getElementById('status-badge');el.className='status-badge';if(state==='ok'){el.textContent='● Live';el.className='ok';}else if(state==='error'){el.textContent='● Offline';el.className='error';}else{el.textContent='○ Loading…';el.className='';}el.id='status-badge';}
 function renderCards(){const jData=dashboardData.filter(r=>r.npi_number===JODENE_NPI&&DISPLAY_CPTS.includes(r.cpt_code));const totalGap=summaryData.reduce((s,r)=>s+(parseFloat(r.total_revenue_gap)||0),0);const totalTarget=summaryData.reduce((s,r)=>s+(parseFloat(r.total_revenue_at_target)||0),0);const totalUnderpaid=jData.filter(r=>r.is_underpaid===true).length;const totalCodes=new Set(jData.map(r=>r.cpt_code)).size;document.getElementById('c-payers').textContent=summaryData.length;document.getElementById('c-codes').textContent=totalCodes;document.getElementById('c-underpaid').textContent=totalUnderpaid;document.getElementById('c-gap').textContent=fmtK(totalGap);document.getElementById('c-target').textContent=fmtK(totalTarget);}
-function renderPayerTable(){const tbody=document.getElementById('payer-tbody');const payerMap=new Map();summaryData.forEach(row=>{const canonical=canonicalizePayer(row.payer_name);if(!payerMap.has(canonical))payerMap.set(canonical,{...row,payer_name:canonical});});tbody.innerHTML=CANONICAL_PAYERS.map(canonical=>{const row=payerMap.get(canonical);if(!row){return`<tr class="payer-row" style="opacity:.4;pointer-events:none;"><td><span class="expand-icon" style="color:#cbd5e1">▶</span></td><td><span class="payer-name" style="color:#94a3b8">${canonical}</span></td><td class="right" colspan="6" style="color:#cbd5e1;font-size:.78rem;font-style:italic;">No contract data loaded</td><td class="center"></td></tr>`;}const gap=row.total_revenue_gap;const gapFmt=gap?`<strong style="color:#dc2626">${fmtK(gap)}</strong>`:'—';return`<tr class="payer-row" onclick="toggleDrilldown(${row.payer_id},this)" data-payer="${row.payer_id}"><td><span class="expand-icon">▶</span></td><td><span class="payer-name">${canonical}</span></td><td class="right">${row.codes_with_rates??'—'}</td><td class="right">${row.codes_underpaid>0?`<span class="badge badge-red">${row.codes_underpaid}</span>`:`<span class="badge badge-green">0</span>`}</td><td class="right"><div class="pct-bar-wrap"><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:${Math.min(100,(row.avg_pct_of_medicare||0)/1.6)}%;background:${pctColor(row.avg_pct_of_medicare,130)}"></div></div>${pctBadge(row.avg_pct_of_medicare,130)}</div></td><td class="right">${fmtK(row.total_revenue_current)}</td><td class="right">${fmtK(row.total_revenue_at_target)}</td><td class="right">${gapFmt}</td><td class="center" onclick="event.stopPropagation()"><button class="btn btn-sm" onclick="openLetterModal(${row.payer_id},'${canonical}')" style="background:#7c3aed;">✉ Letter</button><button class="btn btn-sm" onclick="exportCSV(${row.payer_id})" style="margin-top:4px;background:#0891b2;">⬇ CSV</button></td></tr><tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;"><td colspan="8"><div class="drilldown-inner" id="drilldown-inner-${row.payer_id}"><div class="loading">Loading…</div></div></td></tr>`;}).join('');}
+function renderPayerTable(){const tbody=document.getElementById('payer-tbody');const payerMap=new Map();summaryData.forEach(row=>{const canonical=canonicalizePayer(row.payer_name);if(!payerMap.has(canonical))payerMap.set(canonical,{...row,payer_name:canonical});});tbody.innerHTML=getActivePayers().map(canonical=>{const row=payerMap.get(canonical);if(!row){return`<tr class="payer-row" style="opacity:.4;pointer-events:none;"><td><span class="expand-icon" style="color:#cbd5e1">▶</span></td><td><span class="payer-name" style="color:#94a3b8">${canonical}</span></td><td class="right" colspan="6" style="color:#cbd5e1;font-size:.78rem;font-style:italic;">No contract data loaded</td><td class="center"></td></tr>`;}const gap=row.total_revenue_gap;const gapFmt=gap?`<strong style="color:#dc2626">${fmtK(gap)}</strong>`:'—';return`<tr class="payer-row" onclick="toggleDrilldown(${row.payer_id},this)" data-payer="${row.payer_id}"><td><span class="expand-icon">▶</span></td><td><span class="payer-name">${canonical}</span></td><td class="right">${row.codes_with_rates??'—'}</td><td class="right">${row.codes_underpaid>0?`<span class="badge badge-red">${row.codes_underpaid}</span>`:`<span class="badge badge-green">0</span>`}</td><td class="right"><div class="pct-bar-wrap"><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:${Math.min(100,(row.avg_pct_of_medicare||0)/1.6)}%;background:${pctColor(row.avg_pct_of_medicare,130)}"></div></div>${pctBadge(row.avg_pct_of_medicare,130)}</div></td><td class="right">${fmtK(row.total_revenue_current)}</td><td class="right">${fmtK(row.total_revenue_at_target)}</td><td class="right">${gapFmt}</td><td class="center" onclick="event.stopPropagation()"><button class="btn btn-sm" onclick="openLetterModal(${row.payer_id},'${canonical}')" style="background:#7c3aed;">✉ Letter</button><button class="btn btn-sm" onclick="exportCSV(${row.payer_id})" style="margin-top:4px;background:#0891b2;">⬇ CSV</button></td></tr><tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;"><td colspan="8"><div class="drilldown-inner" id="drilldown-inner-${row.payer_id}"><div class="loading">Loading…</div></div></td></tr>`;}).join('');}
 const openDrilldowns=new Set();
 async function toggleDrilldown(payerId,rowEl){const drillRow=document.getElementById(`drilldown-${payerId}`);const innerDiv=document.getElementById(`drilldown-inner-${payerId}`);const isOpen=openDrilldowns.has(payerId);rowEl.classList.toggle('expanded',!isOpen);if(isOpen){drillRow.style.display='none';openDrilldowns.delete(payerId);return;}drillRow.style.display='table-row';openDrilldowns.add(payerId);innerDiv.innerHTML='<div class="loading">Loading underpaid codes…</div>';try{const data=await fetchJSON(`dashboard/underpaid/${payerId}`);const seen12=new Map();(data.underpaid_codes||[]).forEach(c=>{if(!DISPLAY_CPTS.includes(c.cpt_code))return;if(!seen12.has(c.cpt_code))seen12.set(c.cpt_code,c);});const codes=DISPLAY_CPTS.filter(c=>seen12.has(c)).map(c=>seen12.get(c));if(!codes.length){innerDiv.innerHTML=`<div class="empty">✓ No underpaid codes found for ${data.payer_name}.</div>`;return;}innerDiv.innerHTML=`<div class="drilldown-title">${data.payer_name} — ${codes.length} Underpaid Code${codes.length!==1?'s':''}</div><table><thead><tr><th>Code</th><th>Description</th><th class="right">Payer Rate</th><th class="right">Medicare</th><th class="right">% of Med</th><th class="right">Target (130%)</th><th class="right">Gap/Unit</th><th class="right">Volume</th><th class="right">Annual Gap $</th></tr></thead><tbody>${codes.map(c=>`<tr><td><strong>${c.cpt_code}</strong></td><td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.short_description}</td><td class="right">${fmt$(c.payer_allowed)}</td><td class="right">${fmt$(c.medicare_allowed)}</td><td class="right">${pctBadge(c.pct_of_medicare,130)}</td><td class="right">${fmt$(c.target_allowed)}</td><td class="right" style="color:#dc2626;font-weight:600">${fmt$(c.rate_gap_per_unit)}</td><td class="right">${c.annual_volume!=null?fmtN(c.annual_volume):'<span style="color:#94a3b8">—</span>'}</td><td class="right" style="font-weight:700;color:#dc2626">${c.annual_revenue_gap!=null?fmtK(c.annual_revenue_gap):'<span style="color:#94a3b8">—</span>'}</td></tr>`).join('')}</tbody></table>`;}catch(e){innerDiv.innerHTML=`<div class="error-msg">Error loading data: ${e.message}</div>`;}}
-function renderFullTable(){const showAll=document.getElementById('show-all').checked;const tbody=document.getElementById('full-tbody');const seen=new Map();dashboardData.filter(r=>DISPLAY_CPTS.includes(r.cpt_code)).forEach(r=>{const canonical=canonicalizePayer(r.payer_name);const key=`${canonical}|${r.cpt_code}`;if(!seen.has(key)){seen.set(key,{...r,payer_name:canonical});}else{const ex=seen.get(key);if(r.npi_number===JODENE_NPI&&ex.npi_number!==JODENE_NPI)seen.set(key,{...r,payer_name:canonical});}});let rows=[...seen.values()];if(!showAll)rows=rows.filter(r=>r.is_underpaid===true);rows.sort((a,b)=>{const pa=payerSortIdx(a.payer_name),pb=payerSortIdx(b.payer_name);if(pa!==pb)return pa-pb;return(CPT_ORDER[a.cpt_code]??99)-(CPT_ORDER[b.cpt_code]??99);});if(!rows.length){tbody.innerHTML=`<tr><td colspan="11" class="empty">${showAll?'No rate data loaded yet.':'No underpaid codes found. Check Show all codes.'}</td></tr>`;return;}let _ftPayer=null,_ftIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ftPayer){_ftPayer=r.payer_name;_ftIdx=0;}const bg=_ftIdx++%2===0?pal.rowA:pal.rowB;return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td>${r.payer_name}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem">${r.short_description}</td><td class="right">${fmt$(r.payer_allowed)}</td><td class="right">${fmt$(r.medicare_allowed)}</td><td class="right">${pctBadge(r.pct_of_medicare,r.target_pct_of_medicare)}</td><td class="right" style="color:#475569;font-size:.8rem">${fmt$(r.target_allowed)}</td><td class="right" style="color:${r.rate_gap_per_unit>0?'#dc2626':'#16a34a'};font-weight:600">${fmt$(r.rate_gap_per_unit)}</td><td class="right">${r.annual_volume!=null?fmtN(r.annual_volume):'<span style="color:#94a3b8">—</span>'}</td><td class="right" style="font-weight:700;color:${r.annual_revenue_gap>0?'#dc2626':'#16a34a'}">${r.annual_revenue_gap!=null?fmtK(r.annual_revenue_gap):'—'}</td><td class="center">${statusBadge(r.is_underpaid)}</td></tr>`;}).join('');}
+function renderFullTable(){const showAll=document.getElementById('show-all').checked;const tbody=document.getElementById('full-tbody');const seen=new Map();dashboardData.filter(r=>DISPLAY_CPTS.includes(r.cpt_code)).forEach(r=>{const canonical=canonicalizePayer(r.payer_name);const key=`${canonical}|${r.cpt_code}`;if(!seen.has(key)){seen.set(key,{...r,payer_name:canonical});}else{const ex=seen.get(key);if(r.npi_number===JODENE_NPI&&ex.npi_number!==JODENE_NPI)seen.set(key,{...r,payer_name:canonical});}});const _ap=new Set(getActivePayers());let rows=[...seen.values()].filter(r=>_ap.has(r.payer_name));if(!showAll)rows=rows.filter(r=>r.is_underpaid===true);rows.sort((a,b)=>{const pa=payerSortIdx(a.payer_name),pb=payerSortIdx(b.payer_name);if(pa!==pb)return pa-pb;return(CPT_ORDER[a.cpt_code]??99)-(CPT_ORDER[b.cpt_code]??99);});if(!rows.length){tbody.innerHTML=`<tr><td colspan="11" class="empty">${showAll?'No rate data loaded yet.':'No underpaid codes found. Check Show all codes.'}</td></tr>`;return;}let _ftPayer=null,_ftIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ftPayer){_ftPayer=r.payer_name;_ftIdx=0;}const bg=_ftIdx++%2===0?pal.rowA:pal.rowB;return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td>${r.payer_name}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem">${r.short_description}</td><td class="right">${fmt$(r.payer_allowed)}</td><td class="right">${fmt$(r.medicare_allowed)}</td><td class="right">${pctBadge(r.pct_of_medicare,r.target_pct_of_medicare)}</td><td class="right" style="color:#475569;font-size:.8rem">${fmt$(r.target_allowed)}</td><td class="right" style="color:${r.rate_gap_per_unit>0?'#dc2626':'#16a34a'};font-weight:600">${fmt$(r.rate_gap_per_unit)}</td><td class="right">${r.annual_volume!=null?fmtN(r.annual_volume):'<span style="color:#94a3b8">—</span>'}</td><td class="right" style="font-weight:700;color:${r.annual_revenue_gap>0?'#dc2626':'#16a34a'}">${r.annual_revenue_gap!=null?fmtK(r.annual_revenue_gap):'—'}</td><td class="center">${statusBadge(r.is_underpaid)}</td></tr>`;}).join('');}
 async function openLetterModal(payerId,payerName){const modal=document.getElementById('letter-modal');const body=document.getElementById('letter-modal-body');document.getElementById('letter-modal-title').textContent=`Negotiation Letter — ${payerName}`;document.getElementById('letter-modal-subtitle').textContent='Generating from live dashboard data…';body.innerHTML='<div class="loading">Generating letter…</div>';modal.style.display='block';try{const data=await fetchJSON(`letters/preview/${payerId}`);document.getElementById('letter-modal-subtitle').textContent=`${data.underpaid_codes} underpaid codes · Est. gap: ${fmtK(data.total_gap_estimate)}`;document.getElementById('letter-download-btn').onclick=()=>window.open(`/api/letters/download/${payerId}`,'_blank');body.innerHTML=`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px;font-size:.8rem;color:#475569;"><strong>Ready to send?</strong> Review below, copy to Word or email, then hit <strong>⬇ Download .txt</strong>.</div><pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:.82rem;line-height:1.7;background:white;border:1px solid #e2e8f0;border-radius:8px;padding:24px;max-height:60vh;overflow-y:auto;">${escapeHtml(data.letter)}</pre>`;}catch(e){body.innerHTML=`<div class="error-msg">Could not generate letter: ${e.message}</div>`;}}
 function closeLetterModal(){document.getElementById('letter-modal').style.display='none';}
 document.getElementById('letter-modal').addEventListener('click',function(e){if(e.target===this)closeLetterModal();});
@@ -574,9 +815,19 @@ function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').r
 function exportCSV(payerId=null){const url=payerId?`/api/dashboard/export?payer_id=${payerId}&underpaid_only=false&state=${selectedState}`:`/api/dashboard/export?state=${selectedState}`;window.open(url,'_blank');}
 let channelData=[];let channelPayerFilter=null;
 async function loadChannelComparison(){try{const raw=await fetchJSON('channel-comparison');const seen=new Map();raw.forEach(row=>{if(!DISPLAY_CPTS.includes(row.cpt_code))return;const canonical=canonicalizePayer((row.payer_name||'').trim());const key=`${canonical.toLowerCase()}|${row.cpt_code}`;if(!seen.has(key)){seen.set(key,Object.assign({},row,{payer_name:canonical}));}else{const ex=seen.get(key);if((row.headway_rate||0)>(ex.headway_rate||0)){ex.headway_rate=row.headway_rate;ex.headway_updated_at=row.headway_updated_at;}if((row.alma_rate||0)>(ex.alma_rate||0)){ex.alma_rate=row.alma_rate;ex.alma_updated_at=row.alma_updated_at;}if((row.grow_rate||0)>(ex.grow_rate||0)){ex.grow_rate=row.grow_rate;ex.grow_updated_at=row.grow_updated_at;}if((row.direct_rate||0)>(ex.direct_rate||0))ex.direct_rate=row.direct_rate;}});channelData=[...seen.values()].sort((a,b)=>{const pa=payerSortIdx(a.payer_name),pb=payerSortIdx(b.payer_name);if(pa!==pb)return pa-pb;return(CPT_ORDER[a.cpt_code]??99)-(CPT_ORDER[b.cpt_code]??99);});buildChannelPayerTabs();renderChannelTable();}catch(e){if(!e.message.includes('404'))console.warn('Channel comparison:',e.message);}}
-function buildChannelPayerTabs(){const tabBar=document.getElementById('channel-payer-tabs');const allActive=channelPayerFilter===null;tabBar.innerHTML=`<button class="tab-btn ${allActive?'active':''}" onclick="filterChannelTable(null,this)">All Payers</button>`+CANONICAL_PAYERS.map(canonical=>{const pal=getPayerPalette(canonical);const isActive=channelPayerFilter===canonical;const inlineStyle=isActive?`background:${pal.accent};color:white;border-color:${pal.accent};`:'';return`<button class="tab-btn ${isActive?'active':''}" style="${inlineStyle}" data-accent="${pal.accent}" onclick="filterChannelTable('${canonical.replace(/'/g,"\'")}',this)">${canonical}</button>`;}).join('');}
+function buildChannelPayerTabs(){
+  const tabBar=document.getElementById('channel-payer-tabs');
+  const allActive=channelPayerFilter===null;
+  const mainPayerSet=new Set(CANONICAL_PAYERS.map(p=>p.toLowerCase()));
+  // Find payers in the loaded data that aren't in the main 6 — these are state-specific plans
+  const statePlayers=[...new Set(channelData.map(r=>r.payer_name))].filter(p=>p&&!mainPayerSet.has(p.toLowerCase())).sort();
+  const makeBtn=(canonical,small=false)=>{const pal=getPayerPalette(canonical);const isActive=channelPayerFilter===canonical;const inlineStyle=isActive?`background:${pal.accent};color:white;border-color:${pal.accent};`:'';const sizeStyle=small?'font-size:.7rem;padding:3px 7px;':'';return`<button class="tab-btn ${isActive?'active':''}" style="${inlineStyle}${sizeStyle}" data-accent="${pal.accent}" onclick="filterChannelTable('${canonical.replace(/'/g,"\\'")}',this)">${canonical}</button>`;};
+  tabBar.innerHTML=`<button class="tab-btn ${allActive?'active':''}" onclick="filterChannelTable(null,this)">All Payers</button>`
+    +getActivePayers().map(c=>makeBtn(c)).join('')
+    +(statePlayers.length?`<span style="display:inline-flex;align-items:center;margin:0 6px;color:#94a3b8;font-size:.75rem;font-weight:600;letter-spacing:.04em;">│ State Plans:</span>`+statePlayers.map(c=>makeBtn(c,true)).join(''):'');
+}
 function filterChannelTable(payerName,btn){channelPayerFilter=payerName;document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});btn.classList.add('active');if(payerName&&btn.dataset.accent){btn.style.background=btn.dataset.accent;btn.style.color='white';btn.style.borderColor=btn.dataset.accent;}renderChannelTable();}
-function renderChannelTable(){const tbody=document.getElementById('channel-tbody');const bestOnly=document.getElementById('channel-best-only').checked;let rows=channelData;if(channelPayerFilter!=null)rows=rows.filter(r=>r.payer_name===channelPayerFilter);if(bestOnly){rows=rows.filter(r=>{const intermediaryRates=[r.headway_rate,r.alma_rate,r.grow_rate].filter(v=>v!=null);if(!intermediaryRates.length)return false;const best=Math.max(...intermediaryRates);return r.direct_rate==null?true:best>r.direct_rate;});}if(!rows.length){tbody.innerHTML=`<tr><td colspan="10" class="empty">${channelData.length===0?'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.':'No rows match the current filter.'}</td></tr>`;return;}let _ctPayer=null,_ctIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ctPayer){_ctPayer=r.payer_name;_ctIdx=0;}const bg=_ctIdx++%2===0?pal.rowA:pal.rowB;const direct=r.direct_rate,headway=r.headway_rate,alma=r.alma_rate,grow=r.grow_rate;const candidates=[direct,headway,alma,grow].filter(v=>v!=null);const best=candidates.length?Math.max(...candidates):null;function rateCell(val){if(val==null)return`<span style="color:#cbd5e1">—</span>`;const cls=(best!=null&&val===best&&candidates.filter(v=>v===best).length===1)?'rate-best':(val<best?'rate-lower':'');return`<span class="${cls}">${fmt$(val)}</span>`;}const updateDates=[r.headway_updated_at,r.alma_updated_at,r.grow_updated_at].filter(d=>d!=null).map(d=>new Date(d));let lastUpdatedCell;if(updateDates.length===0){lastUpdatedCell=`<span style="color:#cbd5e1;font-size:.75rem;">—</span>`;}else{const oldest=new Date(Math.min(...updateDates));const daysSince=Math.floor((Date.now()-oldest)/86400000);const label=oldest.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit'});lastUpdatedCell=daysSince>90?`<span title="${daysSince} days ago" style="color:#d97706;font-weight:600;">⚠ ${label}</span>`:`<span style="color:#64748b;">${label}</span>`;}const allChannels=[['Direct',direct],['Headway',headway],['Alma',alma],['Grow',grow]].filter(([,v])=>v!=null);let channelBadge;if(!allChannels.length){channelBadge=`<span class="channel-badge channel-na">No data</span>`;}else{const maxVal=Math.max(...allChannels.map(([,v])=>v));const winners=allChannels.filter(([,v])=>v===maxVal).map(([n])=>n);if(winners.length===1){const w=winners[0];const cls=w==='Direct'?'channel-direct':w==='Headway'?'channel-headway':w==='Alma'?'channel-alma':'channel-grow';channelBadge=`<span class="channel-badge ${cls}">${w}</span>`;}else{channelBadge=`<span class="channel-badge channel-tie">${winners.join(' / ')}</span>`;}}return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td style="font-size:.8rem;">${r.payer_name||'—'}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;color:#475569">${r.short_description||''}</td><td class="right" style="color:#64748b;font-size:.8rem">${fmt$(r.medicare_allowed)}</td><td class="right">${rateCell(direct)}</td><td class="right">${rateCell(headway)}</td><td class="right">${rateCell(alma)}</td><td class="right">${rateCell(grow)}</td><td class="center">${channelBadge}</td><td class="center">${lastUpdatedCell}</td></tr>`;}).join('');}
+function renderChannelTable(){const tbody=document.getElementById('channel-tbody');const bestOnly=document.getElementById('channel-best-only').checked;const _ap=new Set(getActivePayers());let rows=channelData.filter(r=>_ap.has(r.payer_name));if(channelPayerFilter!=null)rows=rows.filter(r=>r.payer_name===channelPayerFilter);if(bestOnly){rows=rows.filter(r=>{const intermediaryRates=[r.headway_rate,r.alma_rate,r.grow_rate].filter(v=>v!=null);if(!intermediaryRates.length)return false;const best=Math.max(...intermediaryRates);return r.direct_rate==null?true:best>r.direct_rate;});}if(!rows.length){tbody.innerHTML=`<tr><td colspan="10" class="empty">${channelData.length===0?'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.':'No rows match the current filter.'}</td></tr>`;return;}let _ctPayer=null,_ctIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ctPayer){_ctPayer=r.payer_name;_ctIdx=0;}const bg=_ctIdx++%2===0?pal.rowA:pal.rowB;const direct=r.direct_rate,headway=r.headway_rate,alma=r.alma_rate,grow=r.grow_rate;const candidates=[direct,headway,alma,grow].filter(v=>v!=null);const best=candidates.length?Math.max(...candidates):null;function rateCell(val){if(val==null)return`<span style="color:#cbd5e1">—</span>`;const cls=(best!=null&&val===best&&candidates.filter(v=>v===best).length===1)?'rate-best':(val<best?'rate-lower':'');return`<span class="${cls}">${fmt$(val)}</span>`;}const updateDates=[r.headway_updated_at,r.alma_updated_at,r.grow_updated_at].filter(d=>d!=null).map(d=>new Date(d));let lastUpdatedCell;if(updateDates.length===0){lastUpdatedCell=`<span style="color:#cbd5e1;font-size:.75rem;">—</span>`;}else{const oldest=new Date(Math.min(...updateDates));const daysSince=Math.floor((Date.now()-oldest)/86400000);const label=oldest.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit'});lastUpdatedCell=daysSince>90?`<span title="${daysSince} days ago" style="color:#d97706;font-weight:600;">⚠ ${label}</span>`:`<span style="color:#64748b;">${label}</span>`;}const allChannels=[['Direct',direct],['Headway',headway],['Alma',alma],['Grow',grow]].filter(([,v])=>v!=null);let channelBadge;if(!allChannels.length){channelBadge=`<span class="channel-badge channel-na">No data</span>`;}else{const maxVal=Math.max(...allChannels.map(([,v])=>v));const winners=allChannels.filter(([,v])=>v===maxVal).map(([n])=>n);if(winners.length===1){const w=winners[0];const cls=w==='Direct'?'channel-direct':w==='Headway'?'channel-headway':w==='Alma'?'channel-alma':'channel-grow';channelBadge=`<span class="channel-badge ${cls}">${w}</span>`;}else{channelBadge=`<span class="channel-badge channel-tie">${winners.join(' / ')}</span>`;}}return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td style="font-size:.8rem;">${r.payer_name||'—'}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;color:#475569">${r.short_description||''}</td><td class="right" style="color:#64748b;font-size:.8rem">${fmt$(r.medicare_allowed)}</td><td class="right">${rateCell(direct)}</td><td class="right">${rateCell(headway)}</td><td class="right">${rateCell(alma)}</td><td class="right">${rateCell(grow)}</td><td class="center">${channelBadge}</td><td class="center">${lastUpdatedCell}</td></tr>`;}).join('');}
 function downloadChannelTemplate(){window.open('/api/intermediaries/template','_blank');}
 function exportChannelCSV(){const url=channelPayerFilter?`/api/channel-comparison/export?payer_id=${channelPayerFilter}&state=${selectedState}`:`/api/channel-comparison/export?state=${selectedState}`;window.open(url,'_blank');}
 function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag-over');}
@@ -601,10 +852,10 @@ const TAG_META = {
 const PAYER_CONTRACT_COLORS = {
   'Cigna':          {accent:'#006B8F',light:'#f0f7fa'},
   'Aetna':          {accent:'#B01C2E',light:'#fdf5f6'},
-  'BCBS - Florida': {accent:'#00338D',light:'#f0f4fb'},
+  'BCBS - Florida Blue': {accent:'#00338D',light:'#f0f4fb'},
   'Ambetter':       {accent:'#007B87',light:'#f0fafb'},
-  'Optum/UHC/Oscar':{accent:'#002677',light:'#f0f3fb'},
-  'Wellmark Iowa':    {accent:'#005587',light:'#f0f6fb'},
+  'UHC / Oscar / Optum':{accent:'#002677',light:'#f0f3fb'},
+  'BCBS - Wellmark (Iowa)':    {accent:'#005587',light:'#f0f6fb'},
 };
 const CORE_DASHBOARD_CPTS = ['99214','99215','99204','99205','90833','90836','90838','90875','98002','98003','98006','98007'];
 
@@ -731,7 +982,7 @@ function initExplorer() {
 // ── Comprehensive Rate Store (localStorage) ──────────────────────────
 // compRates: { [payer]: { [cpt_code]: { allowed_amount, effective_date } } }
 let compRates = {};
-const COMP_RATES_KEY = 'solrei_comp_rates_v1';
+const COMP_RATES_KEY = 'solrei_comp_rates_v2';
 
 function loadCompRatesFromStorage() {
   try {
@@ -1021,10 +1272,121 @@ function syncPayerRateCards() {
   }
 }
 
+// ── Actual Billing Analysis ────────────────────────────────────────
+
+let billingActualsData = [];     // raw rows from /api/billing-actuals/plans
+let billingSessionTypes = [];    // available session types for current state
+
+function billingProviderParam() {
+  return selectedProvider && selectedProvider !== 'All'
+    ? `&provider_name=${encodeURIComponent(selectedProvider)}` : '';
+}
+
+async function initBillingActuals() {
+  try {
+    const provParam = billingProviderParam();
+    const types = await fetchJSON(`billing-actuals/session-types?state=${selectedState}${provParam}`);
+    billingSessionTypes = types;
+    const sel = document.getElementById('billing-session-select');
+    const prev = sel.value;
+    if (types.length === 0) {
+      const label = selectedProvider !== 'All' ? `${selectedProvider} in ${selectedState}` : selectedState;
+      sel.innerHTML = `<option value="">No data for ${label}</option>`;
+      document.getElementById('billing-actuals-tbody').innerHTML =
+        `<tr><td colspan="7" class="empty">No billing actuals data for ${label}.</td></tr>`;
+      document.getElementById('billing-actuals-footer').textContent = '';
+      return;
+    }
+    sel.innerHTML = types.map(t =>
+      `<option value="${t.session_type}">${t.session_type}</option>`
+    ).join('');
+    if (prev && types.some(t => t.session_type === prev)) sel.value = prev;
+    await loadBillingActuals();
+  } catch(e) {
+    console.warn('Billing actuals init:', e.message);
+  }
+}
+
+async function loadBillingActuals() {
+  const sel = document.getElementById('billing-session-select');
+  const sessionType = sel.value;
+  if (!sessionType) return;
+  try {
+    const provParam = billingProviderParam();
+    const rows = await fetchJSON(
+      `billing-actuals/plans?state=${selectedState}&session_type=${encodeURIComponent(sessionType)}${provParam}`
+    );
+    billingActualsData = rows;
+    renderBillingActuals();
+  } catch(e) {
+    console.warn('Billing actuals load:', e.message);
+  }
+}
+
+function renderBillingActuals() {
+  const tbody = document.getElementById('billing-actuals-tbody');
+  const footer = document.getElementById('billing-actuals-footer');
+  const rows = billingActualsData;
+
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">No data for this session type in the selected state.</td></tr>';
+    footer.textContent = '';
+    return;
+  }
+
+  const totalSessions = rows.reduce((s, r) => s + (r.total_sessions || 0), 0);
+  footer.textContent = `${rows.length} insurance plan${rows.length !== 1 ? 's' : ''} · ${totalSessions} total sessions · Source: 2026 Headway & Alma billing exports`;
+
+  tbody.innerHTML = rows.map(r => {
+    const hw = r.headway_avg != null ? parseFloat(r.headway_avg) : null;
+    const al = r.alma_avg   != null ? parseFloat(r.alma_avg)    : null;
+    const diff = (hw != null && al != null) ? (hw - al) : null;
+
+    const best = r.best_intermediary;
+    const badgeCls = best === 'Headway' ? 'channel-headway'
+                   : best === 'Alma'    ? 'channel-alma'
+                   : best === 'Tie'     ? 'channel-tie'
+                   : 'channel-na';
+    const badgeLabel = best || 'No Data';
+
+    function rateCell(val, isWinner) {
+      if (val == null) return `<span style="color:#cbd5e1">—</span>`;
+      const style = isWinner && best !== 'Tie' ? 'font-weight:700;color:#059669' : 'color:#334155';
+      return `<span style="${style}">${fmt$(val)}</span>`;
+    }
+
+    function sessCell(val) {
+      if (!val) return `<span style="color:#cbd5e1;font-size:.75rem;">—</span>`;
+      return `<span style="color:#94a3b8;font-size:.75rem;">${val}</span>`;
+    }
+
+    const diffCell = diff == null ? `<span style="color:#cbd5e1">—</span>`
+      : diff > 0 ? `<span style="color:#059669;font-weight:600;">+${fmt$(diff)}</span>`
+      : diff < 0 ? `<span style="color:#dc2626;font-weight:600;">${fmt$(diff)}</span>`
+      : `<span style="color:#94a3b8">$0</span>`;
+
+    const hwWin = best === 'Headway';
+    const alWin = best === 'Alma';
+
+    return `<tr>
+      <td style="font-size:.82rem;font-weight:500;color:#1a2332;">${r.insurance_plan}</td>
+      <td class="right">${rateCell(hw, hwWin)}</td>
+      <td class="right">${sessCell(r.headway_sessions)}</td>
+      <td class="right">${rateCell(al, alWin)}</td>
+      <td class="right">${sessCell(r.alma_sessions)}</td>
+      <td class="right">${diffCell}</td>
+      <td class="center"><span class="channel-badge ${badgeCls}">${badgeLabel}</span></td>
+    </tr>`;
+  }).join('');
+}
+
 // ── Boot ──────────────────────────────────────────────────────────
 initExplorer();
+updateStateDropdownForProvider();
+updateProviderBanner();
 loadAll();
 loadChannelComparison();
+initBillingActuals();
 </script>
 </body>
 </html>
