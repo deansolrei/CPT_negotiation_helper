@@ -1,0 +1,3 @@
+-- Migration 31: Load Medicare 2026 rates from Master Sheet (July 7 2026)
+-- Run annually when Medicare rates update
+-- Source: MASTER sheet col AL (statewide) + AM=Fort Lauderdale, AN=Miami for FL

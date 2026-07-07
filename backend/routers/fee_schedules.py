@@ -2,9 +2,19 @@
 routers/fee_schedules.py
 ------------------------
 Endpoints for importing and viewing fee schedule lines and benchmark rates.
+
+Direct Rate Import (SBH / Clinic Submit):
+  POST /api/direct-rates/import
+  CSV columns: payer_name, cpt_code, state, allowed_amount, effective_date
+  Auto-creates payers and contracts as needed, linked to Jodene Jensen NPI1.
 """
 
-from fastapi import APIRouter, HTTPException
+import csv
+import io
+from datetime import date
+
+from fastapi import APIRouter, HTTPException, UploadFile, File, Query
+from fastapi.responses import StreamingResponse
 from backend.database import get_db
 from ..models import (
     FeeScheduleImportRequest,
@@ -16,6 +26,200 @@ from ..models import (
 )
 
 router = APIRouter(prefix="/api", tags=["Fee Schedules"])
+
+
+# ── Direct Rate Import (SBH / Clinic Submit) ─────────────────
+
+DIRECT_BILLING_PROVIDER = "Jodene Jensen, PMHNP-BC"   # NPI1 entity name in DB
+
+
+@router.post("/direct-rates/import")
+async def import_direct_rates(
+    file: UploadFile = File(...),
+    provider_name: str = Query(
+        default=DIRECT_BILLING_PROVIDER,
+        description="Legal name of the provider entity doing direct billing",
+    ),
+):
+    """
+    Import clinic-submit (SBH) direct billing rates from a CSV file.
+
+    CSV columns: payer_name, cpt_code, state, allowed_amount, effective_date
+
+    - payer_name: e.g. 'Aetna', 'Optum/UHC/Oscar', 'Cigna'
+    - cpt_code:   e.g. '99214'
+    - state:      two-letter state code e.g. 'FL'
+    - allowed_amount: contracted rate e.g. '94.76'
+    - effective_date: YYYY-MM-DD (optional, defaults to today)
+
+    Auto-creates payers and contracts if they don't exist.
+    Uses INSERT ON CONFLICT DO UPDATE — safe to re-upload.
+    Rates are linked to the specified provider entity (Jodene Jensen by default).
+    """
+    content = await file.read()
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("latin-1")
+
+    reader = csv.DictReader(io.StringIO(text))
+    rows = [r for r in reader if not (list(r.values())[0] or "").strip().startswith("#")]
+
+    imported = 0
+    skipped  = 0
+    errors   = []
+
+    with get_db() as cur:
+        # Look up the provider entity
+        cur.execute(
+            "SELECT provider_entity_id FROM provider_entities WHERE legal_name = %s AND active = TRUE",
+            (provider_name,),
+        )
+        pe = cur.fetchone()
+        if not pe:
+            return {"status": "error", "imported": 0, "skipped": 0,
+                    "errors": [f"Provider entity '{provider_name}' not found in database."]}
+        provider_entity_id = pe["provider_entity_id"]
+
+        # Pre-load valid CPT codes
+        cur.execute("SELECT cpt_code FROM cpt_codes")
+        valid_cpts = {r["cpt_code"] for r in cur.fetchall()}
+
+        for i, row in enumerate(rows, start=2):
+            payer_name_raw  = (row.get("payer_name") or "").strip()
+            cpt_code        = (row.get("cpt_code")   or "").strip()
+            state           = (row.get("state")       or "").strip().upper() or None
+            amount_raw      = (row.get("allowed_amount") or "").strip().replace("$", "").replace(",", "")
+            eff_raw         = (row.get("effective_date") or "").strip()
+
+            if not payer_name_raw or not cpt_code or not amount_raw:
+                skipped += 1
+                continue
+
+            try:
+                allowed_amount = float(amount_raw)
+            except ValueError:
+                errors.append(f"Row {i}: invalid amount '{amount_raw}'")
+                skipped += 1
+                continue
+
+            effective_date = eff_raw if eff_raw else date.today().isoformat()
+
+            # Auto-add unknown CPT codes
+            if cpt_code not in valid_cpts:
+                cur.execute(
+                    "INSERT INTO cpt_codes (cpt_code, short_description, category) "
+                    "VALUES (%s, %s, 'E/M') ON CONFLICT DO NOTHING",
+                    (cpt_code, cpt_code),
+                )
+                valid_cpts.add(cpt_code)
+
+            # Ensure payer exists (case-insensitive lookup, then create)
+            cur.execute(
+                "SELECT payer_id FROM payers WHERE lower(payer_name) = lower(%s)",
+                (payer_name_raw,),
+            )
+            payer_row = cur.fetchone()
+            if payer_row:
+                payer_id = payer_row["payer_id"]
+            else:
+                cur.execute(
+                    "INSERT INTO payers (payer_name) VALUES (%s) "
+                    "ON CONFLICT DO NOTHING RETURNING payer_id",
+                    (payer_name_raw,),
+                )
+                ins = cur.fetchone()
+                if not ins:
+                    cur.execute("SELECT payer_id FROM payers WHERE lower(payer_name) = lower(%s)",
+                                (payer_name_raw,))
+                    ins = cur.fetchone()
+                payer_id = ins["payer_id"]
+
+            # Ensure a direct-billing contract exists for (payer, provider_entity)
+            cur.execute(
+                """
+                SELECT contract_id FROM contracts
+                WHERE payer_id = %s AND provider_entity_id = %s AND active = TRUE
+                LIMIT 1
+                """,
+                (payer_id, provider_entity_id),
+            )
+            contract_row = cur.fetchone()
+            if contract_row:
+                contract_id = contract_row["contract_id"]
+            else:
+                cur.execute(
+                    """
+                    INSERT INTO contracts
+                        (payer_id, provider_entity_id, product_line, effective_date, active, notes)
+                    VALUES (%s, %s, 'Commercial', %s, TRUE, 'Auto-created from SBH direct rate import')
+                    RETURNING contract_id
+                    """,
+                    (payer_id, provider_entity_id, effective_date),
+                )
+                contract_id = cur.fetchone()["contract_id"]
+
+            # Upsert the fee schedule line
+            try:
+                cur.execute(
+                    """
+                    INSERT INTO fee_schedule_lines
+                        (contract_id, cpt_code, modifier, place_of_service,
+                         unit_type, allowed_amount, state, effective_date)
+                    VALUES (%s, %s, NULL, NULL, 'per_service', %s, %s, %s)
+                    ON CONFLICT ON CONSTRAINT fee_schedule_lines_unique
+                    DO UPDATE SET
+                        allowed_amount = EXCLUDED.allowed_amount,
+                        state          = EXCLUDED.state,
+                        effective_date = EXCLUDED.effective_date
+                    """,
+                    (contract_id, cpt_code, allowed_amount, state, effective_date),
+                )
+                imported += 1
+            except Exception as e:
+                errors.append(f"Row {i} ({payer_name_raw}/{cpt_code}/{state}): {e}")
+                skipped += 1
+
+    return {
+        "status":   "ok",
+        "imported": imported,
+        "skipped":  skipped,
+        "errors":   errors[:20],
+        "message":  f"Imported {imported} direct rate(s) for {provider_name}. {skipped} skipped.",
+    }
+
+
+@router.get("/direct-rates")
+def get_direct_rates(state: str = Query(default="FL")):
+    """Return all direct/clinic-submit rates for a given state."""
+    state_upper = (state or "FL").upper()
+    with get_db() as cur:
+        cur.execute(
+            """
+            SELECT
+                p.payer_name,
+                fsl.cpt_code,
+                cc.short_description,
+                fsl.state,
+                fsl.allowed_amount,
+                fsl.effective_date,
+                pe.legal_name AS provider
+            FROM fee_schedule_lines fsl
+            JOIN contracts         c   ON fsl.contract_id      = c.contract_id
+            JOIN payers            p   ON c.payer_id           = p.payer_id
+            JOIN provider_entities pe  ON c.provider_entity_id = pe.provider_entity_id
+            JOIN cpt_codes         cc  ON cc.cpt_code          = fsl.cpt_code
+            WHERE c.active = TRUE
+              AND (c.end_date   IS NULL OR c.end_date   >= CURRENT_DATE)
+              AND (fsl.end_date IS NULL OR fsl.end_date >= CURRENT_DATE)
+              AND (fsl.state IS NULL OR fsl.state = %s)
+            ORDER BY p.payer_name, fsl.cpt_code
+            """,
+            (state_upper,),
+        )
+        return cur.fetchall()
+
+
 
 
 # ── Fee Schedule Import ───────────────────────────────────────

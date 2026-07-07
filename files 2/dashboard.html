@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Insurance CPT Negotiation Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#F8FBF9;color:#2E3A32;min-height:100vh}
+header{background:#C3D5CB;color:white;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.15);position:sticky;top:0;z-index:50}
+header .logo-wrap{display:flex;align-items:center;gap:14px}
+header .logo-wrap img{height:52px;width:auto;object-fit:contain}
+header h1{font-size:1.05rem;font-weight:600;letter-spacing:-0.2px;color:white;opacity:.92}
+header p{font-size:.78rem;opacity:.72;margin-top:2px}
+#status-badge{font-size:.75rem;padding:5px 12px;border-radius:20px;font-weight:600;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)}
+#status-badge.ok{background:#7fcc9b;border-color:#1b532f;color:#277644}
+#status-badge.error{background:#dc262622;border-color:#7a0e0e;color:#c83c3c}
+main{max-width:1400px;margin:0 auto;padding:28px 24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
+.card{background:rgb(224,220,220);border-radius:10px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.07);border-left:4px solid #319bc2}
+.card.gap{border-left-color:#ce1717}.card.ok{border-left-color:#277644}
+.card label{font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#64748b;font-weight:600}
+.card .value{font-size:1.7rem;font-weight:700;margin-top:4px;color:#1a2332}
+.card.gap .value{color:#ce1717}.card.ok .value{color:#277644}
+.section-title{font-size:1rem;font-weight:700;color:#10161f;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title span{font-size:.75rem;font-weight:500;color:#64748b}
+.table-wrap{background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow-x:hidden;overflow-y:auto;max-height:65vh;margin-bottom:28px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead tr{background:#eef2f7}
+thead th{position:sticky;top:0;z-index:2;background:#eef2f7;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+th:not(:last-child),td:not(:last-child){border-right:1px solid rgba(0,0,0,.09)}
+thead th:not(:last-child){border-right:1px solid rgba(0,0,0,.18)}
+#full-table td:nth-child(even),#channel-table td:nth-child(even){background-color:rgba(0,0,0,.018)}
+#channel-table th:nth-child(5),#channel-table td:nth-child(5){border-left:2px solid rgba(0,38,119,.18);border-right:2px solid rgba(0,38,119,.18);background-color:rgba(0,38,119,.04)}
+#channel-table th:nth-child(10),#channel-table td:nth-child(10){width:86px;min-width:86px;max-width:86px;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:4px;padding-right:4px}
+#channel-table thead th:nth-child(5){background-color:rgba(0,38,119,.10);color:#002677;font-weight:800;letter-spacing:.4px}
+#full-table th:nth-child(4),#full-table td:nth-child(4){border-left:2px solid rgba(0,38,119,.18);border-right:2px solid rgba(0,38,119,.18);background-color:rgba(0,38,119,.04)}
+#full-table thead th:nth-child(4){background-color:rgba(0,38,119,.10);color:#002677;font-weight:800;letter-spacing:.4px}
+thead th{padding:11px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#64748b;border-bottom:2px solid #e2e8f0;white-space:nowrap}
+thead th.right{text-align:right}
+tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#f8fafc}
+tbody td{padding:11px 14px}
+tbody td.right{text-align:right;font-variant-numeric:tabular-nums}
+tbody td.center{text-align:center}
+.payer-row{cursor:pointer}
+.payer-row:hover{background:#eff6ff!important}
+.payer-name{font-weight:600;color:#319bc2}
+.payer-name:hover{text-decoration:underline}
+.expand-icon{color:#94a3b8;font-size:.8rem;transition:transform .2s}
+.expanded .expand-icon{transform:rotate(90deg)}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:.72rem;font-weight:600}
+.badge-red{background:#BEBCBC;color:#CE1717}
+.badge-green{background:#E6F4EA;color:#137333}
+.badge-yellow{background:#f9f292;color:#16792a}
+.badge-gray{background:#f1f5f9;color:#64748b}
+.badge-blue{background:#dbeafe;color:#2563a8}
+.drilldown-row td{padding:0!important;background:#f8fafc!important}
+.drilldown-inner{padding:0 16px 16px}
+.drilldown-title{font-size:.8rem;font-weight:700;color:#475569;padding:12px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.drilldown-row table thead tr{background:#f1f5f9}
+.pct-bar-wrap{display:flex;align-items:center;gap:8px}
+.pct-bar-bg{flex:1;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;min-width:60px}
+.pct-bar-fill{height:100%;border-radius:3px}
+.loading{text-align:center;padding:48px;color:#94a3b8;font-size:.9rem}
+.empty{text-align:center;padding:32px;color:#94a3b8;font-size:.85rem}
+.error-msg{background:#fee2e2;color:#951717;border-radius:8px;padding:16px 20px;margin-bottom:20px;font-size:.85rem}
+.btn{background:#319bc2;color:white;border:none;border-radius:7px;padding:8px 18px;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .15s}
+.btn:hover{background:#2589ad}
+.btn-sm{padding:5px 12px;font-size:.75rem;border-radius:5px}
+.target-note{font-size:.72rem;color:#64748b;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.target-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+footer{text-align:center;padding:24px;font-size:.75rem;color:#94a3b8}
+.upload-zone{border:2px dashed #cbd5e1;border-radius:10px;padding:20px 24px;text-align:center;background:#f8fafc;margin-bottom:16px;transition:border-color .2s,background .2s;cursor:pointer}
+.upload-zone.drag-over{border-color:#319bc2;background:#eff6ff}
+.upload-zone p{color:#64748b;font-size:.82rem;margin-top:6px}
+.upload-zone input[type="file"]{display:none}
+.channel-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:.7rem;font-weight:700;white-space:nowrap}
+.channel-direct{background:#497aa9;color:#fff}
+.channel-headway{background:#4fa86b;color:#fff}
+.channel-alma{background:#264b3a;color:#fff}
+.channel-grow{background:#beb1fa;color:#1a2332}
+.channel-tie{background:#686f76;color:#fff}
+.channel-na{background:#f1f5f9;color:#94a3b8}
+.rate-best{font-weight:700;color:#059669}
+.rate-lower{color:#94a3b8}
+.tab-bar{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.tab-btn{padding:6px 16px;border-radius:6px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;background:white;color:#64748b;transition:all .15s}
+.tab-btn.active{background:#319bc2;color:white;border-color:#2563a8}
+.upload-status{padding:10px 16px;border-radius:7px;font-size:.82rem;margin-top:10px;display:none}
+.upload-status.success{background:#dcfce7;color:#166534;display:block}
+.upload-status.error{background:#fee2e2;color:#951717;display:block}
+.upload-status.loading{background:#eff6ff;color:#2563a8;display:block}
+
+/* ── CPT Code Explorer ─────────────────────────────────────── */
+.explorer-panel{background:white;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:28px;overflow:hidden;border:2px solid #7c3aed22}
+.explorer-header{background:linear-gradient(135deg,#2d1b69 0%,#4c2a9a 100%);color:white;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}.explorer-header *{pointer-events:none}
+.explorer-header:hover{background:linear-gradient(135deg,#3a2280 0%,#5c35b0 100%)}
+.explorer-title-wrap{display:flex;align-items:center;gap:12px}
+.explorer-icon{font-size:1.3rem}
+.explorer-title{font-size:1rem;font-weight:700;letter-spacing:-.2px}
+.explorer-subtitle{font-size:.75rem;opacity:.8;margin-top:2px}
+.explorer-toggle{font-size:1.2rem;transition:transform .25s;opacity:.8}
+.explorer-toggle.open{transform:rotate(180deg)}
+.explorer-body{display:none;padding:20px 24px}
+.explorer-body.open{display:block}
+.explorer-search-row{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.explorer-search-wrap{position:relative;flex:1;min-width:240px}
+.explorer-search-wrap input{width:100%;padding:9px 14px 9px 36px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.9rem;color:#1a2332;outline:none;transition:border-color .15s}
+.explorer-search-wrap input:focus{border-color:#7c3aed}
+.explorer-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;font-size:.9rem}
+.explorer-filters{display:flex;gap:8px;flex-wrap:wrap}
+.explorer-filters select{padding:8px 28px 8px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:.8rem;color:#1a2332;background:white;cursor:pointer;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.explorer-filters select:focus{border-color:#7c3aed}
+.explorer-stats{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.expl-stat{background:#f8f5ff;border-radius:8px;padding:8px 14px;font-size:.78rem;color:#4c2a9a;font-weight:600;border:1px solid #e9e0fa}
+.expl-stat span{font-size:1.1rem;font-weight:700;margin-right:4px}
+.explorer-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.expl-tag{display:inline-flex;align-items:center;font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.etag-core{background:#ede9fe;color:#5b21b6}
+.etag-addon{background:#dcfce7;color:#166534}
+.etag-assess{background:#dbeafe;color:#1e40af}
+.etag-em{background:#f1f5f9;color:#475569}
+.etag-coord{background:#fef3c7;color:#92400e}
+.etag-payer{background:#ffe4e6;color:#9f1239}
+.etag-ancil{background:#f0fdf4;color:#14532d}
+.explorer-cat-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px}
+.expl-cat-btn{padding:4px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;background:white;color:#64748b;transition:all .12s;white-space:nowrap}
+.expl-cat-btn:hover{background:#f5f3ff;color:#5b21b6;border-color:#c4b5fd}
+.expl-cat-btn.active{background:#7c3aed;color:white;border-color:#6d28d9}
+.explorer-results{max-height:520px;overflow-y:auto}
+.expl-section-head{font-size:.7rem;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.07em;padding:10px 0 6px;border-bottom:1px solid #ede9fe;margin-bottom:6px;margin-top:14px;display:flex;align-items:center;justify-content:space-between}
+.expl-section-head:first-of-type{margin-top:0}
+.expl-count{font-size:.68rem;color:#a78bfa;font-weight:600}
+.expl-row{display:grid;grid-template-columns:90px 1fr 110px;gap:10px;align-items:start;padding:9px 12px;border-radius:8px;border:1px solid #f1f0f8;background:white;margin-bottom:5px;transition:background .1s,border-color .1s;cursor:default}
+.expl-row:hover{background:#faf9ff;border-color:#ddd6fe}
+.expl-row.highlight{background:#fdf4ff;border-color:#c084fc}
+.expl-code{font-family:monospace;font-size:.82rem;font-weight:700;color:#2d1b69;padding-top:2px}
+.expl-desc-wrap{}
+.expl-short{font-size:.82rem;font-weight:600;color:#1a2332;line-height:1.4}
+.expl-desc{font-size:.75rem;color:#64748b;margin-top:2px;line-height:1.5}
+.expl-sub{font-size:.68rem;color:#94a3b8;margin-top:3px}
+.expl-tag-cell{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.expl-empty{text-align:center;padding:32px;color:#94a3b8;font-size:.85rem}
+.payer-rates-section{margin-top:20px;padding-top:20px;border-top:1px solid #ede9fe}
+.payer-rates-title{font-size:.85rem;font-weight:700;color:#2d1b69;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.payer-rates-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.payer-rate-card{border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.payer-rate-card-head{padding:10px 14px;font-size:.78rem;font-weight:700;color:white;display:flex;align-items:center;justify-content:space-between}
+.payer-rate-card-body{padding:10px 14px}
+.payer-rate-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:.78rem}
+.payer-rate-row:last-child{border-bottom:none}
+.payer-rate-code{font-family:monospace;font-weight:700;color:#1a2332}
+.payer-rate-val{font-weight:600;color:#059669}
+.payer-rate-val.missing{color:#94a3b8;font-weight:400}
+.core-codes-banner{background:#f0fdf4;border:1.5px solid #86efac;border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:.82rem;color:#14532d}
+.core-codes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.core-code-pill{background:white;border:1.5px solid #86efac;border-radius:8px;padding:8px 12px;text-align:center}
+.core-code-pill code{font-size:.85rem;font-weight:700;color:#166534;display:block}
+.core-code-pill span{font-size:.68rem;color:#64748b;margin-top:2px;display:block;line-height:1.3}
+mark{background:#fef08a;border-radius:2px;padding:0 1px}
+
+/* ── Comprehensive Rate Upload & Table ─────────────────────── */
+.comp-rate-upload{background:#f8f5ff;border:1.5px dashed #c4b5fd;border-radius:10px;padding:16px 20px;margin-bottom:16px;cursor:pointer;text-align:center;transition:border-color .2s,background .2s}
+.comp-rate-upload:hover,.comp-rate-upload.drag-over{border-color:#7c3aed;background:#ede9fe}
+.comp-rate-upload input[type="file"]{display:none}
+.comp-rate-upload-status{padding:8px 14px;border-radius:7px;font-size:.78rem;margin-top:8px;display:none}
+.comp-rate-upload-status.success{background:#dcfce7;color:#166534;display:block}
+.comp-rate-upload-status.error{background:#fee2e2;color:#951717;display:block}
+.comp-rate-upload-status.loading{background:#ede9fe;color:#5b21b6;display:block}
+.comp-rate-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.comp-rate-payer-tabs{display:flex;gap:4px;flex-wrap:wrap;flex:1}
+.comp-rate-tab{padding:5px 14px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;background:white;color:#64748b;transition:all .12s;white-space:nowrap}
+.comp-rate-tab.active{color:white}
+.comp-rate-table-wrap{border:1px solid #e9e0fa;border-radius:10px;overflow:hidden;max-height:480px;overflow-y:auto}
+.comp-rate-table{width:100%;border-collapse:collapse;font-size:.8rem}
+.comp-rate-table thead th{position:sticky;top:0;z-index:2;background:#2d1b69;color:white;padding:9px 12px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.comp-rate-table thead th.right{text-align:right}
+.comp-rate-table tbody tr{border-bottom:1px solid #f5f3ff;transition:background .1s}
+.comp-rate-table tbody tr:hover{background:#faf9ff}
+.comp-rate-table tbody td{padding:8px 12px;vertical-align:top}
+.comp-rate-table tbody td.right{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;color:#059669}
+.comp-rate-table tbody td.missing{text-align:right;color:#cbd5e1}
+.comp-rate-table .crt-code{font-family:monospace;font-weight:700;color:#2d1b69;font-size:.82rem}
+.comp-rate-table .crt-short{font-size:.75rem;color:#475569;line-height:1.4}
+.comp-rate-table .crt-cat{font-size:.65rem;color:#a78bfa;margin-top:1px}
+.comp-rate-table tr.is-core{background:#f0fdf4}
+.comp-rate-table tr.is-core td.crt-code{color:#166534}
+.comp-rate-empty{text-align:center;padding:40px;color:#94a3b8;font-size:.85rem}
+.comp-rate-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.comp-rate-stat{background:#f8f5ff;border:1px solid #e9e0fa;border-radius:8px;padding:7px 14px;font-size:.75rem;color:#5b21b6;font-weight:600}
+.comp-rate-stat span{font-weight:700;margin-right:3px}
+
+/* ── Provider filter tabs ──────────────────────────────────── */
+#provider-tabs .tab-btn.active{background:#1a3a5c;color:white;border-color:#1a3a5c}
+#provider-tabs .tab-btn:hover:not(.active){background:#f0f6fb;color:#1a3a5c;border-color:#1a3a5c}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <img src="/assets/solrei_logo.gif" alt="Solrei Behavioral Health"
+      onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'">
+    <div id="logo-fallback" style="display:none;">
+      <h1>Insurance CPT Negotiation App</h1>
+      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+    </div>
+    <div>
+      <h1>Insurance CPT Negotiation App</h1>
+      <p>Solrei Behavioral Health, Inc. · Windermere, FL · NPI2: 1003521006</p>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <label for="state-selector" style="font-size:.78rem;font-weight:600;color:#94a3b8;letter-spacing:.5px;white-space:nowrap;">STATE</label>
+      <select id="state-selector" onchange="onStateChange()" style="background:#1e3a5f;border:1px solid rgba(255,255,255,.18);color:white;border-radius:6px;padding:4px 8px;font-size:.85rem;font-weight:600;cursor:pointer;outline:none;min-width:60px;">
+        <option value="AK">AK — Alaska</option>
+        <option value="AZ">AZ — Arizona</option>
+        <option value="CO">CO — Colorado</option>
+        <option value="DC">DC — Washington DC</option>
+        <option value="FL" selected>FL — Florida</option>
+        <option value="HI">HI — Hawaii</option>
+        <option value="IA">IA — Iowa</option>
+        <option value="ID">ID — Idaho</option>
+        <option value="KS">KS — Kansas</option>
+        <option value="MD">MD — Maryland</option>
+        <option value="ME">ME — Maine</option>
+        <option value="MN">MN — Minnesota</option>
+        <option value="MT">MT — Montana</option>
+        <option value="ND">ND — North Dakota</option>
+        <option value="NE">NE — Nebraska</option>
+        <option value="NH">NH — New Hampshire</option>
+        <option value="NM">NM — New Mexico</option>
+        <option value="NV">NV — Nevada</option>
+        <option value="OR">OR — Oregon</option>
+        <option value="SD">SD — South Dakota</option>
+        <option value="VT">VT — Vermont</option>
+        <option value="WA">WA — Washington</option>
+        <option value="WY">WY — Wyoming</option>
+      </select>
+    </div>
+    <button class="btn btn-sm" id="refresh-btn" onclick="handleRefresh(this)">↻ Refresh</button>
+    <div id="status-badge">Connecting…</div>
+  </div>
+</header>
+
+<main>
+  <div id="error-container"></div>
+
+  <div class="cards" id="cards">
+    <div class="card"><label>Payers Loaded</label><div class="value" id="c-payers">—</div></div>
+    <div class="card"><label>CPT Codes Tracked</label><div class="value" id="c-codes">—</div></div>
+    <div class="card gap"><label>Underpaid Codes</label><div class="value" id="c-underpaid">—</div></div>
+    <div class="card gap"><label>Est. Annual Revenue Gap</label><div class="value" id="c-gap">—</div></div>
+    <div class="card"><label>Est. Revenue at Target</label><div class="value" id="c-target">—</div></div>
+    <div class="card"><label>Target vs. Medicare</label><div class="value" id="c-pct">130%</div></div>
+  </div>
+
+  <div class="section-title">
+    Payer Summary
+    <span>— click any row to see underpaid codes · use buttons to generate letters or export data</span>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn btn-sm" onclick="exportCSV()" title="Download full dashboard as CSV">⬇ Export CSV</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table id="payer-table">
+      <thead><tr>
+        <th></th><th>Payer</th><th class="right">Codes w/ Rates</th>
+        <th class="right">Codes Underpaid</th><th class="right">Avg % of Medicare</th>
+        <th class="right">Current Revenue</th><th class="right">Revenue at Target</th>
+        <th class="right">Revenue Gap</th><th class="center">Actions</th>
+      </tr></thead>
+      <tbody id="payer-tbody"><tr><td colspan="9" class="loading">Loading payer data…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div id="letter-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;overflow-y:auto;">
+    <div style="background:white;max-width:820px;margin:40px auto;border-radius:12px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);">
+      <div style="background:#1a3a5c;color:white;padding:18px 24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-weight:700;font-size:1rem;" id="letter-modal-title">Negotiation Letter</div>
+          <div style="font-size:.75rem;opacity:.75;margin-top:2px;" id="letter-modal-subtitle"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <button class="btn btn-sm" id="letter-download-btn">⬇ Download .txt</button>
+          <button onclick="closeLetterModal()" style="background:rgba(255,255,255,.15);border:none;color:white;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:.85rem;">✕ Close</button>
+        </div>
+      </div>
+      <div id="letter-modal-body" style="padding:24px;"><div class="loading">Generating letter…</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    Rate Comparison by Payer — All Providers
+    <span>— showing underpaid codes only</span>
+    <label style="margin-left:auto;font-size:.8rem;font-weight:500;cursor:pointer;">
+      <input type="checkbox" id="show-all" onchange="renderFullTable()"> Show all codes
+    </label>
+  </div>
+  <div class="table-wrap">
+    <table id="full-table">
+      <thead><tr>
+        <th>Payer</th><th>Code</th><th>Description</th>
+        <th class="right">Payer Rate</th><th class="right">Medicare</th>
+        <th class="right">% of Med</th><th class="right">Target</th>
+        <th class="right">Gap/Unit</th><th class="right">Volume</th>
+        <th class="right">Annual Gap $</th><th class="center">Status</th>
+      </tr></thead>
+      <tbody id="full-tbody"><tr><td colspan="11" class="loading">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section-title" style="margin-top:12px;">
+    Billing Channel Comparison
+    <span>— Direct billing vs Headway · Alma · Grow Therapy</span>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-sm" onclick="downloadChannelTemplate()" style="background:#0891b2;">⬇ Rate Template CSV</button>
+      <button class="btn btn-sm" onclick="exportChannelCSV()" style="background:#059669;">⬇ Export Comparison</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px;flex-wrap:wrap;">
+    <div style="font-size:.75rem;font-weight:700;color:#64748b;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;">Provider</div>
+    <div class="tab-bar" id="provider-tabs" style="margin-bottom:0;">
+      <button class="tab-btn active" onclick="setProviderFilter(null,this)">All Providers</button>
+      <button class="tab-btn" onclick="setProviderFilter('JJ',this)">Jodene Jensen</button>
+      <button class="tab-btn" onclick="setProviderFilter('KR',this)">Katherine Robins</button>
+      <button class="tab-btn" onclick="setProviderFilter('LK',this)">Lori Kistler</button>
+    </div>
+    <div style="font-size:.7rem;color:#94a3b8;margin-left:4px;">Common rates shown for all</div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+    <div class="tab-bar" id="channel-payer-tabs">
+      <button class="tab-btn active" onclick="filterChannelTable(null,this)">All Payers</button>
+    </div>
+    <label style="font-size:.8rem;font-weight:500;cursor:pointer;margin-left:auto;">
+      <input type="checkbox" id="channel-best-only" onchange="renderChannelTable()"> Show only where intermediary pays more
+    </label>
+  </div>
+
+  <div class="table-wrap">
+    <table id="channel-table">
+      <thead><tr>
+        <th>Payer</th><th>CPT</th><th>Description</th>
+        <th class="right">Medicare</th><th class="right">Direct</th>
+        <th class="right">Headway</th><th class="right">Alma</th>
+        <th class="right">Grow Therapy</th><th class="center">Best Channel</th>
+        <th class="center" title="Date intermediary rates were last uploaded." style="width:86px;min-width:86px;max-width:86px;font-size:.68rem;letter-spacing:.5px;white-space:nowrap;">UPDATED</th>
+      </tr></thead>
+      <tbody id="channel-tbody">
+        <tr><td colspan="10" class="empty">No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap" style="padding:20px;margin-top:16px;max-height:none;overflow-y:visible;">
+    <div style="font-weight:600;font-size:.9rem;color:#1a2332;margin-bottom:4px;">📤 Update Rates from Google Sheet</div>
+    <div style="font-size:.78rem;color:#64748b;margin-bottom:14px;">Source of truth: <strong>MASTER Google Sheet</strong> — all four channels (Alma · Headway · Grow · SBH Direct) in one upload</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+      <div style="flex:1;min-width:280px;">
+        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)" onclick="document.getElementById('rate-file-input').click()" style="border-color:#c4b5fd;background:#faf9ff;">
+          <div style="font-size:1.4rem;margin-bottom:4px;">📂</div>
+          <strong style="font-size:.85rem;color:#2d1b69;">Click or drag to upload SLAVE Sheet CSV</strong>
+          <p style="color:#7c3aed;">Download the <em>intermediary_rates</em> tab from the SLAVE Google Sheet after running populate_slave_v9.gs</p>
+          <input type="file" id="rate-file-input" accept=".csv" onchange="uploadRatesCSV(this.files[0])">
+        </div>
+        <div id="upload-status" class="upload-status"></div>
+      </div>
+      <div style="flex:1;min-width:240px;background:#f8f5ff;border-radius:8px;padding:16px;font-size:.8rem;color:#475569;line-height:1.7;border:1px solid #ede9fe;">
+        <strong style="color:#2d1b69;font-size:.85rem;">Quarterly Update Steps:</strong><br><br>
+        1. Open <strong>SLAVE Google Sheet</strong><br>
+        2. Extensions → Apps Script → run <code>populate_slave_v8.gs</code><br>
+        3. Click <em>intermediary_rates</em> tab<br>
+        4. File → Download → <strong>CSV</strong><br>
+        5. Drag &amp; drop that file here<br><br>
+        <strong style="color:#059669;">All four channels update at once:</strong><br>
+        Alma · Headway · Grow · SBH Direct Submit<br>
+        Provider rates (JJ / KR / LK) stored separately
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CPT CODE EXPLORER                                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <div class="explorer-panel" id="cpt-explorer">
+    <div class="explorer-header" onclick="toggleExplorer()">
+      <div class="explorer-title-wrap">
+        <div class="explorer-icon">🔍</div>
+        <div>
+          <div class="explorer-title">CPT Code Explorer — Extended Behavioral Health Reference</div>
+          <div class="explorer-subtitle">131 codes · Search by symptom, condition, or keyword · Includes all standard + supplemental BH codes</div>
+        </div>
+      </div>
+      <div class="explorer-toggle open" id="explorer-toggle-icon">▾</div>
+    </div>
+    <div class="explorer-body open" id="explorer-body">
+
+      <!-- Core codes banner -->
+      <div class="core-codes-banner">
+        <strong>★ Your Primary Billing Codes</strong> — These are the codes actively tracked in the dashboard above.
+        <div class="core-codes-grid">
+          <div class="core-code-pill"><code>99214</code><span>Est. patient, moderate</span></div>
+          <div class="core-code-pill"><code>99215</code><span>Est. patient, high</span></div>
+          <div class="core-code-pill"><code>99204</code><span>New patient, moderate</span></div>
+          <div class="core-code-pill"><code>99205</code><span>New patient, high</span></div>
+          <div class="core-code-pill"><code>90833</code><span>Therapy add-on 30 min</span></div>
+          <div class="core-code-pill"><code>90836</code><span>Therapy add-on 45 min</span></div>
+          <div class="core-code-pill"><code>90838</code><span>Therapy add-on 60 min</span></div>
+          <div class="core-code-pill"><code>90875</code><span>Biofeedback 30 min</span></div>
+          <div class="core-code-pill"><code>98002</code><span>UHC equiv. 99204</span></div>
+          <div class="core-code-pill"><code>98003</code><span>UHC equiv. 99205</span></div>
+          <div class="core-code-pill"><code>98006</code><span>UHC equiv. 99214</span></div>
+          <div class="core-code-pill"><code>98007</code><span>UHC equiv. 99215</span></div>
+        </div>
+      </div>
+
+      <!-- Search + filters -->
+      <div class="explorer-search-row">
+        <div class="explorer-search-wrap">
+          <span class="explorer-search-icon">🔍</span>
+          <input type="text" id="expl-search" placeholder="Search by keyword, symptom, or condition — e.g. "marijuana", "smoking", "eating disorder"..." oninput="explorerFilter()">
+        </div>
+        <div class="explorer-filters">
+          <select id="expl-cat-filter" onchange="explorerFilter()">
+            <option value="">All categories</option>
+          </select>
+          <select id="expl-tag-filter" onchange="explorerFilter()">
+            <option value="">All types</option>
+            <option value="core-bh">Core BH Billable</option>
+            <option value="add-on">Add-on Codes</option>
+            <option value="assessment">Assessment / Testing</option>
+            <option value="em">E/M Codes</option>
+            <option value="coordination">Care Coordination</option>
+            <option value="payer-specific">Payer-Specific</option>
+            <option value="ancillary">Ancillary</option>
+          </select>
+          <button class="btn btn-sm" style="background:#7c3aed;" onclick="clearExplorer()">Clear</button>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="explorer-stats">
+        <div class="expl-stat"><span id="expl-stat-showing">131</span> showing</div>
+        <div class="expl-stat"><span id="expl-stat-bh">47</span> core BH billable</div>
+        <div class="expl-stat"><span id="expl-stat-total">131</span> total codes</div>
+      </div>
+
+      <!-- Legend -->
+      <div class="explorer-legend">
+        <span class="expl-tag etag-core">Core BH</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">Direct BH billing</span>
+        <span class="expl-tag etag-addon">Add-on</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">Paired with primary</span>
+        <span class="expl-tag etag-assess">Assessment</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">Testing & screening</span>
+        <span class="expl-tag etag-em">E/M</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">Evaluation & management</span>
+        <span class="expl-tag etag-coord">Coordination</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">Care management</span>
+        <span class="expl-tag etag-payer">Payer-Specific</span><span style="font-size:.72rem;color:#64748b;margin-right:6px;">UHC/Optum variants</span>
+        <span class="expl-tag etag-ancil">Ancillary</span><span style="font-size:.72rem;color:#64748b;">Supporting services</span>
+      </div>
+
+      <!-- Category quick-filter tabs -->
+      <div class="explorer-cat-tabs" id="expl-cat-tabs"></div>
+
+      <!-- Results -->
+      <div class="explorer-results" id="expl-results"></div>
+
+      <!-- Payer contract rates section -->
+      <div class="payer-rates-section">
+        <div class="payer-rates-title" style="margin-bottom:14px;">
+          💵 Comprehensive Contract Rate Reference — All CPT Codes by Payer
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn btn-sm" style="background:#7c3aed;font-size:.72rem;" onclick="downloadCompRateTemplate()">⬇ Rate Template CSV</button>
+            <button class="btn btn-sm" style="background:#059669;font-size:.72rem;" onclick="clearCompRates()" title="Clear all uploaded comprehensive rates">✕ Clear Rates</button>
+          </div>
+        </div>
+
+        <!-- Upload zone -->
+        <div class="comp-rate-upload" id="comp-rate-upload-zone"
+          ondragover="compDragOver(event)" ondragleave="compDragLeave(event)" ondrop="compDrop(event)"
+          onclick="document.getElementById('comp-rate-file-input').click()">
+          <div style="font-size:1.2rem;margin-bottom:4px;">📂</div>
+          <strong style="font-size:.83rem;color:#2d1b69;">Click or drag to upload Comprehensive Rate CSV</strong>
+          <p style="font-size:.75rem;color:#7c3aed;margin-top:4px;">
+            Columns: <code>payer</code> · <code>cpt_code</code> · <code>allowed_amount</code> · <code>effective_date</code> (optional)<br>
+            One row per payer + CPT code combination. Download the template above to get started.
+          </p>
+          <input type="file" id="comp-rate-file-input" accept=".csv" onchange="uploadCompRates(this.files[0])">
+        </div>
+        <div id="comp-rate-upload-status" class="comp-rate-upload-status"></div>
+
+        <!-- Summary stats -->
+        <div class="comp-rate-summary" id="comp-rate-summary" style="display:none;"></div>
+
+        <!-- Payer tabs + search -->
+        <div class="comp-rate-toolbar">
+          <div class="comp-rate-payer-tabs" id="comp-rate-payer-tabs"></div>
+          <input type="text" id="comp-rate-search" placeholder="🔍 Filter codes…"
+            style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:7px;font-size:.78rem;width:160px;outline:none;"
+            oninput="renderCompRateTable()">
+        </div>
+
+        <!-- Rate table -->
+        <div class="comp-rate-table-wrap" id="comp-rate-table-wrap">
+          <div class="comp-rate-empty">
+            No comprehensive rates loaded yet.<br>
+            <span style="font-size:.78rem;">Download the template above, fill in your contracted rates, and upload.</span>
+          </div>
+        </div>
+        <div style="font-size:.7rem;color:#94a3b8;margin-top:8px;">
+          ★ Highlighted rows are codes also tracked in the main dashboard · Rates stored locally in your browser
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</main>
+<footer>Insurance CPT Negotiation App · Solrei Behavioral Health, Inc. · <span class="medicare-state-label">Medicare 2026 FL</span> · Target: 130% of Medicare</footer>
+
+<script>
+const API='/api';
+let summaryData=[];
+let dashboardData=[];
+const CANONICAL_PAYERS=['Aetna','Ambetter','BCBS - Florida','Cigna','Optum/UHC/Oscar','Wellmark Iowa'];
+const _ALIAS_KEYS=[
+  ['florida blue','BCBS - Florida'],['florida bcbs','BCBS - Florida'],
+  ['aetna','Aetna'],['ambetter','Ambetter'],
+  ['bcbs','BCBS - Florida'],['blue cross','BCBS - Florida'],
+  ['cigna','Cigna'],
+  ['optum','Optum/UHC/Oscar'],['uhc','Optum/UHC/Oscar'],['oscar','Optum/UHC/Oscar'],['united','Optum/UHC/Oscar'],['wellmark','Wellmark Iowa'],['iowa','Wellmark Iowa'],
+];
+function canonicalizePayer(name){
+  if(!name)return name;
+  const lower=(name||'').toLowerCase().trim();
+  for(const[key,canonical]of _ALIAS_KEYS){if(lower.includes(key))return canonical;}
+  return name.trim();
+}
+function payerSortIdx(name){const idx=CANONICAL_PAYERS.indexOf(name);return idx===-1?999:idx;}
+const PAYER_PALETTE={
+  'aetna':{accent:'#B01C2E',rowA:'#fdf5f6',rowB:'#f9eaec'},
+  'ambetter':{accent:'#007B87',rowA:'#f0fafb',rowB:'#e2f4f6'},
+  'bcbs':{accent:'#00338D',rowA:'#f0f4fb',rowB:'#e2ebf9'},
+  'cigna':{accent:'#006B8F',rowA:'#f0f7fa',rowB:'#e0eef5'},
+  'optum':{accent:'#002677',rowA:'#f0f3fb',rowB:'#dce4f6'},
+  'wellmark':{accent:'#005587',rowA:'#f0f6fb',rowB:'#deeaf5'},
+};
+const DEFAULT_PALETTE={accent:'#334155',rowA:'#f8fafc',rowB:'#f1f5f9'};
+function getPayerPalette(payerName){
+  if(!payerName)return DEFAULT_PALETTE;
+  const lower=payerName.toLowerCase();
+  for(const[key,pal]of Object.entries(PAYER_PALETTE)){if(lower.includes(key))return pal;}
+  return DEFAULT_PALETTE;
+}
+const JODENE_NPI='1093433955';
+const DISPLAY_CPTS=['99214','99215','90833','90836','90838','90875','99204','99205','98002','98003','98006','98007'];
+const CPT_ORDER=Object.fromEntries(DISPLAY_CPTS.map((c,i)=>[c,i]));
+const fmt$=v=>v==null?'—':'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtK=v=>v==null?'—':'$'+(Number(v)/1000).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+'K';
+const fmtPct=v=>v==null?'—':Number(v).toFixed(1)+'%';
+const fmtN=v=>v==null?'—':Number(v).toLocaleString('en-US');
+function pctColor(pct,target){if(pct==null)return'#94a3b8';const r=pct/(target||130);if(r>=1)return'#16a34a';if(r>=.90)return'#b45309';return'#dc2626';}
+function pctBadge(pct,target){if(pct==null)return`<span class="badge badge-gray">—</span>`;const r=pct/(target||130);const cls=r>=1?'badge-green':r>=.90?'badge-yellow':'badge-red';return`<span class="badge ${cls}">${fmtPct(pct)}</span>`;}
+function statusBadge(isUnderpaid){if(isUnderpaid===true)return`<span class="badge badge-red">↓ Underpaid</span>`;if(isUnderpaid===false)return`<span class="badge badge-green">✓ On Target</span>`;return`<span class="badge badge-gray">No Data</span>`;}
+async function handleRefresh(btn){btn.disabled=true;btn.textContent='↻ Refreshing…';await loadAll();btn.textContent='✓ Done';setTimeout(()=>{btn.textContent='↻ Refresh';btn.disabled=false;},1200);}
+let selectedState='FL';
+function onStateChange(){const sel=document.getElementById('state-selector');selectedState=sel.value;document.querySelectorAll('.medicare-state-label').forEach(el=>{el.textContent=`Medicare 2026 ${selectedState}`;});loadAll();}
+async function fetchJSON(path){const sep=path.includes('?')?'&':'?';const r=await fetch(`${API}/${path}${sep}state=${selectedState}`);if(!r.ok)throw new Error(`${r.status} ${r.statusText}`);return r.json();}
+async function loadAll(){setStatus('loading');document.getElementById('error-container').innerHTML='';try{const[summary,dashboard]=await Promise.all([fetchJSON('dashboard/summary'),fetchJSON('dashboard')]);summaryData=summary;dashboardData=dashboard;renderCards();renderPayerTable();renderFullTable();setStatus('ok');}catch(e){setStatus('error');document.getElementById('error-container').innerHTML=`<div class="error-msg">⚠️ Could not connect to API. Make sure uvicorn is running: <code>uvicorn backend.main:app --reload</code><br><small>${e.message}</small></div>`;}await loadChannelComparison();syncPayerRateCards();}
+function setStatus(state){const el=document.getElementById('status-badge');el.className='status-badge';if(state==='ok'){el.textContent='● Live';el.className='ok';}else if(state==='error'){el.textContent='● Offline';el.className='error';}else{el.textContent='○ Loading…';el.className='';}el.id='status-badge';}
+function renderCards(){const jData=dashboardData.filter(r=>r.npi_number===JODENE_NPI&&DISPLAY_CPTS.includes(r.cpt_code));const totalGap=summaryData.reduce((s,r)=>s+(parseFloat(r.total_revenue_gap)||0),0);const totalTarget=summaryData.reduce((s,r)=>s+(parseFloat(r.total_revenue_at_target)||0),0);const totalUnderpaid=jData.filter(r=>r.is_underpaid===true).length;const totalCodes=new Set(jData.map(r=>r.cpt_code)).size;document.getElementById('c-payers').textContent=summaryData.length;document.getElementById('c-codes').textContent=totalCodes;document.getElementById('c-underpaid').textContent=totalUnderpaid;document.getElementById('c-gap').textContent=fmtK(totalGap);document.getElementById('c-target').textContent=fmtK(totalTarget);}
+function renderPayerTable(){const tbody=document.getElementById('payer-tbody');const payerMap=new Map();summaryData.forEach(row=>{const canonical=canonicalizePayer(row.payer_name);if(!payerMap.has(canonical))payerMap.set(canonical,{...row,payer_name:canonical});});tbody.innerHTML=CANONICAL_PAYERS.map(canonical=>{const row=payerMap.get(canonical);if(!row){return`<tr class="payer-row" style="opacity:.4;pointer-events:none;"><td><span class="expand-icon" style="color:#cbd5e1">▶</span></td><td><span class="payer-name" style="color:#94a3b8">${canonical}</span></td><td class="right" colspan="6" style="color:#cbd5e1;font-size:.78rem;font-style:italic;">No contract data loaded</td><td class="center"></td></tr>`;}const gap=row.total_revenue_gap;const gapFmt=gap?`<strong style="color:#dc2626">${fmtK(gap)}</strong>`:'—';return`<tr class="payer-row" onclick="toggleDrilldown(${row.payer_id},this)" data-payer="${row.payer_id}"><td><span class="expand-icon">▶</span></td><td><span class="payer-name">${canonical}</span></td><td class="right">${row.codes_with_rates??'—'}</td><td class="right">${row.codes_underpaid>0?`<span class="badge badge-red">${row.codes_underpaid}</span>`:`<span class="badge badge-green">0</span>`}</td><td class="right"><div class="pct-bar-wrap"><div class="pct-bar-bg"><div class="pct-bar-fill" style="width:${Math.min(100,(row.avg_pct_of_medicare||0)/1.6)}%;background:${pctColor(row.avg_pct_of_medicare,130)}"></div></div>${pctBadge(row.avg_pct_of_medicare,130)}</div></td><td class="right">${fmtK(row.total_revenue_current)}</td><td class="right">${fmtK(row.total_revenue_at_target)}</td><td class="right">${gapFmt}</td><td class="center" onclick="event.stopPropagation()"><button class="btn btn-sm" onclick="openLetterModal(${row.payer_id},'${canonical}')" style="background:#7c3aed;">✉ Letter</button><button class="btn btn-sm" onclick="exportCSV(${row.payer_id})" style="margin-top:4px;background:#0891b2;">⬇ CSV</button></td></tr><tr class="drilldown-row" id="drilldown-${row.payer_id}" style="display:none;"><td colspan="8"><div class="drilldown-inner" id="drilldown-inner-${row.payer_id}"><div class="loading">Loading…</div></div></td></tr>`;}).join('');}
+const openDrilldowns=new Set();
+async function toggleDrilldown(payerId,rowEl){const drillRow=document.getElementById(`drilldown-${payerId}`);const innerDiv=document.getElementById(`drilldown-inner-${payerId}`);const isOpen=openDrilldowns.has(payerId);rowEl.classList.toggle('expanded',!isOpen);if(isOpen){drillRow.style.display='none';openDrilldowns.delete(payerId);return;}drillRow.style.display='table-row';openDrilldowns.add(payerId);innerDiv.innerHTML='<div class="loading">Loading underpaid codes…</div>';try{const data=await fetchJSON(`dashboard/underpaid/${payerId}`);const seen12=new Map();(data.underpaid_codes||[]).forEach(c=>{if(!DISPLAY_CPTS.includes(c.cpt_code))return;if(!seen12.has(c.cpt_code))seen12.set(c.cpt_code,c);});const codes=DISPLAY_CPTS.filter(c=>seen12.has(c)).map(c=>seen12.get(c));if(!codes.length){innerDiv.innerHTML=`<div class="empty">✓ No underpaid codes found for ${data.payer_name}.</div>`;return;}innerDiv.innerHTML=`<div class="drilldown-title">${data.payer_name} — ${codes.length} Underpaid Code${codes.length!==1?'s':''}</div><table><thead><tr><th>Code</th><th>Description</th><th class="right">Payer Rate</th><th class="right">Medicare</th><th class="right">% of Med</th><th class="right">Target (130%)</th><th class="right">Gap/Unit</th><th class="right">Volume</th><th class="right">Annual Gap $</th></tr></thead><tbody>${codes.map(c=>`<tr><td><strong>${c.cpt_code}</strong></td><td style="max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.short_description}</td><td class="right">${fmt$(c.payer_allowed)}</td><td class="right">${fmt$(c.medicare_allowed)}</td><td class="right">${pctBadge(c.pct_of_medicare,130)}</td><td class="right">${fmt$(c.target_allowed)}</td><td class="right" style="color:#dc2626;font-weight:600">${fmt$(c.rate_gap_per_unit)}</td><td class="right">${c.annual_volume!=null?fmtN(c.annual_volume):'<span style="color:#94a3b8">—</span>'}</td><td class="right" style="font-weight:700;color:#dc2626">${c.annual_revenue_gap!=null?fmtK(c.annual_revenue_gap):'<span style="color:#94a3b8">—</span>'}</td></tr>`).join('')}</tbody></table>`;}catch(e){innerDiv.innerHTML=`<div class="error-msg">Error loading data: ${e.message}</div>`;}}
+function renderFullTable(){const showAll=document.getElementById('show-all').checked;const tbody=document.getElementById('full-tbody');const seen=new Map();dashboardData.filter(r=>DISPLAY_CPTS.includes(r.cpt_code)).forEach(r=>{const canonical=canonicalizePayer(r.payer_name);const key=`${canonical}|${r.cpt_code}`;if(!seen.has(key)){seen.set(key,{...r,payer_name:canonical});}else{const ex=seen.get(key);if(r.npi_number===JODENE_NPI&&ex.npi_number!==JODENE_NPI)seen.set(key,{...r,payer_name:canonical});}});let rows=[...seen.values()];if(!showAll)rows=rows.filter(r=>r.is_underpaid===true);rows.sort((a,b)=>{const pa=payerSortIdx(a.payer_name),pb=payerSortIdx(b.payer_name);if(pa!==pb)return pa-pb;return(CPT_ORDER[a.cpt_code]??99)-(CPT_ORDER[b.cpt_code]??99);});if(!rows.length){tbody.innerHTML=`<tr><td colspan="11" class="empty">${showAll?'No rate data loaded yet.':'No underpaid codes found. Check Show all codes.'}</td></tr>`;return;}let _ftPayer=null,_ftIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ftPayer){_ftPayer=r.payer_name;_ftIdx=0;}const bg=_ftIdx++%2===0?pal.rowA:pal.rowB;return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td>${r.payer_name}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.8rem">${r.short_description}</td><td class="right">${fmt$(r.payer_allowed)}</td><td class="right">${fmt$(r.medicare_allowed)}</td><td class="right">${pctBadge(r.pct_of_medicare,r.target_pct_of_medicare)}</td><td class="right" style="color:#475569;font-size:.8rem">${fmt$(r.target_allowed)}</td><td class="right" style="color:${r.rate_gap_per_unit>0?'#dc2626':'#16a34a'};font-weight:600">${fmt$(r.rate_gap_per_unit)}</td><td class="right">${r.annual_volume!=null?fmtN(r.annual_volume):'<span style="color:#94a3b8">—</span>'}</td><td class="right" style="font-weight:700;color:${r.annual_revenue_gap>0?'#dc2626':'#16a34a'}">${r.annual_revenue_gap!=null?fmtK(r.annual_revenue_gap):'—'}</td><td class="center">${statusBadge(r.is_underpaid)}</td></tr>`;}).join('');}
+async function openLetterModal(payerId,payerName){const modal=document.getElementById('letter-modal');const body=document.getElementById('letter-modal-body');document.getElementById('letter-modal-title').textContent=`Negotiation Letter — ${payerName}`;document.getElementById('letter-modal-subtitle').textContent='Generating from live dashboard data…';body.innerHTML='<div class="loading">Generating letter…</div>';modal.style.display='block';try{const data=await fetchJSON(`letters/preview/${payerId}`);document.getElementById('letter-modal-subtitle').textContent=`${data.underpaid_codes} underpaid codes · Est. gap: ${fmtK(data.total_gap_estimate)}`;document.getElementById('letter-download-btn').onclick=()=>window.open(`/api/letters/download/${payerId}`,'_blank');body.innerHTML=`<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px;font-size:.8rem;color:#475569;"><strong>Ready to send?</strong> Review below, copy to Word or email, then hit <strong>⬇ Download .txt</strong>.</div><pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:.82rem;line-height:1.7;background:white;border:1px solid #e2e8f0;border-radius:8px;padding:24px;max-height:60vh;overflow-y:auto;">${escapeHtml(data.letter)}</pre>`;}catch(e){body.innerHTML=`<div class="error-msg">Could not generate letter: ${e.message}</div>`;}}
+function closeLetterModal(){document.getElementById('letter-modal').style.display='none';}
+document.getElementById('letter-modal').addEventListener('click',function(e){if(e.target===this)closeLetterModal();});
+function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function exportCSV(payerId=null){const url=payerId?`/api/dashboard/export?payer_id=${payerId}&underpaid_only=false&state=${selectedState}`:`/api/dashboard/export?state=${selectedState}`;window.open(url,'_blank');}
+let channelData=[];let channelPayerFilter=null;let channelProviderFilter=null;
+function setProviderFilter(provider, btn) {
+  channelProviderFilter = provider;
+  document.querySelectorAll('#provider-tabs .tab-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+  });
+  btn.classList.add('active');
+  loadChannelComparison();
+}
+
+async function loadChannelComparison(){try{const providerParam = channelProviderFilter ? '&provider=' + channelProviderFilter : '';
+      const raw = await fetchJSON('channel-comparison' + (providerParam ? '?' + providerParam.slice(1) : ''));const seen=new Map();raw.forEach(row=>{if(!DISPLAY_CPTS.includes(row.cpt_code))return;const canonical=canonicalizePayer((row.payer_name||'').trim());const key=`${canonical.toLowerCase()}|${row.cpt_code}`;if(!seen.has(key)){seen.set(key,Object.assign({},row,{payer_name:canonical}));}else{const ex=seen.get(key);if((row.headway_rate||0)>(ex.headway_rate||0)){ex.headway_rate=row.headway_rate;ex.headway_updated_at=row.headway_updated_at;}if((row.alma_rate||0)>(ex.alma_rate||0)){ex.alma_rate=row.alma_rate;ex.alma_updated_at=row.alma_updated_at;}if((row.grow_rate||0)>(ex.grow_rate||0)){ex.grow_rate=row.grow_rate;ex.grow_updated_at=row.grow_updated_at;}if((row.direct_rate||0)>(ex.direct_rate||0))ex.direct_rate=row.direct_rate;}});channelData=[...seen.values()].sort((a,b)=>{const pa=payerSortIdx(a.payer_name),pb=payerSortIdx(b.payer_name);if(pa!==pb)return pa-pb;return(CPT_ORDER[a.cpt_code]??99)-(CPT_ORDER[b.cpt_code]??99);});buildChannelPayerTabs();renderChannelTable();}catch(e){if(!e.message.includes('404'))console.warn('Channel comparison:',e.message);}}
+function buildChannelPayerTabs(){const tabBar=document.getElementById('channel-payer-tabs');const allActive=channelPayerFilter===null;tabBar.innerHTML=`<button class="tab-btn ${allActive?'active':''}" onclick="filterChannelTable(null,this)">All Payers</button>`+CANONICAL_PAYERS.map(canonical=>{const pal=getPayerPalette(canonical);const isActive=channelPayerFilter===canonical;const inlineStyle=isActive?`background:${pal.accent};color:white;border-color:${pal.accent};`:'';return`<button class="tab-btn ${isActive?'active':''}" style="${inlineStyle}" data-accent="${pal.accent}" onclick="filterChannelTable('${canonical.replace(/'/g,"\'")}',this)">${canonical}</button>`;}).join('');}
+function filterChannelTable(payerName,btn){channelPayerFilter=payerName;document.querySelectorAll('#channel-payer-tabs .tab-btn').forEach(b=>{b.classList.remove('active');b.style.background='';b.style.color='';b.style.borderColor='';});btn.classList.add('active');if(payerName&&btn.dataset.accent){btn.style.background=btn.dataset.accent;btn.style.color='white';btn.style.borderColor=btn.dataset.accent;}renderChannelTable();}
+function renderChannelTable(){const tbody=document.getElementById('channel-tbody');const bestOnly=document.getElementById('channel-best-only').checked;let rows=channelData;if(channelPayerFilter!=null)rows=rows.filter(r=>r.payer_name===channelPayerFilter);if(bestOnly){rows=rows.filter(r=>{const intermediaryRates=[r.headway_rate,r.alma_rate,r.grow_rate].filter(v=>v!=null);if(!intermediaryRates.length)return false;const best=Math.max(...intermediaryRates);return r.direct_rate==null?true:best>r.direct_rate;});}if(!rows.length){tbody.innerHTML=`<tr><td colspan="10" class="empty">${channelData.length===0?'No intermediary rates loaded yet. Download the Rate Template CSV, fill in rates, and upload above.':'No rows match the current filter.'}</td></tr>`;return;}let _ctPayer=null,_ctIdx=0;tbody.innerHTML=rows.map(r=>{const pal=getPayerPalette(r.payer_name);if(r.payer_name!==_ctPayer){_ctPayer=r.payer_name;_ctIdx=0;}const bg=_ctIdx++%2===0?pal.rowA:pal.rowB;const direct=r.direct_rate,headway=r.headway_rate,alma=r.alma_rate,grow=r.grow_rate;const candidates=[direct,headway,alma,grow].filter(v=>v!=null);const best=candidates.length?Math.max(...candidates):null;function rateCell(val){if(val==null)return`<span style="color:#cbd5e1">—</span>`;const cls=(best!=null&&val===best&&candidates.filter(v=>v===best).length===1)?'rate-best':(val<best?'rate-lower':'');return`<span class="${cls}">${fmt$(val)}</span>`;}const updateDates=[r.headway_updated_at,r.alma_updated_at,r.grow_updated_at].filter(d=>d!=null).map(d=>new Date(d));let lastUpdatedCell;if(updateDates.length===0){lastUpdatedCell=`<span style="color:#cbd5e1;font-size:.75rem;">—</span>`;}else{const oldest=new Date(Math.min(...updateDates));const daysSince=Math.floor((Date.now()-oldest)/86400000);const label=oldest.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit'});lastUpdatedCell=daysSince>90?`<span title="${daysSince} days ago" style="color:#d97706;font-weight:600;">⚠ ${label}</span>`:`<span style="color:#64748b;">${label}</span>`;}const allChannels=[['Direct',direct],['Headway',headway],['Alma',alma],['Grow',grow]].filter(([,v])=>v!=null);let channelBadge;if(!allChannels.length){channelBadge=`<span class="channel-badge channel-na">No data</span>`;}else{const maxVal=Math.max(...allChannels.map(([,v])=>v));const winners=allChannels.filter(([,v])=>v===maxVal).map(([n])=>n);if(winners.length===1){const w=winners[0];const cls=w==='Direct'?'channel-direct':w==='Headway'?'channel-headway':w==='Alma'?'channel-alma':'channel-grow';channelBadge=`<span class="channel-badge ${cls}">${w}</span>`;}else{channelBadge=`<span class="channel-badge channel-tie">${winners.join(' / ')}</span>`;}}return`<tr style="background:${bg};border-left:3px solid ${pal.accent};"><td style="font-size:.8rem;">${r.payer_name||'—'}</td><td><strong>${r.cpt_code}</strong></td><td style="max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.78rem;color:#475569">${r.short_description||''}</td><td class="right" style="color:#64748b;font-size:.8rem">${fmt$(r.medicare_allowed)}</td><td class="right">${rateCell(direct)}</td><td class="right">${rateCell(headway)}</td><td class="right">${rateCell(alma)}</td><td class="right">${rateCell(grow)}</td><td class="center">${channelBadge}</td><td class="center">${lastUpdatedCell}</td></tr>`;}).join('');}
+function downloadChannelTemplate(){window.open('/api/intermediaries/template','_blank');}
+function exportChannelCSV(){const url=channelPayerFilter?`/api/channel-comparison/export?payer_id=${channelPayerFilter}&state=${selectedState}`:`/api/channel-comparison/export?state=${selectedState}`;window.open(url,'_blank');}
+function handleDragOver(e){e.preventDefault();document.getElementById('upload-zone').classList.add('drag-over');}
+function handleDragLeave(e){document.getElementById('upload-zone').classList.remove('drag-over');}
+function handleDrop(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('drag-over');const file=e.dataTransfer.files[0];if(file)uploadRatesCSV(file);}
+async function uploadRatesCSV(file){if(!file)return;const statusEl=document.getElementById('upload-status');statusEl.className='upload-status loading';statusEl.textContent=`⏳ Uploading ${file.name}…`;const state=selectedState||'FL';const url=`/api/intermediaries/import?state=${state}`;const formData=new FormData();formData.append('file',file);try{const r=await fetch(url,{method:'POST',body:formData});const result=await r.json();if(!r.ok)throw new Error(result.detail||'Upload failed');statusEl.className='upload-status success';statusEl.innerHTML=`✓ ${result.message}`+(result.errors&&result.errors.length?`<br><small style="color:#b45309">Warnings: ${result.errors.join('; ')}</small>`:'');await loadChannelComparison();document.getElementById('rate-file-input').value='';}catch(e){statusEl.className='upload-status error';statusEl.textContent=`✗ Upload failed: ${e.message}`;}}
+
+// ── CPT Code Explorer ─────────────────────────────────────────────
+
+const CPT_CODES = [{"code":"90785","cat":"Core Psych / Therapy","sub":"Interactive Complexity","tag":"add-on","short":"Interactive complexity add-on","desc":"Add when communication factors make the session more complex \u2014 e.g., guardians present, severe reactivity, or language barriers.","keywords":"complexity guardian communication barrier language interpreter"},{"code":"90791","cat":"Core Psych / Therapy","sub":"Psychiatric Evaluation","tag":"core-bh","short":"Psychiatric diagnostic eval (no medical services)","desc":"Comprehensive psychiatric assessment including history, mental status exam, diagnosis, and treatment planning. No prescribing or medical management.","keywords":"intake evaluation assessment diagnosis new patient psychiatric"},{"code":"90792","cat":"Core Psych / Therapy","sub":"Psychiatric Evaluation","tag":"core-bh","short":"Psychiatric diagnostic eval (with medical services)","desc":"Full psychiatric assessment including medical services such as prescribing, ordering labs, or medical decision-making. Used by psychiatrists, NPs, PAs.","keywords":"intake evaluation prescribing medication new patient psychiatrist NP PA"},{"code":"90832","cat":"Core Psych / Therapy","sub":"Psychotherapy","tag":"core-bh","short":"Individual psychotherapy, 30 min","desc":"Individual therapy session of approximately 30 minutes. Standalone \u2014 not combined with medication management at the same visit.","keywords":"therapy individual session 30 minutes counseling"},{"code":"90833","cat":"Core Psych / Therapy","sub":"Psychotherapy + E/M Add-on","tag":"add-on","short":"30-min psychotherapy add-on with E/M","desc":"Billed alongside an E/M code (e.g., 99214) when 30 minutes of therapy is provided during the same visit as medication management.","keywords":"therapy add-on medication management same visit 30 minutes"},{"code":"90834","cat":"Core Psych / Therapy","sub":"Psychotherapy","tag":"core-bh","short":"Individual psychotherapy, 45 min","desc":"Individual therapy session of approximately 45 minutes. Standalone code.","keywords":"therapy individual session 45 minutes counseling"},{"code":"90836","cat":"Core Psych / Therapy","sub":"Psychotherapy + E/M Add-on","tag":"add-on","short":"45-min psychotherapy add-on with E/M","desc":"Billed alongside an E/M code when approximately 45 minutes of therapy is provided with medication management at the same visit.","keywords":"therapy add-on medication management same visit 45 minutes"},{"code":"90837","cat":"Core Psych / Therapy","sub":"Psychotherapy","tag":"core-bh","short":"Individual psychotherapy, 60 min","desc":"Individual therapy session of approximately 60 minutes. The most common full-hour standalone therapy code.","keywords":"therapy individual session 60 minutes counseling one hour"},{"code":"90838","cat":"Core Psych / Therapy","sub":"Psychotherapy + E/M Add-on","tag":"add-on","short":"60-min psychotherapy add-on with E/M","desc":"Billed alongside an E/M code when approximately 60 minutes of therapy is provided with medication management at the same visit.","keywords":"therapy add-on medication management same visit 60 minutes one hour"},{"code":"90839","cat":"Core Psych / Therapy","sub":"Crisis Psychotherapy","tag":"core-bh","short":"Psychotherapy for crisis, first 60 min","desc":"Intensive therapy for a patient in a psychiatric crisis \u2014 life-threatening or highly complex situation. Covers the first 60 minutes.","keywords":"crisis suicidal emergency urgent psychiatric high acuity first 60"},{"code":"90840","cat":"Core Psych / Therapy","sub":"Crisis Psychotherapy","tag":"add-on","short":"Crisis psychotherapy, each additional 30 min","desc":"Add-on to 90839 for each additional 30-minute increment of crisis psychotherapy beyond the first 60 minutes.","keywords":"crisis additional time add-on emergency urgent"},{"code":"90846","cat":"Core Psych / Therapy","sub":"Family Therapy","tag":"core-bh","short":"Family psychotherapy without patient present","desc":"Therapy session with family members conducted without the identified patient. Useful for caregiver guidance, parent coaching, or family support.","keywords":"family therapy without patient caregiver parent spouse"},{"code":"90847","cat":"Core Psych / Therapy","sub":"Family Therapy","tag":"core-bh","short":"Family psychotherapy with patient present","desc":"Conjoint family therapy where the identified patient participates alongside family members.","keywords":"family therapy conjoint patient relational couples spouse parent"},{"code":"90849","cat":"Core Psych / Therapy","sub":"Group Therapy","tag":"core-bh","short":"Multiple-family group psychotherapy","desc":"Structured group session involving multiple families together in a therapeutic format led by a clinician.","keywords":"group multiple family psychotherapy structured"},{"code":"90853","cat":"Core Psych / Therapy","sub":"Group Therapy","tag":"core-bh","short":"Group psychotherapy","desc":"Group therapy session for multiple unrelated patients \u2014 e.g., DBT group, addiction recovery, depression support, marijuana cessation group.","keywords":"group therapy DBT addiction recovery depression support marijuana cannabis substance"},{"code":"90875","cat":"Core Psych / Therapy","sub":"Biofeedback","tag":"core-bh","short":"Psychophysiological therapy with biofeedback, 30 min","desc":"Uses biofeedback to treat psychosomatic conditions such as anxiety, chronic pain, or stress disorders. First 30 minutes.","keywords":"biofeedback anxiety pain stress psychosomatic 30 minutes"},{"code":"90876","cat":"Core Psych / Therapy","sub":"Biofeedback","tag":"core-bh","short":"Psychophysiological therapy with biofeedback, 45 min","desc":"Extended biofeedback-assisted therapy session of approximately 45 minutes for psychosomatic or stress-related conditions.","keywords":"biofeedback anxiety pain stress psychosomatic 45 minutes"},{"code":"90880","cat":"Core Psych / Therapy","sub":"Hypnotherapy","tag":"core-bh","short":"Hypnotherapy","desc":"Clinical hypnosis used as a therapeutic intervention for anxiety, pain management, habit disorders, smoking cessation, or other conditions.","keywords":"hypnotherapy hypnosis anxiety pain smoking habit disorder"},{"code":"90882","cat":"Core Psych / Therapy","sub":"Specialty","tag":"core-bh","short":"Environmental intervention for psychiatric treatment","desc":"Coordination with outside agencies, employers, schools, or institutions on behalf of a patient's psychiatric treatment.","keywords":"coordination agencies employer school institution environmental psychiatric"},{"code":"90887","cat":"Core Psych / Therapy","sub":"Specialty","tag":"core-bh","short":"Interpretation of psychiatric records to family/caregivers","desc":"Time spent explaining a patient's psychiatric condition, treatment plan, or records to family members or non-treating caregivers.","keywords":"family education records explanation caregiver interpretation"},{"code":"90901","cat":"Core Psych / Therapy","sub":"Biofeedback","tag":"core-bh","short":"Biofeedback training, any modality","desc":"Training patients to use biofeedback techniques to self-regulate physiological responses tied to stress, anxiety, or mental health conditions.","keywords":"biofeedback training self regulation anxiety stress"},{"code":"90867","cat":"Core Psych / Therapy","sub":"TMS","tag":"core-bh","short":"TMS treatment, initial delivery + motor threshold","desc":"First Transcranial Magnetic Stimulation session for treatment-resistant depression, including motor threshold determination.","keywords":"TMS transcranial magnetic stimulation depression treatment resistant"},{"code":"90868","cat":"Core Psych / Therapy","sub":"TMS","tag":"core-bh","short":"TMS treatment, subsequent delivery","desc":"Ongoing TMS session for treatment-resistant depression after the initial evaluation session.","keywords":"TMS transcranial magnetic stimulation depression subsequent ongoing"},{"code":"90869","cat":"Core Psych / Therapy","sub":"TMS","tag":"core-bh","short":"TMS re-determination of motor threshold","desc":"Used when a patient's TMS treatment course requires recalibration of the motor threshold.","keywords":"TMS transcranial magnetic stimulation motor threshold recalibration"},{"code":"90870","cat":"Core Psych / Therapy","sub":"ECT","tag":"core-bh","short":"Electroconvulsive therapy (ECT)","desc":"Medically administered procedure for severe depression, bipolar disorder, or psychosis involving brief electrical stimulation under anesthesia.","keywords":"ECT electroconvulsive therapy severe depression bipolar psychosis"},{"code":"96110","cat":"Screening / Assessments","sub":"Developmental","tag":"assessment","short":"Developmental screening","desc":"Standardized developmental screening using a validated instrument. Applicable when assessing children and adolescents in behavioral health.","keywords":"developmental screening pediatric child adolescent autism ADHD"},{"code":"96116","cat":"Screening / Assessments","sub":"Neurobehavioral","tag":"assessment","short":"Neurobehavioral status exam, first hour","desc":"Clinician-administered cognitive and behavioral assessment to evaluate brain function, mental status, and neurobehavioral functioning.","keywords":"neurobehavioral cognitive assessment brain function memory attention first hour"},{"code":"96121","cat":"Screening / Assessments","sub":"Neurobehavioral","tag":"add-on","short":"Neurobehavioral status exam, each additional hour","desc":"Add-on to 96116 for each additional hour of neurobehavioral evaluation beyond the first.","keywords":"neurobehavioral cognitive additional hour add-on"},{"code":"96127","cat":"Screening / Assessments","sub":"Behavioral Screening","tag":"assessment","short":"Brief emotional/behavioral assessment","desc":"Administration, scoring, and documentation of a brief behavioral or emotional screening tool such as PHQ-9, GAD-7, AUDIT, or CAGE. Billed per instrument used.","keywords":"PHQ9 GAD7 AUDIT CAGE depression anxiety screening brief instrument per screen"},{"code":"96156","cat":"Screening / Assessments","sub":"Health Behavior","tag":"assessment","short":"Health behavior assessment or re-assessment","desc":"Assessment of behavioral, emotional, psychological, and social factors that affect a physical health problem \u2014 e.g., obesity, diabetes adherence, chronic pain.","keywords":"health behavior assessment obesity adherence chronic pain lifestyle physical health"},{"code":"96160","cat":"Screening / Assessments","sub":"Risk Assessment","tag":"assessment","short":"Patient-focused health risk assessment","desc":"Administration of a standardized questionnaire to identify behavioral or lifestyle risk factors such as depression, anxiety, substance use, or obesity.","keywords":"risk assessment questionnaire depression anxiety substance obesity lifestyle"},{"code":"96161","cat":"Screening / Assessments","sub":"Risk Assessment","tag":"assessment","short":"Caregiver-focused health risk assessment","desc":"Same as 96160 but completed by a caregiver to identify risks affecting the patient. Useful in pediatric or elderly psychiatric care.","keywords":"caregiver risk assessment questionnaire pediatric elderly parent"},{"code":"96130","cat":"Neuropsychological / Psych Testing","sub":"Psychological Testing","tag":"assessment","short":"Psychological testing evaluation, first hour","desc":"Clinician-administered and interpreted psychological testing for diagnosis or treatment planning. Includes interpretation, integration of data, and report writing.","keywords":"psychological testing evaluation first hour diagnosis report"},{"code":"96131","cat":"Neuropsychological / Psych Testing","sub":"Psychological Testing","tag":"add-on","short":"Psychological testing evaluation, each additional hour","desc":"Add-on for each additional hour of psychological testing evaluation beyond the first.","keywords":"psychological testing additional hour add-on"},{"code":"96132","cat":"Neuropsychological / Psych Testing","sub":"Neuropsychological Testing","tag":"assessment","short":"Neuropsychological testing evaluation, first hour","desc":"Clinician-administered testing to assess memory, cognition, attention, executive function, and other brain-based functions. First hour.","keywords":"neuropsychological testing memory cognition attention executive function first hour"},{"code":"96133","cat":"Neuropsychological / Psych Testing","sub":"Neuropsychological Testing","tag":"add-on","short":"Neuropsychological testing evaluation, each additional hour","desc":"Add-on for each additional hour of neuropsychological testing evaluation.","keywords":"neuropsychological testing additional hour add-on"},{"code":"96136","cat":"Neuropsychological / Psych Testing","sub":"Test Administration","tag":"assessment","short":"Test administration/scoring by clinician, first 30 min","desc":"Psychological or neuropsychological test administration and scoring by a physician or psychologist. First 30 minutes.","keywords":"test administration scoring psychologist physician 30 minutes"},{"code":"96137","cat":"Neuropsychological / Psych Testing","sub":"Test Administration","tag":"add-on","short":"Test administration/scoring by clinician, each additional 30 min","desc":"Add-on for each additional 30-minute block of test administration and scoring.","keywords":"test administration scoring additional 30 minutes add-on"},{"code":"96138","cat":"Neuropsychological / Psych Testing","sub":"Test Administration","tag":"assessment","short":"Test administration by technician, first 30 min","desc":"Psychological testing administered by a trained technician under clinician supervision. First 30 minutes.","keywords":"test administration technician supervision 30 minutes"},{"code":"96139","cat":"Neuropsychological / Psych Testing","sub":"Test Administration","tag":"add-on","short":"Test administration by technician, each additional 30 min","desc":"Add-on for each additional 30-minute block of technician-administered testing.","keywords":"test administration technician additional 30 minutes add-on"},{"code":"96146","cat":"Neuropsychological / Psych Testing","sub":"Test Administration","tag":"assessment","short":"Psychological test via automated platform","desc":"Standardized psychological testing self-administered by the patient using a computer or automated device. Clinician reviews results.","keywords":"automated test platform computer self-administered psychological"},{"code":"96158","cat":"Health Behavior Intervention","sub":"Individual HBAI","tag":"core-bh","short":"Individual health behavior intervention, first 30 min","desc":"Targets behavioral factors affecting a diagnosed physical condition \u2014 obesity, diabetes, chronic pain, smoking. No DSM diagnosis required; condition-based billing.","keywords":"health behavior obesity diabetes smoking chronic pain intervention physical lifestyle 30"},{"code":"96159","cat":"Health Behavior Intervention","sub":"Individual HBAI","tag":"add-on","short":"Individual health behavior intervention, each additional 15 min","desc":"Add-on for each additional 15-minute increment of individual health behavior intervention.","keywords":"health behavior additional 15 minutes add-on"},{"code":"96164","cat":"Health Behavior Intervention","sub":"Group HBAI","tag":"core-bh","short":"Group health behavior intervention, first 30 min","desc":"Group-based intervention addressing behavioral factors affecting physical health \u2014 e.g., weight management group, smoking cessation group.","keywords":"group health behavior weight smoking obesity group intervention 30"},{"code":"96165","cat":"Health Behavior Intervention","sub":"Group HBAI","tag":"add-on","short":"Group health behavior intervention, each additional 15 min","desc":"Add-on for each additional 15 minutes of group health behavior intervention.","keywords":"group health behavior additional 15 minutes add-on"},{"code":"96167","cat":"Health Behavior Intervention","sub":"Family HBAI","tag":"core-bh","short":"Family health behavior intervention with patient, first 30 min","desc":"Family-based intervention with the patient present addressing behavioral factors affecting physical health. Useful for adherence and family support.","keywords":"family health behavior patient present adherence physical health 30"},{"code":"96168","cat":"Health Behavior Intervention","sub":"Family HBAI","tag":"add-on","short":"Family health behavior intervention with patient, each additional 15 min","desc":"Add-on for each additional 15 minutes of family health behavior intervention with patient present.","keywords":"family health behavior add-on additional 15 minutes"},{"code":"96170","cat":"Health Behavior Intervention","sub":"Family HBAI","tag":"core-bh","short":"Family health behavior intervention without patient, first 30 min","desc":"Family-based intervention without the patient present \u2014 caregiver coaching, family education about the patient's health condition.","keywords":"family health behavior without patient caregiver coaching education 30"},{"code":"96171","cat":"Health Behavior Intervention","sub":"Family HBAI","tag":"add-on","short":"Family health behavior intervention without patient, each additional 15 min","desc":"Add-on for each additional 15 minutes of family health behavior intervention without patient.","keywords":"family health behavior without patient additional 15 minutes add-on"},{"code":"99202","cat":"E/M and Telehealth","sub":"New Patient","tag":"em","short":"New patient E/M, low complexity ~15-29 min","desc":"Evaluation and management for a new patient, straightforward to low complexity. Select by time or medical decision-making.","keywords":"new patient office visit low complexity 15 29 minutes evaluation management"},{"code":"99203","cat":"E/M and Telehealth","sub":"New Patient","tag":"em","short":"New patient E/M, low complexity ~30-44 min","desc":"New patient evaluation and management, low complexity, typically 30-44 minutes.","keywords":"new patient office visit low complexity 30 44 minutes"},{"code":"99204","cat":"E/M and Telehealth","sub":"New Patient","tag":"em","short":"New patient E/M, moderate complexity ~45-59 min","desc":"New patient visit with moderate medical decision-making. Frequently used for psychiatric intakes paired with medication management.","keywords":"new patient office moderate complexity 45 59 minutes psychiatric intake medication"},{"code":"99205","cat":"E/M and Telehealth","sub":"New Patient","tag":"em","short":"New patient E/M, high complexity ~60-74 min","desc":"Comprehensive new patient visit with high complexity medical decision-making. For complex psychiatric presentations.","keywords":"new patient office high complexity 60 74 minutes psychiatric comprehensive"},{"code":"99211","cat":"E/M and Telehealth","sub":"Established Patient","tag":"em","short":"Established patient, minimal complexity","desc":"Very brief follow-up \u2014 often medication refills or simple check-ins. May not require physician presence.","keywords":"established patient minimal brief follow-up refill"},{"code":"99212","cat":"E/M and Telehealth","sub":"Established Patient","tag":"em","short":"Established patient, straightforward ~10-19 min","desc":"Short follow-up for a stable patient with minimal decision-making complexity.","keywords":"established patient follow-up straightforward 10 19 minutes stable"},{"code":"99213","cat":"E/M and Telehealth","sub":"Established Patient","tag":"em","short":"Established patient, low complexity ~20-29 min","desc":"Routine follow-up frequently used for medication management with established psychiatric patients.","keywords":"established patient low complexity 20 29 minutes medication management psychiatric"},{"code":"99214","cat":"E/M and Telehealth","sub":"Established Patient","tag":"em","short":"Established patient, moderate complexity ~30-39 min","desc":"The most commonly billed code by psychiatrists for medication management with clinical review.","keywords":"established patient moderate complexity 30 39 minutes medication management psychiatric"},{"code":"99215","cat":"E/M and Telehealth","sub":"Established Patient","tag":"em","short":"Established patient, high complexity ~40-54 min","desc":"Complex follow-up for patients with significant or worsening psychiatric conditions requiring high-level decision-making.","keywords":"established patient high complexity 40 54 minutes psychiatric worsening"},{"code":"99241","cat":"E/M and Telehealth","sub":"Consultations","tag":"em","short":"Office consultation, straightforward","desc":"Formal opinion requested by another provider, low complexity. Not covered by Medicare \u2014 verify payer policy.","keywords":"consultation opinion requested provider straightforward psychiatry"},{"code":"99242","cat":"E/M and Telehealth","sub":"Consultations","tag":"em","short":"Office consultation, low complexity","desc":"Formal consultation with limited medical decision-making. Confirm payer coverage \u2014 not billable to Medicare.","keywords":"consultation low complexity psychiatry opinion"},{"code":"99243","cat":"E/M and Telehealth","sub":"Consultations","tag":"em","short":"Office consultation, moderate complexity","desc":"Standard formal consultation \u2014 commonly used when a PCP requests a psychiatric second opinion.","keywords":"consultation moderate complexity psychiatry PCP referral opinion"},{"code":"99244","cat":"E/M and Telehealth","sub":"Consultations","tag":"em","short":"Office consultation, moderate-high complexity","desc":"Detailed psychiatric consultation involving complex clinical decision-making.","keywords":"consultation moderate high complexity psychiatry detailed"},{"code":"99245","cat":"E/M and Telehealth","sub":"Consultations","tag":"em","short":"Office consultation, high complexity","desc":"Comprehensive formal consultation for a highly complex case \u2014 the highest-level consultation code.","keywords":"consultation high complexity comprehensive psychiatry highest"},{"code":"99341","cat":"E/M and Telehealth","sub":"Home Visits","tag":"em","short":"Home visit, new patient, low complexity","desc":"In-home evaluation for a new patient with low complexity. For hybrid or home-based psychiatric care models.","keywords":"home visit new patient low complexity in-home"},{"code":"99350","cat":"E/M and Telehealth","sub":"Home Visits","tag":"em","short":"Home visit, established patient, high complexity","desc":"High-complexity in-home visit for an established patient unable to travel or requiring home-based behavioral health care.","keywords":"home visit established patient high complexity in-home"},{"code":"99417","cat":"E/M and Telehealth","sub":"Prolonged Services","tag":"add-on","short":"Prolonged outpatient E/M, each additional 15 min","desc":"Add-on to 99205 or 99215 when the visit exceeds the standard time threshold by 15 or more minutes.","keywords":"prolonged extended additional time 15 minutes add-on 99205 99215"},{"code":"99421","cat":"E/M and Telehealth","sub":"Digital E-Visits","tag":"em","short":"Online digital E/M, 5-10 min (established patient)","desc":"Patient-initiated digital assessment through a portal or secure messaging totaling 5-10 minutes over 7 days.","keywords":"digital online portal messaging telehealth 5 10 minutes established patient"},{"code":"99422","cat":"E/M and Telehealth","sub":"Digital E-Visits","tag":"em","short":"Online digital E/M, 11-20 min (established patient)","desc":"Patient-initiated digital evaluation and management totaling 11-20 minutes over 7 days.","keywords":"digital online portal telehealth 11 20 minutes established patient"},{"code":"99423","cat":"E/M and Telehealth","sub":"Digital E-Visits","tag":"em","short":"Online digital E/M, 21+ min (established patient)","desc":"Patient-initiated digital evaluation and management totaling 21 or more minutes over 7 days.","keywords":"digital online portal telehealth 21 minutes established patient"},{"code":"98970","cat":"E/M and Telehealth","sub":"Non-Physician Digital","tag":"em","short":"Non-physician online digital assessment, 5-10 min","desc":"Online digital assessment and management by a qualified non-physician (psychologist, LCSW) totaling 5-10 minutes. Payer rules vary.","keywords":"digital non-physician psychologist LCSW online 5 10 minutes"},{"code":"98971","cat":"E/M and Telehealth","sub":"Non-Physician Digital","tag":"em","short":"Non-physician online digital assessment, 11-20 min","desc":"Non-physician online digital assessment and management totaling 11-20 minutes.","keywords":"digital non-physician psychologist LCSW online 11 20 minutes"},{"code":"98972","cat":"E/M and Telehealth","sub":"Non-Physician Digital","tag":"em","short":"Non-physician online digital assessment, 21+ min","desc":"Non-physician online digital assessment and management totaling 21 or more minutes.","keywords":"digital non-physician psychologist LCSW online 21 minutes"},{"code":"99441","cat":"E/M and Telehealth","sub":"Telephone E/M","tag":"em","short":"Telephone E/M, 5-10 min","desc":"Audio-only telephone evaluation and management lasting 5-10 minutes. Payer coverage varies.","keywords":"telephone phone audio-only 5 10 minutes telehealth"},{"code":"99442","cat":"E/M and Telehealth","sub":"Telephone E/M","tag":"em","short":"Telephone E/M, 11-20 min","desc":"Audio-only telephone evaluation and management lasting 11-20 minutes.","keywords":"telephone phone audio-only 11 20 minutes telehealth"},{"code":"99443","cat":"E/M and Telehealth","sub":"Telephone E/M","tag":"em","short":"Telephone E/M, 21-30 min","desc":"Audio-only telephone evaluation and management lasting 21-30 minutes. Often used for psychiatric follow-ups when video is unavailable.","keywords":"telephone phone audio-only 21 30 minutes telehealth psychiatric"},{"code":"G2010","cat":"E/M and Telehealth","sub":"Virtual Check-In","tag":"em","short":"Remote review of patient-submitted image/video","desc":"Clinician remotely reviews a patient-submitted photo or video and provides follow-up communication. Asynchronous telehealth.","keywords":"remote review image video asynchronous telehealth virtual"},{"code":"G2012","cat":"E/M and Telehealth","sub":"Virtual Check-In","tag":"em","short":"Virtual check-in (brief communication, 5-10 min)","desc":"Brief technology-based check-in of 5-10 minutes to determine whether a full office visit is needed.","keywords":"virtual check-in brief 5 10 minutes portal phone telehealth"},{"code":"99401","cat":"Behavior / Lifestyle Counseling","sub":"Preventive Counseling","tag":"core-bh","short":"Preventive counseling, approx 15 min","desc":"Individual preventive counseling focused on risk reduction, lifestyle change, or health promotion for approximately 15 minutes.","keywords":"preventive counseling lifestyle risk reduction 15 minutes individual"},{"code":"99402","cat":"Behavior / Lifestyle Counseling","sub":"Preventive Counseling","tag":"core-bh","short":"Preventive counseling, approx 30 min","desc":"Individual preventive counseling focused on behavioral and lifestyle risk reduction for approximately 30 minutes.","keywords":"preventive counseling lifestyle risk reduction 30 minutes individual"},{"code":"99403","cat":"Behavior / Lifestyle Counseling","sub":"Preventive Counseling","tag":"core-bh","short":"Preventive counseling, approx 45 min","desc":"Individual preventive medicine counseling for approximately 45 minutes related to health risks and lifestyle change.","keywords":"preventive counseling lifestyle risk reduction 45 minutes individual"},{"code":"99404","cat":"Behavior / Lifestyle Counseling","sub":"Preventive Counseling","tag":"core-bh","short":"Preventive counseling, approx 60 min","desc":"Extended individual preventive counseling for approximately 60 minutes \u2014 weight management, smoking, substance use, lifestyle change.","keywords":"preventive counseling lifestyle weight smoking substance 60 minutes individual extended"},{"code":"99406","cat":"Behavior / Lifestyle Counseling","sub":"Tobacco Cessation","tag":"core-bh","short":"Tobacco/smoking cessation counseling, 3-10 min","desc":"Brief counseling for tobacco or smoking cessation lasting 3-10 minutes. Also applicable for vaping/e-cigarette counseling.","keywords":"tobacco smoking cessation nicotine quit brief 3 10 minutes counseling vaping"},{"code":"99407","cat":"Behavior / Lifestyle Counseling","sub":"Tobacco Cessation","tag":"core-bh","short":"Tobacco/smoking cessation counseling, more than 10 min","desc":"Intensive tobacco cessation counseling lasting more than 10 minutes. For nicotine dependence, vaping, or smokeless tobacco.","keywords":"tobacco smoking cessation nicotine quit intensive vaping smokeless 10 minutes counseling"},{"code":"99408","cat":"Behavior / Lifestyle Counseling","sub":"SBIRT / Substance","tag":"core-bh","short":"Alcohol/substance screening + brief intervention, 15-30 min","desc":"Structured SBIRT (Screening, Brief Intervention and Referral to Treatment) for alcohol or substance use disorders. 15-30 minutes. Applicable for marijuana, opioids, alcohol, stimulants.","keywords":"SBIRT alcohol substance marijuana cannabis drug screening brief intervention 15 30 minutes addiction opioid"},{"code":"99409","cat":"Behavior / Lifestyle Counseling","sub":"SBIRT / Substance","tag":"core-bh","short":"Alcohol/substance screening + brief intervention, more than 30 min","desc":"Extended SBIRT session for alcohol or substance use disorders lasting more than 30 minutes.","keywords":"SBIRT alcohol substance marijuana cannabis drug screening extended intervention 30 minutes addiction"},{"code":"99411","cat":"Behavior / Lifestyle Counseling","sub":"Group Preventive","tag":"core-bh","short":"Group preventive counseling, approx 30 min","desc":"Group preventive counseling of approximately 30 minutes \u2014 weight management, stress reduction, or smoking cessation groups.","keywords":"group preventive counseling weight smoking stress 30 minutes"},{"code":"99412","cat":"Behavior / Lifestyle Counseling","sub":"Group Preventive","tag":"core-bh","short":"Group preventive counseling, approx 60 min","desc":"Group preventive medicine counseling of approximately 60 minutes.","keywords":"group preventive counseling weight smoking stress 60 minutes"},{"code":"97802","cat":"Behavior / Lifestyle Counseling","sub":"Nutrition Therapy","tag":"core-bh","short":"Medical nutrition therapy, initial assessment (per 15 min)","desc":"Initial medical nutrition therapy assessment for eating disorders, obesity, or medically relevant dietary conditions. Per 15 minutes. Applicable in behavioral health settings.","keywords":"nutrition therapy diet eating disorder obesity weight initial assessment per 15 minutes"},{"code":"97803","cat":"Behavior / Lifestyle Counseling","sub":"Nutrition Therapy","tag":"core-bh","short":"Medical nutrition therapy, re-assessment (per 15 min)","desc":"Re-assessment and ongoing medical nutrition therapy intervention per 15 minutes.","keywords":"nutrition therapy diet eating disorder obesity weight re-assessment 15 minutes"},{"code":"97804","cat":"Behavior / Lifestyle Counseling","sub":"Nutrition Therapy","tag":"core-bh","short":"Medical nutrition therapy, group (per 30 min)","desc":"Group medical nutrition therapy session per 30 minutes. Applicable for eating disorder groups or weight management groups.","keywords":"group nutrition therapy diet eating disorder obesity weight 30 minutes"},{"code":"G0473","cat":"Behavior / Lifestyle Counseling","sub":"Obesity","tag":"core-bh","short":"Group behavioral counseling for obesity","desc":"Group behavioral counseling focused on obesity management including diet, exercise, and behavior change strategies. Medicare-oriented HCPCS code.","keywords":"obesity weight group behavioral counseling diet exercise Medicare"},{"code":"80305","cat":"Drug Testing","sub":"Presumptive Screening","tag":"ancillary","short":"Drug test, presumptive \u2014 direct optical observation","desc":"Point-of-care presumptive drug screen read visually. Used in substance use disorder monitoring and MAT programs.","keywords":"drug test screen urine substance marijuana cannabis alcohol opioid visual MAT"},{"code":"80306","cat":"Drug Testing","sub":"Presumptive Screening","tag":"ancillary","short":"Drug test, presumptive \u2014 instrument-assisted","desc":"Presumptive drug screen read by an automated device. More accurate than visual reading. Used in SUD treatment monitoring.","keywords":"drug test screen instrument automated substance marijuana cannabis alcohol opioid SUD"},{"code":"96372","cat":"Drug Testing","sub":"Injection Administration","tag":"ancillary","short":"Therapeutic injection, subcutaneous or intramuscular","desc":"Used when administering injectable psychiatric medications such as long-acting antipsychotics (Abilify Maintena, Invega Sustenna) or Vivitrol for addiction treatment.","keywords":"injection intramuscular antipsychotic Abilify Invega Vivitrol naltrexone addiction long-acting"},{"code":"99446","cat":"Interprofessional / Care Coordination","sub":"Interprofessional Consult","tag":"coordination","short":"Interprofessional consult, 5-10 min","desc":"Consultation provided to another treating provider \u2014 discussion and records review \u2014 without a direct patient visit. 5-10 minutes.","keywords":"interprofessional consult consultation PCP provider 5 10 minutes no patient"},{"code":"99447","cat":"Interprofessional / Care Coordination","sub":"Interprofessional Consult","tag":"coordination","short":"Interprofessional consult, 11-20 min","desc":"Interprofessional consultation and records review for another treating provider, 11-20 minutes.","keywords":"interprofessional consult consultation PCP provider 11 20 minutes no patient"},{"code":"99448","cat":"Interprofessional / Care Coordination","sub":"Interprofessional Consult","tag":"coordination","short":"Interprofessional consult, 21-30 min","desc":"Interprofessional consultation and records review, 21-30 minutes.","keywords":"interprofessional consult consultation PCP provider 21 30 minutes no patient"},{"code":"99449","cat":"Interprofessional / Care Coordination","sub":"Interprofessional Consult","tag":"coordination","short":"Interprofessional consult, 31+ min","desc":"Interprofessional consultation and records review for another treating provider, 31 or more minutes.","keywords":"interprofessional consult consultation PCP provider 31 minutes no patient extended"},{"code":"99451","cat":"Interprofessional / Care Coordination","sub":"Interprofessional Consult","tag":"coordination","short":"Interprofessional consult with written report (no verbal discussion)","desc":"Consultative review and written report provided to another provider without real-time verbal discussion.","keywords":"interprofessional consult written report no verbal discussion"},{"code":"99452","cat":"Interprofessional / Care Coordination","sub":"Requesting Provider","tag":"coordination","short":"Requesting provider prep/communication time","desc":"Time spent by the requesting provider preparing for or communicating with the consulting psychiatric provider.","keywords":"requesting provider preparation communication consulting psychiatry"},{"code":"G0546","cat":"Interprofessional / Care Coordination","sub":"CMS Behavioral Consult","tag":"coordination","short":"CMS behavioral health consult, 5-10 min","desc":"CMS-specific interprofessional behavioral health consultation for shorter discussion time. HCPCS \u2014 verify payer coverage.","keywords":"CMS behavioral consult 5 10 minutes HCPCS"},{"code":"G0547","cat":"Interprofessional / Care Coordination","sub":"CMS Behavioral Consult","tag":"coordination","short":"CMS behavioral health consult, 11-20 min","desc":"CMS-specific interprofessional behavioral health consultation for moderate discussion time.","keywords":"CMS behavioral consult 11 20 minutes HCPCS"},{"code":"G0548","cat":"Interprofessional / Care Coordination","sub":"CMS Behavioral Consult","tag":"coordination","short":"CMS behavioral health consult, 21-30 min","desc":"CMS-specific interprofessional behavioral health consultation, 21-30 minutes.","keywords":"CMS behavioral consult 21 30 minutes HCPCS"},{"code":"G0549","cat":"Interprofessional / Care Coordination","sub":"CMS Behavioral Consult","tag":"coordination","short":"CMS behavioral health consult, 31+ min","desc":"CMS-specific interprofessional behavioral health consultation for extensive discussion time.","keywords":"CMS behavioral consult 31 minutes extended HCPCS"},{"code":"G0550","cat":"Interprofessional / Care Coordination","sub":"CMS Behavioral Consult","tag":"coordination","short":"CMS behavioral health consult, written report only","desc":"CMS-specific consultation with written report and no real-time verbal discussion.","keywords":"CMS behavioral consult written report no verbal HCPCS"},{"code":"G0551","cat":"Interprofessional / Care Coordination","sub":"Records Review","tag":"coordination","short":"Extended records review / record referral service","desc":"Extended record review or referral-related records service in a behavioral health context. HCPCS \u2014 verify payer coverage.","keywords":"records review referral extended behavioral health HCPCS"},{"code":"99484","cat":"BH Integration / Care Mgmt","sub":"BHI","tag":"coordination","short":"General behavioral health integration, monthly (20+ min)","desc":"Monthly billing for at least 20 minutes of behavioral health integration work \u2014 care planning, monitoring, and coordination for patients with depression or anxiety in a primary care setting.","keywords":"behavioral health integration BHI monthly depression anxiety care management coordination 20 minutes"},{"code":"99492","cat":"BH Integration / Care Mgmt","sub":"Psychiatric CoCM","tag":"coordination","short":"Psychiatric CoCM, initial month (70+ min)","desc":"First month of Collaborative Care Model services including behavioral health care manager activities and psychiatric consultant input. At least 70 minutes.","keywords":"collaborative care CoCM psychiatric initial month 70 minutes care management"},{"code":"99493","cat":"BH Integration / Care Mgmt","sub":"Psychiatric CoCM","tag":"coordination","short":"Psychiatric CoCM, subsequent months (60+ min)","desc":"Ongoing monthly CoCM services \u2014 at least 60 minutes per month.","keywords":"collaborative care CoCM psychiatric subsequent monthly 60 minutes ongoing"},{"code":"99494","cat":"BH Integration / Care Mgmt","sub":"Psychiatric CoCM","tag":"add-on","short":"CoCM additional 30 min (add-on)","desc":"Add-on for each additional 30-minute block when collaborative care management time exceeds the base code threshold.","keywords":"CoCM collaborative care additional 30 minutes add-on"},{"code":"G0323","cat":"BH Integration / Care Mgmt","sub":"BHI by Psychologist/LCSW","tag":"coordination","short":"BHI by clinical psychologist or social worker","desc":"Monthly behavioral health integration services furnished directly by a clinical psychologist or licensed clinical social worker. HCPCS \u2014 payer-specific.","keywords":"BHI psychologist LCSW social worker monthly behavioral health integration HCPCS"},{"code":"99483","cat":"BH Integration / Care Mgmt","sub":"Cognitive Assessment","tag":"assessment","short":"Cognitive assessment and care plan","desc":"Detailed cognitive evaluation and care planning for dementia, memory problems, or age-related cognitive decline. Intersects with geriatric psychiatry.","keywords":"cognitive assessment dementia memory care plan geriatric psychiatry elderly"},{"code":"G2214","cat":"BH Integration / Care Mgmt","sub":"Psychiatric CoCM","tag":"coordination","short":"CoCM shorter-duration monthly service","desc":"Used when collaborative care time reaches a shorter threshold but not the full threshold of 99492/99493. HCPCS \u2014 payer-specific.","keywords":"CoCM collaborative care shorter monthly HCPCS"},{"code":"G0511","cat":"BH Integration / Care Mgmt","sub":"RHC/FQHC","tag":"coordination","short":"General care management in RHC/FQHC","desc":"General care management or collaborative care service in a rural health clinic (RHC) or federally qualified health center (FQHC).","keywords":"RHC FQHC rural health care management collaborative"},{"code":"G0512","cat":"BH Integration / Care Mgmt","sub":"RHC/FQHC","tag":"coordination","short":"Psychiatric CoCM in RHC/FQHC","desc":"Psychiatric collaborative care model service provided in a rural health clinic or federally qualified health center.","keywords":"RHC FQHC rural psychiatric CoCM collaborative care"},{"code":"G0444","cat":"Screening / Assessments","sub":"Depression Screening","tag":"assessment","short":"Annual depression screening (Medicare preventive)","desc":"Annual depression screening service, typically 15 minutes. Medicare preventive benefit. Screens for major depressive disorder.","keywords":"annual depression screening Medicare preventive PHQ 15 minutes"},{"code":"G0544","cat":"Safety / Crisis Follow-up","sub":"Post-Crisis","tag":"core-bh","short":"Post-crisis follow-up contacts","desc":"Structured follow-up contacts (often by phone) after a psychiatric emergency or crisis event \u2014 e.g., after ED discharge, inpatient discharge, or acute crisis episode.","keywords":"crisis follow-up ED discharge inpatient post-crisis phone contacts psychiatric emergency"},{"code":"G0560","cat":"Safety / Crisis Follow-up","sub":"Safety Planning","tag":"core-bh","short":"Suicide/overdose safety planning intervention","desc":"Safety planning intervention for a patient at risk of suicide or overdose. Billed in 20-minute increments when eligibility criteria are met.","keywords":"suicide safety plan overdose risk high-risk intervention 20 minutes suicidal"},{"code":"G0552","cat":"Digital Mental Health","sub":"App/Device","tag":"core-bh","short":"Digital mental health treatment, supply + onboarding","desc":"Supply of an FDA-cleared digital mental health treatment device or app and initial patient onboarding/education for the treatment course.","keywords":"digital mental health app device FDA onboarding supply treatment"},{"code":"G0553","cat":"Digital Mental Health","sub":"App/Device","tag":"core-bh","short":"Digital mental health treatment management, first 20 min/month","desc":"Monthly management of digital mental health treatment \u2014 review of usage and at least one interactive communication. First 20 minutes.","keywords":"digital mental health treatment management monthly 20 minutes app device review"},{"code":"G0554","cat":"Digital Mental Health","sub":"App/Device","tag":"add-on","short":"Digital mental health treatment management, additional 20 min","desc":"Add-on for each additional 20-minute increment of monthly digital mental health treatment management.","keywords":"digital mental health management additional 20 minutes add-on"},{"code":"H0001","cat":"Community / Medicaid BH","sub":"SUD Assessment","tag":"core-bh","short":"Alcohol and/or drug assessment","desc":"Comprehensive assessment focused on alcohol or drug use concerns. Common in Medicaid and community-based substance use programs.","keywords":"alcohol drug assessment substance use disorder Medicaid community marijuana cannabis"},{"code":"H0004","cat":"Community / Medicaid BH","sub":"Behavioral Counseling","tag":"core-bh","short":"Behavioral health counseling/therapy, per 15 min","desc":"Behavioral health counseling or therapy billed in 15-minute units. Highly payer- and state-specific \u2014 most common in Medicaid programs.","keywords":"behavioral health counseling therapy 15 minutes Medicaid per unit"},{"code":"H0005","cat":"Community / Medicaid BH","sub":"Group SUD Counseling","tag":"core-bh","short":"Alcohol/drug group counseling","desc":"Group counseling focused on alcohol or substance use. Common in SUD treatment programs and recovery groups.","keywords":"group alcohol drug substance counseling SUD recovery marijuana cannabis addiction"},{"code":"H0033","cat":"Community / Medicaid BH","sub":"Medication Administration","tag":"ancillary","short":"Oral medication administration, directly observed","desc":"Documents and bills for directly observed oral medication intake in substance use treatment (e.g., methadone, buprenorphine/Suboxone, naltrexone).","keywords":"medication administration directly observed methadone buprenorphine Suboxone naltrexone MAT opioid"},{"code":"H2011","cat":"Community / Medicaid BH","sub":"Crisis Services","tag":"core-bh","short":"Crisis intervention, per 15 min","desc":"Crisis intervention service billed in 15-minute increments. Common in Medicaid and community mental health settings.","keywords":"crisis intervention 15 minutes Medicaid community mental health emergency"},{"code":"H2014","cat":"Community / Medicaid BH","sub":"Skills Training","tag":"core-bh","short":"Skills training and development, per 15 min","desc":"Skills-building intervention for coping, social skills, daily living, or self-management. Per 15-minute unit. Common in community behavioral health.","keywords":"skills training coping social daily living self-management 15 minutes community"},{"code":"98002","cat":"Payer-Specific E/M","sub":"Optum/UHC Equivalent","tag":"payer-specific","short":"Optum/UHC telehealth equivalent of 99204","desc":"Used by some payers (Optum, UHC, Oscar, and affiliates) in place of 99204 for new patient telehealth moderate-complexity visits.","keywords":"Optum UHC Oscar telehealth equivalent 99204 new patient moderate"},{"code":"98003","cat":"Payer-Specific E/M","sub":"Optum/UHC Equivalent","tag":"payer-specific","short":"Optum/UHC telehealth equivalent of 99205","desc":"Used by some payers in place of 99205 for new patient telehealth high-complexity visits.","keywords":"Optum UHC Oscar telehealth equivalent 99205 new patient high complexity"},{"code":"98006","cat":"Payer-Specific E/M","sub":"Optum/UHC Equivalent","tag":"payer-specific","short":"Optum/UHC telehealth equivalent of 99214","desc":"Used by some payers in place of 99214 for established patient telehealth moderate-complexity visits.","keywords":"Optum UHC Oscar telehealth equivalent 99214 established patient moderate"},{"code":"98007","cat":"Payer-Specific E/M","sub":"Optum/UHC Equivalent","tag":"payer-specific","short":"Optum/UHC telehealth equivalent of 99215","desc":"Used by some payers in place of 99215 for established patient telehealth high-complexity visits.","keywords":"Optum UHC Oscar telehealth equivalent 99215 established patient high complexity"}];
+
+const TAG_META = {
+  'core-bh':   {cls:'etag-core',   label:'Core BH'},
+  'add-on':    {cls:'etag-addon',  label:'Add-on'},
+  'assessment':{cls:'etag-assess', label:'Assessment'},
+  'em':        {cls:'etag-em',     label:'E/M'},
+  'coordination':{cls:'etag-coord',label:'Coordination'},
+  'payer-specific':{cls:'etag-payer',label:'Payer-Specific'},
+  'ancillary': {cls:'etag-ancil',  label:'Ancillary'},
+};
+
+const PAYER_CONTRACT_COLORS = {
+  'Cigna':          {accent:'#006B8F',light:'#f0f7fa'},
+  'Aetna':          {accent:'#B01C2E',light:'#fdf5f6'},
+  'BCBS - Florida': {accent:'#00338D',light:'#f0f4fb'},
+  'Ambetter':       {accent:'#007B87',light:'#f0fafb'},
+  'Optum/UHC/Oscar':{accent:'#002677',light:'#f0f3fb'},
+  'Wellmark Iowa':    {accent:'#005587',light:'#f0f6fb'},
+};
+const CORE_DASHBOARD_CPTS = ['99214','99215','99204','99205','90833','90836','90838','90875','98002','98003','98006','98007'];
+
+let explorerOpen = true;
+function toggleExplorer() {
+  explorerOpen = !explorerOpen;
+  document.getElementById('explorer-body').classList.toggle('open', explorerOpen);
+  document.getElementById('explorer-toggle-icon').classList.toggle('open', explorerOpen);
+}
+
+function tagHtml(tag) {
+  const m = TAG_META[tag] || {cls:'etag-em',label:tag};
+  return `<span class="expl-tag ${m.cls}">${m.label}</span>`;
+}
+
+function highlightMatch(text, q) {
+  if (!q) return text;
+  const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')', 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function explorerFilter() {
+  const q = document.getElementById('expl-search').value.trim().toLowerCase();
+  const catF = document.getElementById('expl-cat-filter').value;
+  const tagF = document.getElementById('expl-tag-filter').value;
+  const results = document.getElementById('expl-results');
+
+  const filtered = CPT_CODES.filter(c => {
+    const searchable = (c.code + ' ' + c.short + ' ' + c.desc + ' ' + c.keywords + ' ' + c.cat + ' ' + c.sub).toLowerCase();
+    const matchQ = !q || searchable.includes(q);
+    const matchCat = !catF || c.cat === catF;
+    const matchTag = !tagF || c.tag === tagF;
+    return matchQ && matchCat && matchTag;
+  });
+
+  document.getElementById('expl-stat-showing').textContent = filtered.length;
+
+  // Update category tab counts
+  document.querySelectorAll('.expl-cat-btn').forEach(btn => {
+    const cat = btn.dataset.cat;
+    if (cat) {
+      const count = CPT_CODES.filter(c => c.cat === cat && (!q || (c.code+' '+c.short+' '+c.desc+' '+c.keywords).toLowerCase().includes(q)) && (!tagF || c.tag === tagF)).length;
+      const countEl = btn.querySelector('.expl-tab-count');
+      if (countEl) countEl.textContent = count;
+      btn.style.opacity = count === 0 ? '0.4' : '1';
+    }
+  });
+
+  if (!filtered.length) {
+    results.innerHTML = `<div class="expl-empty">No codes found for "${q}". Try a different keyword or clear the filters.</div>`;
+    return;
+  }
+
+  const cats = [...new Set(filtered.map(c => c.cat))];
+  results.innerHTML = cats.map(cat => {
+    const catCodes = filtered.filter(c => c.cat === cat);
+    const rows = catCodes.map(c => {
+      const isCore = CORE_DASHBOARD_CPTS.includes(c.code);
+      return `<div class="expl-row${isCore?' highlight':''}">
+        <div class="expl-code">${highlightMatch(c.code, q)}</div>
+        <div class="expl-desc-wrap">
+          <div class="expl-short">${highlightMatch(c.short, q)}</div>
+          <div class="expl-desc">${highlightMatch(c.desc, q)}</div>
+          <div class="expl-sub">${c.cat} · ${c.sub}</div>
+        </div>
+        <div class="expl-tag-cell">${tagHtml(c.tag)}${isCore?'<span style="font-size:.62rem;color:#166534;font-weight:600;margin-top:2px;">★ Dashboard</span>':''}</div>
+      </div>`;
+    }).join('');
+    return `<div class="expl-section-head"><span>${cat}</span><span class="expl-count">${catCodes.length}</span></div>${rows}`;
+  }).join('');
+}
+
+function clearExplorer() {
+  document.getElementById('expl-search').value = '';
+  document.getElementById('expl-cat-filter').value = '';
+  document.getElementById('expl-tag-filter').value = '';
+  document.querySelectorAll('.expl-cat-btn').forEach(b => b.classList.remove('active'));
+  explorerFilter();
+}
+
+function filterByCat(cat, btn) {
+  const catSel = document.getElementById('expl-cat-filter');
+  if (catSel.value === cat) {
+    catSel.value = '';
+    btn.classList.remove('active');
+  } else {
+    catSel.value = cat;
+    document.querySelectorAll('.expl-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  explorerFilter();
+}
+
+function initExplorer() {
+  // Populate category filter dropdown + quick-tab bar
+  const cats = [...new Set(CPT_CODES.map(c => c.cat))];
+  const catSel = document.getElementById('expl-cat-filter');
+  cats.forEach(cat => {
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat;
+    catSel.appendChild(o);
+  });
+
+  const tabBar = document.getElementById('expl-cat-tabs');
+  tabBar.innerHTML = cats.map(cat => {
+    const count = CPT_CODES.filter(c => c.cat === cat).length;
+    return `<button class="expl-cat-btn" data-cat="${cat}" onclick="filterByCat('${cat.replace(/'/g,"\'")}',this)">
+      ${cat} <span class="expl-tab-count" style="font-size:.65rem;opacity:.7;margin-left:3px;">${count}</span>
+    </button>`;
+  }).join('');
+
+  document.getElementById('expl-stat-total').textContent = CPT_CODES.length;
+  document.getElementById('expl-stat-bh').textContent = CPT_CODES.filter(c => c.tag === 'core-bh').length;
+  document.getElementById('expl-stat-showing').textContent = CPT_CODES.length;
+
+  loadCompRatesFromStorage();
+  explorerFilter();
+  buildPayerRateCards();
+  buildCompRatePayerTabs();
+  renderCompRateTable();
+  updateCompRateSummary();
+}
+
+// ── Comprehensive Rate Store (localStorage) ──────────────────────────
+// compRates: { [payer]: { [cpt_code]: { allowed_amount, effective_date } } }
+let compRates = {};
+const COMP_RATES_KEY = 'solrei_comp_rates_v1';
+
+function loadCompRatesFromStorage() {
+  try {
+    const raw = localStorage.getItem(COMP_RATES_KEY);
+    compRates = raw ? JSON.parse(raw) : {};
+  } catch(e) { compRates = {}; }
+}
+
+function saveCompRatesToStorage() {
+  try { localStorage.setItem(COMP_RATES_KEY, JSON.stringify(compRates)); } catch(e) {}
+}
+
+function clearCompRates() {
+  if (!confirm('Clear all comprehensive rate data? This cannot be undone.')) return;
+  compRates = {};
+  saveCompRatesToStorage();
+  renderCompRateTable();
+  buildCompRatePayerTabs();
+  document.getElementById('comp-rate-summary').style.display = 'none';
+  document.getElementById('comp-rate-upload-status').className = 'comp-rate-upload-status';
+}
+
+// ── CSV template download ─────────────────────────────────────────────
+function downloadCompRateTemplate() {
+  const header = 'payer,cpt_code,allowed_amount,effective_date\n';
+  const rows = CANONICAL_PAYERS.flatMap(payer =>
+    CPT_CODES.map(c => payer + ',' + c.code + ',,')
+  ).join('\n');
+  const blob = new Blob([header + rows], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'solrei_comprehensive_rates_template.csv';
+  a.click();
+}
+
+// ── CSV upload & parse ────────────────────────────────────────────────
+function compDragOver(e) { e.preventDefault(); document.getElementById('comp-rate-upload-zone').classList.add('drag-over'); }
+function compDragLeave(e) { document.getElementById('comp-rate-upload-zone').classList.remove('drag-over'); }
+function compDrop(e) {
+  e.preventDefault();
+  document.getElementById('comp-rate-upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) uploadCompRates(file);
+}
+
+function uploadCompRates(file) {
+  if (!file) return;
+  const statusEl = document.getElementById('comp-rate-upload-status');
+  statusEl.className = 'comp-rate-upload-status loading';
+  statusEl.textContent = '⏳ Parsing ' + file.name + '…';
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const lines = e.target.result.split(/\r?\n/).filter(l => l.trim());
+      if (!lines.length) throw new Error('File is empty');
+
+      // Parse header — flexible column order
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/[^a-z_]/g,''));
+      const col = (names) => { for (const n of names) { const i = headers.indexOf(n); if (i > -1) return i; } return -1; };
+      const iP = col(['payer','payer_name','insurance','carrier']);
+      const iC = col(['cpt_code','cpt','code']);
+      const iA = col(['allowed_amount','rate','amount','allowed','contracted_rate','fee']);
+      const iD = col(['effective_date','date','eff_date','effective']);
+
+      if (iP < 0 || iC < 0 || iA < 0) throw new Error('CSV must have columns: payer, cpt_code, allowed_amount');
+
+      let loaded = 0, skipped = 0;
+      const newRates = JSON.parse(JSON.stringify(compRates)); // clone
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(s => s.trim().replace(/^"|"$/g,''));
+        const payer = canonicalizePayer(cols[iP]);
+        const code = (cols[iC] || '').toUpperCase().trim();
+        const amount = parseFloat(cols[iA]);
+        const date = iD > -1 ? cols[iD] : '';
+
+        if (!payer || !code || isNaN(amount) || amount <= 0) { skipped++; continue; }
+
+        if (!newRates[payer]) newRates[payer] = {};
+        newRates[payer][code] = { allowed_amount: amount, effective_date: date };
+        loaded++;
+      }
+
+      compRates = newRates;
+      saveCompRatesToStorage();
+
+      statusEl.className = 'comp-rate-upload-status success';
+      statusEl.textContent = '✓ Loaded ' + loaded + ' rate' + (loaded !== 1 ? 's' : '') +
+        (skipped ? ' · ' + skipped + ' rows skipped (blank or invalid)' : '');
+
+      buildCompRatePayerTabs();
+      renderCompRateTable();
+      updateCompRateSummary();
+      document.getElementById('comp-rate-file-input').value = '';
+
+    } catch(err) {
+      statusEl.className = 'comp-rate-upload-status error';
+      statusEl.textContent = '✗ ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+}
+
+// ── Payer tabs ────────────────────────────────────────────────────────
+let compRateActivePayer = null;
+
+function buildCompRatePayerTabs() {
+  const bar = document.getElementById('comp-rate-payer-tabs');
+  const payersWithData = CANONICAL_PAYERS.filter(p => compRates[p] && Object.keys(compRates[p]).length > 0);
+  if (!payersWithData.length) { bar.innerHTML = ''; return; }
+
+  // Default to first payer with data
+  if (!compRateActivePayer || !compRates[compRateActivePayer]) {
+    compRateActivePayer = payersWithData[0];
+  }
+
+  bar.innerHTML = payersWithData.map(payer => {
+    const pal = PAYER_CONTRACT_COLORS[payer] || {accent:'#334155'};
+    const count = Object.keys(compRates[payer] || {}).length;
+    const isActive = payer === compRateActivePayer;
+    const style = isActive ? `background:${pal.accent};color:white;border-color:${pal.accent};` : '';
+    return `<button class="comp-rate-tab ${isActive ? 'active' : ''}" style="${style}"
+      data-accent="${pal.accent}"
+      onclick="switchCompRatePayer('${payer.replace(/'/g,"\'")}', this)">
+      ${payer} <span style="font-size:.65rem;opacity:.75;">(${count})</span>
+    </button>`;
+  }).join('');
+}
+
+function switchCompRatePayer(payer, btn) {
+  compRateActivePayer = payer;
+  document.querySelectorAll('.comp-rate-tab').forEach(b => {
+    b.classList.remove('active');
+    b.style.background = ''; b.style.color = ''; b.style.borderColor = '';
+  });
+  btn.classList.add('active');
+  if (btn.dataset.accent) {
+    btn.style.background = btn.dataset.accent;
+    btn.style.color = 'white';
+    btn.style.borderColor = btn.dataset.accent;
+  }
+  renderCompRateTable();
+}
+
+// ── Render rate table ─────────────────────────────────────────────────
+function renderCompRateTable() {
+  const wrap = document.getElementById('comp-rate-table-wrap');
+  const q = (document.getElementById('comp-rate-search').value || '').toLowerCase().trim();
+  const payer = compRateActivePayer;
+
+  const totalPayers = CANONICAL_PAYERS.filter(p => compRates[p] && Object.keys(compRates[p]).length).length;
+  if (!totalPayers) {
+    wrap.innerHTML = `<div class="comp-rate-empty">No comprehensive rates loaded yet.<br><span style="font-size:.78rem;">Download the template above, fill in your contracted rates, and upload.</span></div>`;
+    return;
+  }
+  if (!payer || !compRates[payer]) {
+    wrap.innerHTML = `<div class="comp-rate-empty">Select a payer tab above.</div>`;
+    return;
+  }
+
+  const pal = PAYER_CONTRACT_COLORS[payer] || {accent:'#334155',light:'#f8fafc'};
+  const payerRates = compRates[payer] || {};
+
+  // Build rows: all CPT_CODES ordered by category, filtered by search
+  let rows = CPT_CODES.filter(c => {
+    if (!q) return true;
+    return (c.code + ' ' + c.short + ' ' + c.desc + ' ' + c.cat + ' ' + c.keywords).toLowerCase().includes(q);
+  });
+
+  // Sort: codes with rates first (by category), then codes without rates
+  const withRate = rows.filter(c => payerRates[c.code] != null);
+  const withoutRate = rows.filter(c => payerRates[c.code] == null);
+
+  // Group with-rate rows by category
+  const cats = [...new Set(withRate.map(c => c.cat))];
+  const grouped = cats.map(cat => withRate.filter(c => c.cat === cat));
+
+  const fmt$ = v => v == null ? '—' : '$' + Number(v).toLocaleString('en-US', {minimumFractionDigits:2,maximumFractionDigits:2});
+
+  let tableRows = '';
+
+  // Rows WITH rates — grouped by category
+  cats.forEach((cat, gi) => {
+    const catRows = grouped[gi];
+    tableRows += `<tr><td colspan="5" style="background:#ede9fe;padding:5px 12px;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#5b21b6;border-bottom:1px solid #ddd6fe;">${cat} <span style="opacity:.6;">(${catRows.length})</span></td></tr>`;
+    catRows.forEach(c => {
+      const rateData = payerRates[c.code];
+      const isCore = CORE_DASHBOARD_CPTS.includes(c.code);
+      const effDate = rateData.effective_date ? `<span style="font-size:.65rem;color:#94a3b8;display:block;">${rateData.effective_date}</span>` : '';
+      tableRows += `<tr class="${isCore ? 'is-core' : ''}">
+        <td class="crt-code">${c.code}${isCore ? ' <span style="font-size:.6rem;color:#166534;">★</span>' : ''}</td>
+        <td><div class="crt-short">${c.short}</div><div class="crt-cat">${c.sub}</div></td>
+        <td style="font-size:.7rem;color:#64748b;white-space:nowrap;">${c.tag}</td>
+        <td class="right">${fmt$(rateData.allowed_amount)}${effDate}</td>
+      </tr>`;
+    });
+  });
+
+  // Rows WITHOUT rates (dimmed, collapsed) — only show if no search query
+  if (!q && withoutRate.length) {
+    tableRows += `<tr id="no-rate-toggle-row"><td colspan="5" style="padding:8px 12px;background:#f8fafc;border-top:1px solid #e2e8f0;">
+      <button onclick="toggleNoRateRows()" style="background:none;border:none;color:#94a3b8;font-size:.73rem;cursor:pointer;font-weight:600;">
+        ▸ Show ${withoutRate.length} codes with no rate loaded
+      </button></td></tr>`;
+    tableRows += `<tbody id="no-rate-rows" style="display:none;">`;
+    withoutRate.forEach(c => {
+      tableRows += `<tr style="opacity:.45;">
+        <td class="crt-code">${c.code}</td>
+        <td><div class="crt-short">${c.short}</div><div class="crt-cat">${c.sub}</div></td>
+        <td style="font-size:.7rem;color:#94a3b8;">${c.tag}</td>
+        <td class="missing">—</td>
+      </tr>`;
+    });
+    tableRows += `</tbody>`;
+  }
+
+  if (!tableRows && q) {
+    wrap.innerHTML = `<div class="comp-rate-empty">No codes match "${q}".</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table class="comp-rate-table">
+    <thead><tr>
+      <th style="width:80px;">CPT Code</th>
+      <th>Description</th>
+      <th style="width:100px;">Type</th>
+      <th class="right" style="width:110px;">Contracted Rate</th>
+    </tr></thead>
+    <tbody>${tableRows}</tbody>
+  </table>`;
+}
+
+function toggleNoRateRows() {
+  const el = document.getElementById('no-rate-rows');
+  const btn = document.querySelector('#no-rate-toggle-row button');
+  if (!el || !btn) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? '' : 'none';
+  btn.textContent = hidden
+    ? '▾ Hide codes with no rate loaded'
+    : `▸ Show ${el.querySelectorAll('tr').length} codes with no rate loaded`;
+}
+
+function updateCompRateSummary() {
+  const summaryEl = document.getElementById('comp-rate-summary');
+  const payersWithData = CANONICAL_PAYERS.filter(p => compRates[p] && Object.keys(compRates[p]).length);
+  if (!payersWithData.length) { summaryEl.style.display = 'none'; return; }
+
+  const totalRates = payersWithData.reduce((sum, p) => sum + Object.keys(compRates[p]).length, 0);
+  const lastUpload = localStorage.getItem(COMP_RATES_KEY + '_date') || 'unknown';
+
+  summaryEl.style.display = 'flex';
+  summaryEl.innerHTML = `
+    <div class="comp-rate-stat"><span>${payersWithData.length}</span> payers loaded</div>
+    <div class="comp-rate-stat"><span>${totalRates}</span> total rates</div>
+    <div class="comp-rate-stat"><span>${payersWithData.map(p => Object.keys(compRates[p]).length + ' ' + p.split(' ')[0]).join(' · ')}</span></div>
+  `;
+  localStorage.setItem(COMP_RATES_KEY + '_date', new Date().toLocaleDateString());
+}
+
+// ── Keep old buildPayerRateCards (now unused, kept for compat) ────────
+function buildPayerRateCards() { /* replaced by comprehensive rate table */ }
+
+function syncPayerRateCards() {
+  // Merge dashboard API rates into comprehensive rate store (does NOT overwrite uploaded rates)
+  if (!dashboardData.length) return;
+  let changed = false;
+  CANONICAL_PAYERS.forEach(payer => {
+    CORE_DASHBOARD_CPTS.forEach(code => {
+      const match = dashboardData.find(r => canonicalizePayer(r.payer_name) === payer && r.cpt_code === code);
+      if (match && match.payer_allowed != null) {
+        if (!compRates[payer]) compRates[payer] = {};
+        // Only set if not already present from a CSV upload (CSV upload takes priority)
+        if (!compRates[payer][code]) {
+          compRates[payer][code] = { allowed_amount: match.payer_allowed, effective_date: '' };
+          changed = true;
+        }
+      }
+    });
+  });
+  if (changed) {
+    saveCompRatesToStorage();
+    buildCompRatePayerTabs();
+    renderCompRateTable();
+    updateCompRateSummary();
+  }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+initExplorer();
+loadAll();
+loadChannelComparison();
+</script>
+</body>
+</html>

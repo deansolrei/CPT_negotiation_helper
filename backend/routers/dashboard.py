@@ -40,7 +40,7 @@ def _set_locality(cur, state: str):
 
 # ── Full Dashboard ────────────────────────────────────────────
 
-@router.get("/dashboard", response_model=list[DashboardRow])
+@router.get("/dashboard")
 def get_dashboard(
     payer_id: int = None,
     underpaid_only: bool = False,
@@ -78,7 +78,7 @@ def get_dashboard(
 
 # ── Payer Summary ─────────────────────────────────────────────
 
-@router.get("/dashboard/summary", response_model=list[DashboardSummaryRow])
+@router.get("/dashboard/summary")
 def get_dashboard_summary(
     payer_id: int = None,
     state: str = Query(default="FL", description="Two-letter state code for Medicare benchmark"),
