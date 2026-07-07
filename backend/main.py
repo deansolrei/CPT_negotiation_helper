@@ -44,7 +44,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -68,6 +68,10 @@ app.include_router(best_channel.router)
 os.makedirs(ASSETS_PATH, exist_ok=True)
 app.mount("/assets", StaticFiles(directory=ASSETS_PATH), name="assets")
 
+
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(rest_of_path: str):
+    return {}
 
 @app.get("/dashboard", tags=["Dashboard"], include_in_schema=False)
 def serve_dashboard():
