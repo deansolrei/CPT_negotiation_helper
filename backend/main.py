@@ -19,7 +19,11 @@ from fastapi.staticfiles import StaticFiles
 from backend.routers import payers, contracts, fee_schedules, dashboard, letters, intermediaries
 from backend.routers import sheets_sync
 from backend.routers import medicare_import
+from backend.routers import best_channel
+from backend.routers import best_channel
 from backend.routers import medicare_import
+from backend.routers import best_channel
+from backend.routers import best_channel
 
 # Paths relative to this file
 _APP_ROOT      = os.path.dirname(os.path.dirname(__file__))
@@ -53,7 +57,11 @@ app.include_router(letters.router)
 app.include_router(intermediaries.router)
 app.include_router(sheets_sync.router)
 app.include_router(medicare_import.router)
+app.include_router(best_channel.router)
+app.include_router(best_channel.router)
 app.include_router(medicare_import.router)
+app.include_router(best_channel.router)
+app.include_router(best_channel.router)
 
 
 # Serve static assets (logo, etc.) — mount AFTER routers so /api routes take priority
