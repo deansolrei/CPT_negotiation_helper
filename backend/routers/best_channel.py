@@ -92,11 +92,31 @@ def get_best_channel(
 ):
     state_upper = (state or "FL").upper()
     cpt_list = [c.strip() for c in cpts.split(",") if c.strip()] or ["99214"]
+    n_lower = carrier.lower()
+    is_blue_cross = any(x in n_lower for x in [
+        "blue cross", "blue shield", "bcbs", "anthem", "carefirst",
+        "premera", "regence", "wellmark", "independence blue", "florida blue"
+    ])
     canonical = _resolve_carrier(carrier, state_upper)
+    # Detect Blue Cross family even if no specific canonical match
+    n_lower = carrier.lower()
+    is_blue_cross = any(x in n_lower for x in [
+        "blue cross", "blue shield", "bcbs", "anthem", "carefirst",
+        "premera", "regence", "wellmark", "independence blue", "florida blue"
+    ])
+
     if not canonical:
+        if is_blue_cross:
+            return {
+                "canonical_payer": None, "state": state_upper, "cpt_results": [],
+                "overall_best_channel": "Clinic Submit",
+                "mapped": False, "raw_carrier": carrier,
+                "default_reason": "Blue Cross plan — no intermediary rates on file. Submit directly.",
+                "show_default": True,
+            }
         return {"canonical_payer": None, "state": state_upper, "cpt_results": [],
                 "overall_best_channel": None, "mapped": False, "raw_carrier": carrier,
-                "note": "Carrier not mapped"}
+                "note": "Carrier not mapped — check CPT Dashboard"}
     with get_db() as cur:
         cur.execute("""
             WITH
@@ -124,6 +144,26 @@ def get_best_channel(
         """, (canonical,state_upper,canonical,state_upper,canonical,state_upper,
                 canonical,state_upper,state_upper,cpt_list))
         rows = cur.fetchall()
+    # If no rates found for a mapped Blue Cross payer → default to Clinic Submit
+    if not rows and is_blue_cross:
+        return {
+            "canonical_payer": canonical, "state": state_upper, "cpt_results": [],
+            "overall_best_channel": "Clinic Submit",
+            "mapped": True, "raw_carrier": carrier,
+            "default_reason": "No intermediary rates on file for this Blue Cross plan in " + state_upper + ". Submit directly via Clinic Submit.",
+            "show_default": True,
+        }
+
+    # If no rates found for any payer → default to Clinic Submit
+    if not rows:
+        return {
+            "canonical_payer": canonical, "state": state_upper, "cpt_results": [],
+            "overall_best_channel": "Clinic Submit",
+            "mapped": True, "raw_carrier": carrier,
+            "default_reason": "No intermediary rates on file for " + (canonical or carrier) + " in " + state_upper + ". Submit directly via Clinic Submit.",
+            "show_default": True,
+        }
+
     cpt_results, channel_votes = [], {}
     for row in rows:
         rates = {"Clinic Submit":row["clinic_rate"],"Headway":row["headway_rate"],
