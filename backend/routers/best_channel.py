@@ -64,6 +64,10 @@ BCBS_BY_STATE = {
     "WA": "Regence Blue Shield Washington", "WY": "Blue Cross",
 }
 
+# Map CRB provID to CPT Dashboard provider tag
+PROV_MAP = {"jodene": "JJ", "katie": "KR", "lori": "LK", "megan": ""}
+
+
 def _resolve_carrier(carrier_name, state):
     if not carrier_name: return None
     n = carrier_name.lower().strip()
@@ -84,26 +88,26 @@ def _resolve_carrier(carrier_name, state):
             return BCBS_BY_STATE.get(state.upper(), "Blue Cross") if r is None else r
     return None
 
+
 @router.get("/best-channel")
 def get_best_channel(
     carrier: str = Query(...),
     state: str = Query(default="FL"),
     cpts: str = Query(default="99214"),
+    provider: str = Query(default=""),
 ):
     state_upper = (state or "FL").upper()
     cpt_list = [c.strip() for c in cpts.split(",") if c.strip()] or ["99214"]
+    # Remove duplicates while preserving order
+    seen = set()
+    cpt_list = [c for c in cpt_list if not (c in seen or seen.add(c))]
+
     n_lower = carrier.lower()
     is_blue_cross = any(x in n_lower for x in [
         "blue cross", "blue shield", "bcbs", "anthem", "carefirst",
         "premera", "regence", "wellmark", "independence blue", "florida blue"
     ])
     canonical = _resolve_carrier(carrier, state_upper)
-    # Detect Blue Cross family even if no specific canonical match
-    n_lower = carrier.lower()
-    is_blue_cross = any(x in n_lower for x in [
-        "blue cross", "blue shield", "bcbs", "anthem", "carefirst",
-        "premera", "regence", "wellmark", "independence blue", "florida blue"
-    ])
 
     if not canonical:
         if is_blue_cross:
@@ -117,34 +121,78 @@ def get_best_channel(
         return {"canonical_payer": None, "state": state_upper, "cpt_results": [],
                 "overall_best_channel": None, "mapped": False, "raw_carrier": carrier,
                 "note": "Carrier not mapped — check CPT Dashboard"}
+
+    # Map provider param to tag (JJ / KR / LK / empty)
+    prov_tag = PROV_MAP.get(provider.lower().strip(), provider.upper().strip())
+
+    # Provider filter clause:
+    # - If prov_tag is set: return rows where provider matches OR provider is NULL/empty (COMMON rates)
+    # - If no prov_tag: return all rows (no filter)
+    if prov_tag:
+        prov_filter = "AND (ir.provider IS NULL OR ir.provider = '' OR ir.provider = %s)"
+    else:
+        prov_filter = "AND (1=1 OR %s IS NULL)"  # always true, param ignored
+
     with get_db() as cur:
-        cur.execute("""
+        cur.execute(f"""
             WITH
-            sbh AS (SELECT ir.cpt_code, ir.allowed_amount AS clinic_rate
-                FROM intermediary_rates ir JOIN intermediaries i ON ir.intermediary_id=i.intermediary_id
-                WHERE i.name='SBH' AND ir.payer_name=%s AND ir.state=%s),
-            headway AS (SELECT ir.cpt_code, ir.allowed_amount AS headway_rate
-                FROM intermediary_rates ir JOIN intermediaries i ON ir.intermediary_id=i.intermediary_id
-                WHERE i.name='Headway' AND ir.payer_name=%s AND ir.state=%s),
-            alma AS (SELECT ir.cpt_code, ir.allowed_amount AS alma_rate
-                FROM intermediary_rates ir JOIN intermediaries i ON ir.intermediary_id=i.intermediary_id
-                WHERE i.name='Alma' AND ir.payer_name=%s AND ir.state=%s),
-            grow AS (SELECT ir.cpt_code, ir.allowed_amount AS grow_rate
-                FROM intermediary_rates ir JOIN intermediaries i ON ir.intermediary_id=i.intermediary_id
-                WHERE i.name='Grow Therapy' AND ir.payer_name=%s AND ir.state=%s),
-            medicare AS (SELECT cpt_code, allowed_amount AS medicare_rate
+            sbh AS (
+                SELECT ir.cpt_code, MAX(ir.allowed_amount) AS clinic_rate
+                FROM intermediary_rates ir
+                JOIN intermediaries i ON ir.intermediary_id = i.intermediary_id
+                WHERE i.name = 'SBH' AND ir.payer_name = %s AND ir.state = %s
+                {prov_filter}
+                GROUP BY ir.cpt_code
+            ),
+            headway AS (
+                SELECT ir.cpt_code, MAX(ir.allowed_amount) AS headway_rate
+                FROM intermediary_rates ir
+                JOIN intermediaries i ON ir.intermediary_id = i.intermediary_id
+                WHERE i.name = 'Headway' AND ir.payer_name = %s AND ir.state = %s
+                {prov_filter}
+                GROUP BY ir.cpt_code
+            ),
+            alma AS (
+                SELECT ir.cpt_code, MAX(ir.allowed_amount) AS alma_rate
+                FROM intermediary_rates ir
+                JOIN intermediaries i ON ir.intermediary_id = i.intermediary_id
+                WHERE i.name = 'Alma' AND ir.payer_name = %s AND ir.state = %s
+                {prov_filter}
+                GROUP BY ir.cpt_code
+            ),
+            grow AS (
+                SELECT ir.cpt_code, MAX(ir.allowed_amount) AS grow_rate
+                FROM intermediary_rates ir
+                JOIN intermediaries i ON ir.intermediary_id = i.intermediary_id
+                WHERE i.name = 'Grow Therapy' AND ir.payer_name = %s AND ir.state = %s
+                {prov_filter}
+                GROUP BY ir.cpt_code
+            ),
+            medicare AS (
+                SELECT cpt_code, allowed_amount AS medicare_rate
                 FROM benchmark_fee_schedule
-                WHERE source_name='Medicare 2026' AND effective_year=2026 AND locality=%s)
-            SELECT COALESCE(s.cpt_code,h.cpt_code,a.cpt_code,g.cpt_code) AS cpt_code,
+                WHERE source_name = 'Medicare 2026' AND effective_year = 2026 AND locality = %s
+            )
+            SELECT
+                COALESCE(s.cpt_code, h.cpt_code, a.cpt_code, g.cpt_code) AS cpt_code,
                 s.clinic_rate, h.headway_rate, a.alma_rate, g.grow_rate, m.medicare_rate
-            FROM sbh s FULL JOIN headway h USING(cpt_code) FULL JOIN alma a USING(cpt_code)
-            FULL JOIN grow g USING(cpt_code) FULL JOIN medicare m USING(cpt_code)
-            WHERE COALESCE(s.cpt_code,h.cpt_code,a.cpt_code,g.cpt_code)=ANY(%s)
+            FROM sbh s
+            FULL JOIN headway h USING (cpt_code)
+            FULL JOIN alma    a USING (cpt_code)
+            FULL JOIN grow    g USING (cpt_code)
+            FULL JOIN medicare m USING (cpt_code)
+            WHERE COALESCE(s.cpt_code, h.cpt_code, a.cpt_code, g.cpt_code) = ANY(%s)
             ORDER BY cpt_code
-        """, (canonical,state_upper,canonical,state_upper,canonical,state_upper,
-                canonical,state_upper,state_upper,cpt_list))
+        """, (
+            canonical, state_upper, prov_tag,  # sbh
+            canonical, state_upper, prov_tag,  # headway
+            canonical, state_upper, prov_tag,  # alma
+            canonical, state_upper, prov_tag,  # grow
+            state_upper,                        # medicare
+            cpt_list,
+        ))
         rows = cur.fetchall()
-    # If no rates found for a mapped Blue Cross payer → default to Clinic Submit
+
     if not rows and is_blue_cross:
         return {
             "canonical_payer": canonical, "state": state_upper, "cpt_results": [],
@@ -153,31 +201,46 @@ def get_best_channel(
             "default_reason": "No intermediary rates on file for this Blue Cross plan in " + state_upper + ". Submit directly via Clinic Submit.",
             "show_default": True,
         }
-
-    # If no rates found for any payer → default to Clinic Submit
     if not rows:
         return {
             "canonical_payer": canonical, "state": state_upper, "cpt_results": [],
             "overall_best_channel": "Clinic Submit",
             "mapped": True, "raw_carrier": carrier,
-            "default_reason": "No intermediary rates on file for " + (canonical or carrier) + " in " + state_upper + ". Submit directly via Clinic Submit.",
+            "default_reason": "No rates on file for " + (canonical or carrier) + " in " + state_upper + ".",
             "show_default": True,
         }
 
     cpt_results, channel_votes = [], {}
     for row in rows:
-        rates = {"Clinic Submit":row["clinic_rate"],"Headway":row["headway_rate"],
-                 "Alma":row["alma_rate"],"Grow Therapy":row["grow_rate"]}
-        available = {k:v for k,v in rates.items() if v is not None}
+        rates = {
+            "Clinic Submit": row["clinic_rate"],
+            "Headway":       row["headway_rate"],
+            "Alma":          row["alma_rate"],
+            "Grow Therapy":  row["grow_rate"],
+        }
+        available = {k: v for k, v in rates.items() if v is not None}
         best = max(available, key=available.get) if available else None
-        if best: channel_votes[best] = channel_votes.get(best,0)+1
-        pct = round(row["clinic_rate"]/row["medicare_rate"]*100,1) if row["clinic_rate"] and row["medicare_rate"] else None
-        cpt_results.append({"cpt_code":row["cpt_code"],"clinic_rate":row["clinic_rate"],
-            "headway_rate":row["headway_rate"],"alma_rate":row["alma_rate"],
-            "grow_rate":row["grow_rate"],"medicare_rate":row["medicare_rate"],
-            "pct_of_medicare":pct,"best_channel":best,
-            "best_rate":available.get(best),"clinic_is_best":best=="Clinic Submit"})
-    overall_best = max(channel_votes,key=channel_votes.get) if channel_votes else None
-    return {"canonical_payer":canonical,"state":state_upper,"cpt_results":cpt_results,
-            "overall_best_channel":overall_best,"channel_vote_counts":channel_votes,
-            "mapped":True,"raw_carrier":carrier}
+        if best: channel_votes[best] = channel_votes.get(best, 0) + 1
+        pct = round(row["clinic_rate"] / row["medicare_rate"] * 100, 1) if row["clinic_rate"] and row["medicare_rate"] else None
+        cpt_results.append({
+            "cpt_code":        row["cpt_code"],
+            "clinic_rate":     row["clinic_rate"],
+            "headway_rate":    row["headway_rate"],
+            "alma_rate":       row["alma_rate"],
+            "grow_rate":       row["grow_rate"],
+            "medicare_rate":   row["medicare_rate"],
+            "pct_of_medicare": pct,
+            "best_channel":    best,
+            "best_rate":       available.get(best),
+            "clinic_is_best":  best == "Clinic Submit",
+        })
+    overall_best = max(channel_votes, key=channel_votes.get) if channel_votes else None
+    return {
+        "canonical_payer":      canonical,
+        "state":               state_upper,
+        "cpt_results":         cpt_results,
+        "overall_best_channel": overall_best,
+        "channel_vote_counts":  channel_votes,
+        "mapped":              True,
+        "raw_carrier":         carrier,
+    }
